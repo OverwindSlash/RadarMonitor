@@ -1,0 +1,155 @@
+﻿<Window x:Class="RadarMonitor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RadarMonitor"
+        xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
+        mc:Ignorable="d"
+        Title="CloudSense Radar Monitor (Evaluation Version)" Height="1000" Width="1600" Icon="Assets/Logo.png"
+        Loaded="MainWindow_OnLoaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <!--菜单栏-->
+        <DockPanel Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Dock="Top">
+            <Menu>
+                <MenuItem Header="_Enc">
+                    <MenuItem Name="LoadEnc" Header="_Load Enc..." Click="LoadEnc_OnClick"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="_Radar">
+                    <MenuItem Name="ConnectRadar" Header="_Source..." Click="ConnectRadar_OnClick"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="_Config">
+                    <MenuItem Header="_Display Control"></MenuItem>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+        <!--工作区-->
+        <esri:MapView Name="BaseMapView" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3"
+                      ViewpointChanged="BaseMapView_OnViewpointChanged" MouseMove="BaseMapView_OnMouseMove"></esri:MapView>
+        <Canvas Name="RingsOverlay" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3"></Canvas>
+        <Canvas Name="EchoOverlay" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3"></Canvas>
+        <Canvas Name="ScaleOverlay" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="300" Height="50" Margin="20, 0, 0, 70"></Canvas>
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Width="Auto" DockPanel.Dock="Right" Margin="6, 3, 6, 3">
+            <GroupBox Header="View">
+                <Grid HorizontalAlignment="Center" Width="Auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Button Name="BtnUpperLeft" Width="30" Height="30" Grid.Row="0" Grid.Column="0" ToolTip="Upper-Left" IsEnabled="{Binding Path=IsEncLoaded}"
+                            Click="BtnUpperLeft_OnClick">
+                        <Image Source="assets/UpLeft.png"></Image>
+                    </Button>
+                    <Button Name="BtnUp" Width="30" Height="30" Grid.Row="0" Grid.Column="1" ToolTip="Up" IsEnabled="{Binding Path=IsEncLoaded}"
+                            Click="BtnUp_OnClick">
+                        <Image Source="assets/Up.png"></Image>
+                    </Button>
+                    <Button Name="BtnUpperRight" Width="30" Height="30" Grid.Row="0" Grid.Column="2" ToolTip="Upper-Right" IsEnabled="{Binding Path=IsEncLoaded}"
+                            Click="BtnUpperRight_OnClick">
+                        <Image Source="assets/UpRight.png"></Image>
+                    </Button>
+                    <Button Name="BtnLeft" Width="30" Height="30" Grid.Row="1" Grid.Column="0" ToolTip="Left" IsEnabled="{Binding Path=IsEncLoaded}"
+                            Click="BtnLeft_OnClick">
+                        <Image Source="assets/Left.png"></Image>
+                    </Button>
+                    <Button Name="BtnCenter" Width="30" Height="30" Grid.Row="1" Grid.Column="1" ToolTip="Center" IsEnabled="{Binding Path=IsEncLoaded}"
+                            Click="BtnCenter_OnClick">
+                        <Image Source="assets/Center.png"></Image>
+                    </Button>
+                    <Button Name="BtnRight" Width="30" Height="30" Grid.Row="1" Grid.Column="2" ToolTip="Right" IsEnabled="{Binding Path=IsEncLoaded}"
+                            Click="BtnRight_OnClick">
+                        <Image Source="assets/Right.png"></Image>
+                    </Button>
+                    <Button Name="BtnLowerLeft" Width="30" Height="30" Grid.Row="2" Grid.Column="0" ToolTip="Lower-Left" IsEnabled="{Binding Path=IsEncLoaded}"
+                            Click="BtnLowerLeft_OnClick">
+                        <Image Source="assets/DownLeft.png"></Image>
+                    </Button>
+                    <Button Name="BtnDown" Width="30" Height="30" Grid.Row="2" Grid.Column="1" ToolTip="Down" IsEnabled="{Binding Path=IsEncLoaded}"
+                            Click="BtnDown_OnClick">
+                        <Image Source="assets/Down.png"></Image>
+                    </Button>
+                    <Button Name="BtnLowerRight" Width="30" Height="30" Grid.Row="2" Grid.Column="2" ToolTip="Lower-Right" IsEnabled="{Binding Path=IsEncLoaded}"
+                            Click="BtnLowerRight_OnClick">
+                        <Image Source="assets/DownRight.png"></Image>
+                    </Button>
+                    <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 5, 0, 0">
+                        <Button Name="BtnZoomIn" Width="30" Height="30" ToolTip="Zoom-In" Margin="0, 0, 5, 0" IsEnabled="{Binding Path=IsEncLoaded}"
+                                Click="BtnZoomIn_OnClick">
+                            <Image Source="assets/ZoomIn.png"></Image>
+                        </Button>
+                        <Button Name="BtnZoomOut" Width="30" Height="30" ToolTip="Zoom-Out" Margin="5, 0, 0, 0" IsEnabled="{Binding Path=IsEncLoaded}"
+                                Click="BtnZoomOut_OnClick">
+                            <Image Source="assets/ZoomOut.png"></Image>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Preset Locations" Width="Auto">
+                <StackPanel Orientation="Vertical">
+                    <Button Name="BtnPresetLocation1" Content="Location 1" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsEncLoaded}" Click="BtnPresetLocation1_OnClick"></Button>
+                    <Button Name="BtnPresetLocation2" Content="Location 2" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsEncLoaded}" Click="BtnPresetLocation2_OnClick"></Button>
+                    <Button Name="BtnPresetLocation3" Content="Location 3" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsEncLoaded}" Click="BtnPresetLocation3_OnClick"></Button>
+                    <Button Name="BtnPresetLocation4" Content="Location 4" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsEncLoaded}" Click="BtnPresetLocation4_OnClick"></Button>
+                    <Button Name="BtnPresetLocation5" Content="Location 5" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsEncLoaded}" Click="BtnPresetLocation5_OnClick"></Button>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Layer" Width="Auto">
+                <StackPanel Orientation="Vertical">
+                    <CheckBox Name="DisplayEcho" Content="Display Echo" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsEchoDisplayed}" 
+                              Click="DisplayEcho_OnClick"></CheckBox>
+                    <CheckBox Name="DisplayRings" Content="Display Rings" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsRingsDisplayed}" 
+                              Click="DisplayRings_OnClick"></CheckBox>
+                    <CheckBox Name="DisplayEnc" Content="Display Enc" IsEnabled="{Binding Path=IsEncLoaded}" IsChecked="{Binding Path=IsEncDisplayed}" 
+                              Click="DisplayEnc_OnClick"></CheckBox>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Cursor" Width="Auto">
+                <StackPanel Orientation="Vertical">
+                    <Label Name="CursorLongitude" ToolTip="Longitude"  Content="Lon:"/>
+                    <Label Name="CursorLatitude" ToolTip="Latitude" Content="Lat:"/>
+                    <Label Name="CursorDistance" ToolTip="Distance" Content="D:"/>
+                    <Label Name="CursorAzimuth" ToolTip="Azimuth" Content="A:"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Radar Info" Width="Auto">
+                <StackPanel Orientation="Vertical">
+                    <Label ToolTip="Start Azimuth" Content="SA:"></Label>
+                    <Label ToolTip="End Azimuth" Content="EA:"></Label>
+                    <Label ToolTip="Start Range" Content="SR:"></Label>
+                    <Label ToolTip="Start Range" Content="SR:"></Label>
+                    <Label ToolTip="Cell Duration" Content="CD:"></Label>
+                    <Label ToolTip="Compression Indicator" Content="CI:"></Label>
+                    <Label ToolTip="Cells Resolution" Content="CR:"></Label>
+                    <Label ToolTip="Cells Count" Content="CC:"></Label>
+                    <Label ToolTip="VideoBlock Count" Content="VC:"></Label>
+                </StackPanel>
+            </GroupBox>
+            <Image Source="assets/CloudSense.png" Width="100" Stretch="Fill" Margin="0, 10, 0, 0"></Image>
+        </StackPanel>
+        <!--状态栏-->
+        <StatusBar Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0">
+            <StatusBarItem>
+                <Label Content="Initialization done."></Label>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <Label Content="All rights reserved. CloudSense 2023"></Label>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

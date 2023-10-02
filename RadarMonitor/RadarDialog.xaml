@@ -1,0 +1,74 @@
+﻿<Window x:Class="RadarMonitor.RadarDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RadarMonitor"
+        mc:Ignorable="d"
+        Title="Radar Dialog" Height="320" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Icon="Assets/RadarSettings.png">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0" Header="Preset Radars" Margin="5">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Name="BtnLoadPreset1" Content="1" Width="20" Height="20" Margin="5, 0, 5, 0" Click="BtnLoadPreset1_Click"></Button>
+                <Button Name="BtnLoadPreset2" Content="2" Width="20" Height="20" Margin="5, 0, 5, 0" Click="BtnLoadPreset2_Click"></Button>
+                <Button Name="BtnLoadPreset3" Content="3" Width="20" Height="20" Margin="5, 0, 5, 0" Click="BtnLoadPreset3_Click"></Button>
+                <Button Name="BtnLoadPreset4" Content="4" Width="20" Height="20" Margin="5, 0, 5, 0" Click="BtnLoadPreset4_Click"></Button>
+                <Button Name="BtnLoadPreset5" Content="5" Width="20" Height="20" Margin="5, 0, 5, 0" Click="BtnLoadPreset5_Click"></Button>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Header="Radar Location" Margin="5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" Content="Longitude:" Margin="10,10,5,5" HorizontalAlignment="Right"></Label>
+                <TextBox Name="TbLongitude" Grid.Row="0" Grid.Column="1" Margin="5, 10, 5, 5" Height="20" HorizontalAlignment="Stretch" 
+                 Text="{Binding Longitude, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <Label Grid.Row="0" Grid.Column="2" Content="(-180~180)" Margin="5,10,5,5" HorizontalAlignment="Left"></Label>
+                <Label Grid.Row="1" Grid.Column="0" Content="Latitude:" Margin="10,5,5,10" HorizontalAlignment="Right"></Label>
+                <TextBox Name="TbLatitude" Grid.Row="1" Grid.Column="1" Margin="5, 5, 5, 10" Height="20" HorizontalAlignment="Stretch"
+                 Text="{Binding Latitude, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <Label Grid.Row="1" Grid.Column="2" Content="(-90~90)" Margin="5,5,5,10" HorizontalAlignment="Left"></Label>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="2" Header="CAT-240 IP Address" Margin="5">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="IP:" VerticalAlignment="Center" Margin="10, 5, 0, 5"></Label>
+                <TextBox Name="TbIp1" Width="40" Height="20" VerticalAlignment="Center" 
+                 Text="{Binding IpPart1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <Label Content="." VerticalAlignment="Center"></Label>
+                <TextBox Name="TbIp2" Width="40" Height="20" VerticalAlignment="Center" 
+                 Text="{Binding IpPart2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <Label Content="." VerticalAlignment="Center"></Label>
+                <TextBox Name="TbIp3" Width="40" Height="20" VerticalAlignment="Center" 
+                 Text="{Binding IpPart3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <Label Content="." VerticalAlignment="Center"></Label>
+                <TextBox Name="TbIp4" Width="40" Height="20" VerticalAlignment="Center" 
+                 Text="{Binding IpPart4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <Label Content="Port:" VerticalAlignment="Center" Margin="20, 5, 0, 5"></Label>
+                <TextBox Name="TbPort" Width="60" Height="20" VerticalAlignment="Center" 
+                 Text="{Binding Port, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+            </StackPanel>
+        </GroupBox>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button Name="BtnOk" Grid.Column="0" Content="OK" Width="60" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" Click="BtnOK_Click"></Button>
+            <Button Name="BtnCancel" Grid.Column="1" Content="Cancel" Width="60" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" Click="BtnCancel_Click"></Button>
+        </Grid>
+    </Grid>
+</Window>
