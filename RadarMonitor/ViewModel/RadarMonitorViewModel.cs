@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using CAT240Parser;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -41,6 +42,9 @@ namespace RadarMonitor.ViewModel
 
         private double _radarLongitude;
         private double _radarLatitude;
+
+        private string _radarIpAddress;
+        private int _radarPort;
 
         public bool IsEncLoaded
         {
@@ -114,8 +118,27 @@ namespace RadarMonitor.ViewModel
             }
         }
 
+        public string RadarIpAddress
+        {
+            get => _radarIpAddress;
+            set
+            {
+                SetField(ref _radarIpAddress, value, "RadarIpAddress");
+            }
+        }
+
+        public int RadarPort
+        {
+            get => _radarPort;
+            set
+            {
+                SetField(ref _radarPort, value, "RadarPort");
+            }
+        }
+
         public RadarMonitorViewModel()
         {
+            _radarIpAddress = string.Empty;
             try
             {
                 LoadPresetLocations();
@@ -145,6 +168,11 @@ namespace RadarMonitor.ViewModel
             }
 
             return _presetLocations[index];
+        }
+
+        public void CaptureCat240NetworkPackage()
+        {
+            
         }
     }
 }

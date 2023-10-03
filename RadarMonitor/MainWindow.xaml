@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RadarMonitor"
         xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
+        xmlns:sampleGL="clr-namespace:Silk.WPF.OpenGL.Sample;assembly=Silk.WPF"
         mc:Ignorable="d"
         Title="CloudSense Radar Monitor (Evaluation Version)" Height="1000" Width="1600" Icon="Assets/Logo.png"
         Loaded="MainWindow_OnLoaded">
@@ -37,7 +38,8 @@
             <esri:MapView Name="BaseMapView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3"
                           ViewpointChanged="BaseMapView_OnViewpointChanged" MouseMove="BaseMapView_OnMouseMove"></esri:MapView>
             <Canvas Name="RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
-            <Canvas Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
+            <sampleGL:ExampleScene Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"/>
+            <!-- <Canvas Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas> -->
             <Canvas Name="ScaleOverlay" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="300" Height="50" Margin="20, 0, 0, 70" IsHitTestVisible="False"></Canvas>
         </Grid>
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Width="Auto" DockPanel.Dock="Right" Margin="3, 3, 6, 3" ZIndex="1" Background="White">

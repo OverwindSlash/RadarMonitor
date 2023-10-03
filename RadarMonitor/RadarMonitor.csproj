@@ -111,4 +111,9 @@
     <PackageReference Include="YamlDotNet" Version="13.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CAT240Parser\CAT240Parser.csproj" />
+    <ProjectReference Include="..\Silk.OpenGL.WPF\Silk.WPF.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -3,18 +3,44 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadarMonitor", "RadarMonitor\RadarMonitor.csproj", "{5988EA8D-AF46-4FD7-8A5C-1FE685033287}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadarMonitor", "RadarMonitor\RadarMonitor.csproj", "{5988EA8D-AF46-4FD7-8A5C-1FE685033287}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CAT240Parser", "CAT240Parser\CAT240Parser.csproj", "{4FCF8D2C-465E-4075-8286-30361FE74594}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Silk.WPF", "Silk.OpenGL.WPF\Silk.WPF.csproj", "{F558C536-FBE3-4F0B-9435-09AE1CDC5F07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{5988EA8D-AF46-4FD7-8A5C-1FE685033287}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5988EA8D-AF46-4FD7-8A5C-1FE685033287}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5988EA8D-AF46-4FD7-8A5C-1FE685033287}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5988EA8D-AF46-4FD7-8A5C-1FE685033287}.Debug|x64.Build.0 = Debug|Any CPU
 		{5988EA8D-AF46-4FD7-8A5C-1FE685033287}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5988EA8D-AF46-4FD7-8A5C-1FE685033287}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5988EA8D-AF46-4FD7-8A5C-1FE685033287}.Release|x64.ActiveCfg = Release|Any CPU
+		{5988EA8D-AF46-4FD7-8A5C-1FE685033287}.Release|x64.Build.0 = Release|Any CPU
+		{4FCF8D2C-465E-4075-8286-30361FE74594}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FCF8D2C-465E-4075-8286-30361FE74594}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FCF8D2C-465E-4075-8286-30361FE74594}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4FCF8D2C-465E-4075-8286-30361FE74594}.Debug|x64.Build.0 = Debug|Any CPU
+		{4FCF8D2C-465E-4075-8286-30361FE74594}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FCF8D2C-465E-4075-8286-30361FE74594}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FCF8D2C-465E-4075-8286-30361FE74594}.Release|x64.ActiveCfg = Release|Any CPU
+		{4FCF8D2C-465E-4075-8286-30361FE74594}.Release|x64.Build.0 = Release|Any CPU
+		{F558C536-FBE3-4F0B-9435-09AE1CDC5F07}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{F558C536-FBE3-4F0B-9435-09AE1CDC5F07}.Debug|Any CPU.Build.0 = Debug|x64
+		{F558C536-FBE3-4F0B-9435-09AE1CDC5F07}.Debug|x64.ActiveCfg = Debug|x64
+		{F558C536-FBE3-4F0B-9435-09AE1CDC5F07}.Debug|x64.Build.0 = Debug|x64
+		{F558C536-FBE3-4F0B-9435-09AE1CDC5F07}.Release|Any CPU.ActiveCfg = Release|x64
+		{F558C536-FBE3-4F0B-9435-09AE1CDC5F07}.Release|Any CPU.Build.0 = Release|x64
+		{F558C536-FBE3-4F0B-9435-09AE1CDC5F07}.Release|x64.ActiveCfg = Release|x64
+		{F558C536-FBE3-4F0B-9435-09AE1CDC5F07}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -104,15 +104,23 @@ namespace RadarMonitor
 
             if (dialogResult == true)
             {
-                var settingsViewModel = (RadarSettingsViewModel)radarDialog.DataContext;
+                var settings = (RadarSettingsViewModel)radarDialog.DataContext;
 
+                // 获取雷达经纬度信息
                 var viewModel = (RadarMonitorViewModel)DataContext;
                 viewModel.IsRadarConnected = true;
-                viewModel.RadarLongitude = double.Parse(settingsViewModel.Longitude);
-                viewModel.RadarLatitude = double.Parse(settingsViewModel.Latitude);
+                viewModel.RadarLongitude = double.Parse(settings.Longitude);
+                viewModel.RadarLatitude = double.Parse(settings.Latitude);
 
                 viewModel.IsRingsDisplayed = true;
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
+
+                // 获取雷达网络信息
+                viewModel.RadarIpAddress =
+                    $"{settings.IpPart1}.{settings.IpPart2}.{settings.IpPart3}.{settings.IpPart4}";
+
+                // 测试雷达颜色
+                EchoOverlay.EchoColor = Colors.White;
             }
         }
 
@@ -144,10 +152,10 @@ namespace RadarMonitor
             if ((viewModel.RadarLongitude != 0.0) && (viewModel.RadarLatitude != 0.0))
             {
                 var distance = CalculateDistance(viewModel.RadarLongitude, viewModel.RadarLatitude, location.X, location.Y);
-                CursorDistance.Content = "D2R: " + distance.ToString("F2") + " KM";
+                CursorDistance.Content = "D2R:   " + distance.ToString("F2") + " KM";
 
                 var azimuth = CalculateAzimuth(viewModel.RadarLongitude, viewModel.RadarLatitude,location.X, location.Y);
-                CursorAzimuth.Content = "A2R: " + azimuth.ToString("F2") + "°";
+                CursorAzimuth.Content = "A2R:   " + azimuth.ToString("F2") + "°";
             }
         }
 
