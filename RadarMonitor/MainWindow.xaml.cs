@@ -123,6 +123,7 @@ namespace RadarMonitor
             viewModel.CurrentEncScale = mapView.MapScale;
 
             DrawScaleLine();
+            DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
         }
 
         private void BaseMapView_OnMouseMove(object sender, MouseEventArgs e)
@@ -219,7 +220,8 @@ namespace RadarMonitor
                     newCenterPoint = new MapPoint(centerPoint.X - moveUnit, centerPoint.Y, centerPoint.SpatialReference);
                     break;
                 case "Center":
-                    newCenterPoint = new MapPoint(centerPoint.X, centerPoint.Y, centerPoint.SpatialReference);
+                    var viewModel = (RadarMonitorViewModel)DataContext;
+                    newCenterPoint = new MapPoint(viewModel.RadarLongitude, viewModel.RadarLatitude, SpatialReferences.Wgs84);
                     break;
                 case "Right":
                     newCenterPoint = new MapPoint(centerPoint.X + moveUnit, centerPoint.Y, centerPoint.SpatialReference);

@@ -19,7 +19,7 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <!--菜单栏-->
-        <DockPanel Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Dock="Top">
+        <DockPanel Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Dock="Top" ZIndex="1">
             <Menu>
                 <MenuItem Header="_Enc">
                     <MenuItem Name="LoadEnc" Header="_Load Enc..." Click="LoadEnc_OnClick"></MenuItem>
@@ -33,12 +33,14 @@
             </Menu>
         </DockPanel>
         <!--工作区-->
-        <esri:MapView Name="BaseMapView" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3"
-                      ViewpointChanged="BaseMapView_OnViewpointChanged" MouseMove="BaseMapView_OnMouseMove"></esri:MapView>
-        <Canvas Name="RingsOverlay" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3"></Canvas>
-        <Canvas Name="EchoOverlay" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3"></Canvas>
-        <Canvas Name="ScaleOverlay" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="300" Height="50" Margin="20, 0, 0, 70"></Canvas>
-        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Width="Auto" DockPanel.Dock="Right" Margin="6, 3, 6, 3">
+        <Grid Grid.Row="1" Grid.Column="0" ZIndex="0">
+            <esri:MapView Name="BaseMapView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3"
+                          ViewpointChanged="BaseMapView_OnViewpointChanged" MouseMove="BaseMapView_OnMouseMove"></esri:MapView>
+            <Canvas Name="RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
+            <Canvas Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
+            <Canvas Name="ScaleOverlay" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="300" Height="50" Margin="20, 0, 0, 70" IsHitTestVisible="False"></Canvas>
+        </Grid>
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Width="Auto" DockPanel.Dock="Right" Margin="3, 3, 6, 3" ZIndex="1" Background="White">
             <GroupBox Header="View">
                 <Grid HorizontalAlignment="Center" Width="Auto">
                     <Grid.RowDefinitions>
