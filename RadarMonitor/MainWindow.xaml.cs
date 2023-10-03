@@ -52,7 +52,7 @@ namespace RadarMonitor
             _dpiX = 96;
             _dpiY = 96;
 
-            double adjustRatio = 1.1111;  // 为了让屏幕上实际显示的线段长度更准确而人为引入的调整参数
+            double adjustRatio = 1.173;  // 为了让屏幕上实际显示的线段长度更准确而人为引入的调整参数
 
             _dpcX = _dpiX / 2.54 * adjustRatio;
             _dpcY = _dpiY / 2.54 * adjustRatio;
@@ -139,6 +139,16 @@ namespace RadarMonitor
 
             CursorLongitude.Content = "Lon: " + location.X.ToString("F6");
             CursorLatitude.Content = "Lat:    " + location.Y.ToString("F6");
+
+            var viewModel = (RadarMonitorViewModel)DataContext;
+            if ((viewModel.RadarLongitude != 0.0) && (viewModel.RadarLatitude != 0.0))
+            {
+                var distance = CalculateDistance(viewModel.RadarLongitude, viewModel.RadarLatitude, location.X, location.Y);
+                CursorDistance.Content = "D2R: " + distance.ToString("F2") + " KM";
+
+                var azimuth = CalculateAzimuth(viewModel.RadarLongitude, viewModel.RadarLatitude,location.X, location.Y);
+                CursorAzimuth.Content = "A2R: " + azimuth.ToString("F2") + "°";
+            }
         }
 
         private void DisplayEcho_OnClick(object sender, RoutedEventArgs e)
@@ -221,7 +231,14 @@ namespace RadarMonitor
                     break;
                 case "Center":
                     var viewModel = (RadarMonitorViewModel)DataContext;
-                    newCenterPoint = new MapPoint(viewModel.RadarLongitude, viewModel.RadarLatitude, SpatialReferences.Wgs84);
+                    if ((viewModel.RadarLongitude != 0.0) && (viewModel.RadarLatitude != 0.0))
+                    {
+                        newCenterPoint = new MapPoint(viewModel.RadarLongitude, viewModel.RadarLatitude, SpatialReferences.Wgs84);
+                    }
+                    else
+                    {
+                        newCenterPoint = new MapPoint(centerPoint.X, centerPoint.Y, centerPoint.SpatialReference);
+                    }
                     break;
                 case "Right":
                     newCenterPoint = new MapPoint(centerPoint.X + moveUnit, centerPoint.Y, centerPoint.SpatialReference);
@@ -255,6 +272,56 @@ namespace RadarMonitor
 
             Viewpoint newViewpoint = new Viewpoint(mapPoint, newScale);
             BaseMapView.SetViewpoint(newViewpoint);
+        }
+
+        private double CalculateDistance(double lon1, double lat1, double lon2, double lat2)
+        {
+            lat1 = lat1 * (Math.PI / 180);
+            lon1 = lon1 * (Math.PI / 180);
+            lat2 = lat2 * (Math.PI / 180);
+            lon2 = lon2 * (Math.PI / 180);
+
+            double earthRadius = 6371.0; // 地球半径（以公里为单位）
+
+            double dlon = lon2 - lon1;
+            double dlat = lat2 - lat1;
+
+            double a = Math.Sin(dlat / 2) * Math.Sin(dlat / 2) +
+                       Math.Cos(lat1) * Math.Cos(lat2) *
+                       Math.Sin(dlon / 2) * Math.Sin(dlon / 2);
+
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            double distance = earthRadius * c;
+
+            return distance;
+        }
+
+        static double CalculateAzimuth(double lon1, double lat1, double lon2, double lat2)
+        {
+            lat1 = lat1 * (Math.PI / 180);
+            lon1 = lon1 * (Math.PI / 180);
+            lat2 = lat2 * (Math.PI / 180);
+            lon2 = lon2 * (Math.PI / 180);
+
+            // 计算差值
+            double dlon = lon2 - lon1;
+
+            // 使用反正切函数计算方位角
+            double y = Math.Sin(dlon) * Math.Cos(lat2);
+            double x = Math.Cos(lat1) * Math.Sin(lat2) - Math.Sin(lat1) * Math.Cos(lat2) * Math.Cos(dlon);
+            double azimuth = Math.Atan2(y, x);
+
+            // 将弧度转换为度数
+            azimuth = azimuth * (180.0 / Math.PI);
+
+            // 将负角度转换为正角度
+            if (azimuth < 0)
+            {
+                azimuth += 360.0;
+            }
+
+            return azimuth;
         }
 
         private void DrawScaleLine()
@@ -510,7 +577,5 @@ namespace RadarMonitor
             ZoomView(false);
         }
         #endregion
-
-        
     }
 }

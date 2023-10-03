@@ -70,7 +70,7 @@
                             Click="BtnLeft_OnClick">
                         <Image Source="assets/Left.png"></Image>
                     </Button>
-                    <Button Name="BtnCenter" Width="30" Height="30" Grid.Row="1" Grid.Column="1" ToolTip="Center" IsEnabled="{Binding Path=IsEncLoaded}"
+                    <Button Name="BtnCenter" Width="30" Height="30" Grid.Row="1" Grid.Column="1" ToolTip="ToRadar" IsEnabled="{Binding Path=IsEncLoaded}"
                             Click="BtnCenter_OnClick">
                         <Image Source="assets/Center.png"></Image>
                     </Button>
@@ -125,8 +125,8 @@
                 <StackPanel Orientation="Vertical">
                     <Label Name="CursorLongitude" ToolTip="Longitude"  Content="Lon:"/>
                     <Label Name="CursorLatitude" ToolTip="Latitude" Content="Lat:"/>
-                    <Label Name="CursorDistance" ToolTip="Distance" Content="D:"/>
-                    <Label Name="CursorAzimuth" ToolTip="Azimuth" Content="A:"/>
+                    <Label Name="CursorDistance" ToolTip="Distance to Radar" Content="D2R:"/>
+                    <Label Name="CursorAzimuth" ToolTip="Azimuth to Radar" Content="A2R:"/>
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Radar Info" Width="Auto">
