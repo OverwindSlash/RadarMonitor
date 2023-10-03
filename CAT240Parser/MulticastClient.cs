@@ -1,13 +1,18 @@
-﻿using System.Diagnostics;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using UdpClient = NetCoreServer.UdpClient;
 
 namespace CAT240Parser
 {
-    class MulticastClient : UdpClient
+    public delegate void Cat240ReceivedEventHandler(object sender, Cat240DataBlock data);
+
+    public class MulticastClient : UdpClient
     {
         public string Multicast;
+
+        // 定义事件
+        public event Cat240ReceivedEventHandler OnCat240Received;
+
 
         public MulticastClient(string address, int port) : base(address, port) { }
 
@@ -46,8 +51,7 @@ namespace CAT240Parser
         {
             Cat240DataBlock dataBlock = new Cat240DataBlock(buffer, size);
 
-            Trace.WriteLine($"SAzi:{dataBlock.Items.StartAzimuthInDegree:F4}, SRng:{dataBlock.Items.StartRange}, CellDur:{dataBlock.Items.CellDuration}, " +
-                              $"ValidB:{dataBlock.Items.ValidBytesInDataBlock}, ValidC:{dataBlock.Items.ValidCellsInDataBlock}");
+            OnCat240Received?.Invoke(this, dataBlock);
 
             // Continue receive datagrams
             ReceiveAsync();
@@ -55,7 +59,7 @@ namespace CAT240Parser
 
         protected override void OnError(SocketError error)
         {
-            Console.WriteLine($"Multicast UDP client caught an error with code {error}");
+            //Console.WriteLine($"Multicast UDP client caught an error with code {error}");
         }
 
         private bool _stop;

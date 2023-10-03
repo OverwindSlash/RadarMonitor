@@ -8,7 +8,7 @@
         xmlns:sampleGL="clr-namespace:Silk.WPF.OpenGL.Sample;assembly=Silk.WPF"
         mc:Ignorable="d"
         Title="CloudSense Radar Monitor (Evaluation Version)" Height="1000" Width="1600" Icon="Assets/Logo.png"
-        Loaded="MainWindow_OnLoaded">
+        Loaded="MainWindow_OnLoaded" Closing="MainWindow_OnClosing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -42,7 +42,7 @@
             <!-- <Canvas Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas> -->
             <Canvas Name="ScaleOverlay" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="300" Height="50" Margin="20, 0, 0, 70" IsHitTestVisible="False"></Canvas>
         </Grid>
-        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Width="Auto" DockPanel.Dock="Right" Margin="3, 3, 6, 3" ZIndex="1" Background="White">
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Width="120" DockPanel.Dock="Right" Margin="3, 3, 6, 3" ZIndex="1" Background="White">
             <GroupBox Header="View">
                 <Grid HorizontalAlignment="Center" Width="Auto">
                     <Grid.RowDefinitions>
@@ -132,17 +132,40 @@
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Radar Info" Width="Auto">
-                <StackPanel Orientation="Vertical">
-                    <Label ToolTip="Start Azimuth" Content="SA:"></Label>
-                    <Label ToolTip="End Azimuth" Content="EA:"></Label>
-                    <Label ToolTip="Start Range" Content="SR:"></Label>
-                    <Label ToolTip="Start Range" Content="SR:"></Label>
-                    <Label ToolTip="Cell Duration" Content="CD:"></Label>
-                    <Label ToolTip="Compression Indicator" Content="CI:"></Label>
-                    <Label ToolTip="Cells Resolution" Content="CR:"></Label>
-                    <Label ToolTip="Cells Count" Content="CC:"></Label>
-                    <Label ToolTip="VideoBlock Count" Content="VC:"></Label>
-                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Vertical">
+                        <Label Name="LblStartAzimuth" ToolTip="Start Azimuth" Content="SA:"></Label>
+                        <Label Name="LblEndAzimuth" ToolTip="End Azimuth" Content="EA:"></Label>
+                        <Label Name="LblStartRange" ToolTip="Start Range" Content="SR:"></Label>
+                        <Label Name="LblCellDuration" ToolTip="Cell Duration" Content="CD:"></Label>
+                        <Label Name="LblCellCompression" ToolTip="Compression Indicator" Content="CI:"></Label>
+                        <Label Name="LblCellResolution" ToolTip="Cells Resolution" Content="CR:"></Label>
+                        <Label Name="LblCellCount" ToolTip="Cells Count" Content="CC:"></Label>
+                        <Label Name="LblVideoBlockCount" ToolTip="VideoBlock Count" Content="VC:"></Label>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical">
+                        <TextBlock Name="TbStartAzimuth" ToolTip="Start Azimuth" Height="{Binding ElementName=LblStartAzimuth, Path=ActualHeight}" Margin="0, 5, 0, 0"
+                                   Text="{Binding StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
+                        <TextBlock Name="TbEndAzimuth" ToolTip="End Azimuth" Height="{Binding ElementName=LblEndAzimuth, Path=ActualHeight}" 
+                                   Text="{Binding EndAzimuth, StringFormat={}{0:F2}}"></TextBlock>
+                        <TextBlock Name="TbStartRange" ToolTip="Start Range" Height="{Binding ElementName=LblStartRange, Path=ActualHeight}" 
+                                   Text="{Binding StartRange}"></TextBlock>
+                        <TextBlock Name="TbCellDuration" ToolTip="Cell Duration" Height="{Binding ElementName=LblCellDuration, Path=ActualHeight}" 
+                                   Text="{Binding CellDuration}"></TextBlock>
+                        <TextBlock Name="TbCellCompression" ToolTip="Compression Indicator" Height="{Binding ElementName=LblCellCompression, Path=ActualHeight}" 
+                                   Text="{Binding CellCompression}"></TextBlock>
+                        <TextBlock Name="TbCellResolution" ToolTip="Cells Resolution" Height="{Binding ElementName=LblCellResolution, Path=ActualHeight}" 
+                                   Text="{Binding CellResolution}"></TextBlock>
+                        <TextBlock Name="TbCellCount" ToolTip="Cells Count" Height="{Binding ElementName=LblCellCount, Path=ActualHeight}" 
+                                   Text="{Binding CellCount}"></TextBlock>
+                        <TextBlock Name="TbVideoBlockCount" ToolTip="VideoBlock Count" Height="{Binding ElementName=LblVideoBlockCount, Path=ActualHeight}" 
+                                   Text="{Binding VideoBlockCount}"></TextBlock>
+                    </StackPanel>
+                </Grid>
             </GroupBox>
             <Image Source="assets/CloudSense.png" Width="100" Stretch="Fill" Margin="0, 10, 0, 0"></Image>
         </StackPanel>

@@ -46,6 +46,17 @@ namespace RadarMonitor.ViewModel
         private string _radarIpAddress;
         private int _radarPort;
 
+        private MulticastClient _client;
+
+        private double _startAzimuth;
+        private double _endAzimuth;
+        private int _startRange;
+        private int _cellDuration;
+        private bool _cellCompression;
+        private int _cellResolution;
+        private int _cellCount;
+        private int _videoBlockCount;
+
         public bool IsEncLoaded
         {
             get => _isEncLoaded;
@@ -136,6 +147,78 @@ namespace RadarMonitor.ViewModel
             }
         }
 
+        public double StartAzimuth
+        {
+            get => _startAzimuth;
+            set
+            {
+                SetField(ref _startAzimuth, value, "StartAzimuth");
+            }
+        }
+
+        public double EndAzimuth
+        {
+            get => _endAzimuth;
+            set
+            {
+                SetField(ref _endAzimuth, value, "EndAzimuth");
+            }
+        }
+
+        public int StartRange
+        {
+            get => _startRange;
+            set
+            {
+                SetField(ref _startRange, value, "StartRange");
+            }
+        }
+
+        public int CellDuration
+        {
+            get => _cellDuration;
+            set
+            {
+                SetField(ref _cellDuration, value, "CellDuration");
+            }
+        }
+
+        public bool CellCompression
+        {
+            get => _cellCompression;
+            set
+            {
+                SetField(ref _cellCompression, value, "CellCompression");
+            }
+        }
+
+        public int CellResolution
+        {
+            get => _cellResolution;
+            set
+            {
+                SetField(ref _cellResolution, value, "CellResolution");
+            }
+        }
+
+        public int CellCount
+        {
+            get => _cellCount;
+            set
+            {
+                SetField(ref _cellCount, value, "CellCount");
+            }
+        }
+
+        public int VideoBlockCount
+        {
+            get => _videoBlockCount;
+            set
+            {
+                SetField(ref _videoBlockCount, value, "VideoBlockCount");
+            }
+        }
+
         public RadarMonitorViewModel()
         {
             _radarIpAddress = string.Empty;
@@ -172,7 +255,34 @@ namespace RadarMonitor.ViewModel
 
         public void CaptureCat240NetworkPackage()
         {
-            
+            StopCaptureCat240NetworkPackage();
+
+            _client = new MulticastClient(_radarIpAddress, RadarPort);
+            _client.SetupMulticast(true);
+            _client.Multicast = "239.255.0.1";
+            _client.OnCat240Received += OnReceivedCat240DataBlock;
+
+            _client.Connect();
+        }
+
+        public void StopCaptureCat240NetworkPackage()
+        {
+            if (_client != null)
+            {
+                _client.DisconnectAndStop();
+            }
+        }
+
+        public void OnReceivedCat240DataBlock(object sender, Cat240DataBlock data)
+        {
+            StartAzimuth = data.Items.StartAzimuthInDegree;
+            EndAzimuth = data.Items.EndAzimuthInDegree;
+            StartRange = (int)data.Items.StartRange;
+            CellCompression = data.Items.IsDataCompressed;
+            CellDuration = (int)data.Items.CellDuration;
+            CellResolution = data.Items.VideoResolution;
+            CellCount = (int)data.Items.ValidCellsInDataBlock;
+            VideoBlockCount = (int)data.Items.ValidCellsInDataBlock;
         }
     }
 }

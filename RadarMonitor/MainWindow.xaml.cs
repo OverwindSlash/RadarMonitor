@@ -7,6 +7,7 @@ using RadarMonitor.Model;
 using RadarMonitor.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -56,6 +57,12 @@ namespace RadarMonitor
 
             _dpcX = _dpiX / 2.54 * adjustRatio;
             _dpcY = _dpiY / 2.54 * adjustRatio;
+        }
+
+        private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
+        {
+            var viewModel = (RadarMonitorViewModel)DataContext;
+            viewModel.StopCaptureCat240NetworkPackage();
         }
 
         private async void LoadEnc_OnClick(object sender, RoutedEventArgs e)
@@ -118,6 +125,9 @@ namespace RadarMonitor
                 // 获取雷达网络信息
                 viewModel.RadarIpAddress =
                     $"{settings.IpPart1}.{settings.IpPart2}.{settings.IpPart3}.{settings.IpPart4}";
+                viewModel.RadarPort = settings.Port;
+
+                viewModel.CaptureCat240NetworkPackage();
 
                 // 测试雷达颜色
                 EchoOverlay.EchoColor = Colors.White;
@@ -585,5 +595,7 @@ namespace RadarMonitor
             ZoomView(false);
         }
         #endregion
+
+        
     }
 }
