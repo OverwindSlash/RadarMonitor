@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RadarMonitor"
         mc:Ignorable="d"
-        Title="Radar Dialog" Height="320" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Icon="Assets/RadarSettings.png">
+        Title="Radar Dialog" Height="320" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Icon="Assets/RadarSettings.png" Topmost="True">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
