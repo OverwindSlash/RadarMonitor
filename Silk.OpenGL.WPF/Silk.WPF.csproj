@@ -10,6 +10,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="OpenGL\Common\**" />
+	  <EmbeddedResource Remove="OpenGL\Common\**" />
+	  <None Remove="OpenGL\Common\**" />
+	  <Page Remove="OpenGL\Common\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Silk.NET.Direct3D9" Version="2.17.1" />
 		<PackageReference Include="Silk.NET.GLFW" Version="2.17.1" />
 		<PackageReference Include="Silk.NET.Maths" Version="2.17.1" />
@@ -18,19 +25,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="OpenGL\Sample\Shaders\lighting.frag">
+	  <None Update="Shaders\frag.shader">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="OpenGL\Sample\Shaders\shader.frag">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="OpenGL\Sample\Shaders\shader.vert">
+	  <None Update="Shaders\vert.shader">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="OpenGL\Common\" />
+	  <ProjectReference Include="..\CAT240Parser\CAT240Parser.csproj" />
+	  <ProjectReference Include="..\OpenGL\OpenGLSharp.csproj" />
 	</ItemGroup>
 	
 </Project>

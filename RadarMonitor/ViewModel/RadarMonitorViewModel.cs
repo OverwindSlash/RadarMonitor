@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using CAT240Parser;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using Silk.WPF.OpenGL.Scene;
 
 namespace RadarMonitor.ViewModel
 {
@@ -56,6 +57,7 @@ namespace RadarMonitor.ViewModel
         private int _cellResolution;
         private int _cellCount;
         private int _videoBlockCount;
+
 
         public bool IsEncLoaded
         {
@@ -261,7 +263,6 @@ namespace RadarMonitor.ViewModel
             _client.SetupMulticast(true);
             _client.Multicast = "239.255.0.1";
             _client.OnCat240Received += OnReceivedCat240DataBlock;
-
             _client.Connect();
         }
 
@@ -283,6 +284,7 @@ namespace RadarMonitor.ViewModel
             CellResolution = data.Items.VideoResolution;
             CellCount = (int)data.Items.ValidCellsInDataBlock;
             VideoBlockCount = (int)data.Items.ValidCellsInDataBlock;
+            ExampleScene.OnReceivedCat240DataBlock(sender, data);
         }
     }
 }

@@ -106,11 +106,11 @@ namespace RadarMonitor.ViewModel
             _longitude = "118.82300101666256";
             _latitude = "32.03646416724121";
 
-            _ipPart1 = 239;
-            _ipPart2 = 192;
-            _ipPart3 = 43;
-            _ipPart4 = 78;
-            _port = 4378;
+            _ipPart1 = 127;
+            _ipPart2 = 0;
+            _ipPart3 = 0;
+            _ipPart4 = 1;
+            _port = 30101;
         }
 
         public RadarSettingsViewModel(RadarSettings settings)

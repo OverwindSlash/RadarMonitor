@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RadarMonitor"
         xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
-        xmlns:sampleGL="clr-namespace:Silk.WPF.OpenGL.Sample;assembly=Silk.WPF"
+        xmlns:sampleGL="clr-namespace:Silk.WPF.OpenGL.Scene;assembly=Silk.WPF"
         mc:Ignorable="d"
         Title="CloudSense Radar Monitor (Evaluation Version)" Height="1000" Width="1600" Icon="Assets/Logo.png"
         Loaded="MainWindow_OnLoaded" Closing="MainWindow_OnClosing">

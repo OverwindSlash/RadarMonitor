@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace Silk.WPF.OpenGL;
 
-public class GameControl : GameBase<Framebuffer>
+public class OpenGLControl : GameBase<Framebuffer>
 {
     private RenderContext _context;
     
