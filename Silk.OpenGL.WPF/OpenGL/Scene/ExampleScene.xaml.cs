@@ -32,6 +32,8 @@ public class RadarDataReceivedEventArgs
     uint shaderProgram;
 
     private System.Windows.Media.Color _echoColor = System.Windows.Media.Colors.White;
+
+
     private static uint lastId = 0;
     private const int SECTIONS = 4096;
     private const int CELLS = 6000;
@@ -58,6 +60,13 @@ public class RadarDataReceivedEventArgs
     private Vector3 CameraDirection = Vector3.Zero;
     private float CameraZoom = 45f;
 
+    // properties to be modified by radar monitor viewmodel
+    public float MapHeight { get; set; }    
+    public float MapWidth { get; set; }
+    public float MapHeightOffCenter { get; set; }
+    public float MapWidthOffCenter { get; set; }
+    public int UIHeight { get; set; } = 1000;
+    public int UIWidth { get; set; } = 1600;
 
     public System.Windows.Media.Color EchoColor
     {
@@ -66,21 +75,6 @@ public class RadarDataReceivedEventArgs
         {
             _echoColor = value;
         }
-    }
-
-    private int _height = 1000;
-    public int UIHeight
-    {
-        get => _height;
-        set { _height=value; }
-    }
-
-    private int _width = 1600;
-
-    public int UIWidth
-    {
-        get { return _width; }
-        set { _width = value; }
     }
 
 
