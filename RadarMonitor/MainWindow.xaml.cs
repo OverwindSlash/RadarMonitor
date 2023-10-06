@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Silk.NET.SDL;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Point = System.Windows.Point;
@@ -230,7 +231,7 @@ namespace RadarMonitor
                 viewModel.CaptureCat240NetworkPackage();
                 viewModel.IsEchoDisplayed = true;
 
-                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale);
+                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 60);   // TODO: 如何在没有收到信号的时候确定maxdistance初始值
             }
         }
 
@@ -242,7 +243,7 @@ namespace RadarMonitor
 
             DrawScaleLine();
             DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
-            TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale);
+            TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
         }
 
         private void BaseMapView_OnMouseMove(object sender, MouseEventArgs e)
@@ -612,20 +613,20 @@ namespace RadarMonitor
             }
         }
 
-        private void TransformRadarEcho(double longitude, double latitude, double viewModelCurrentEncScale)
+        private void TransformRadarEcho(double longitude, double latitude, double scale, double maxDistance)
         {
-            if ((longitude == 0) || (latitude == 0))
+            if ((longitude == 0) || (latitude == 0) || (scale == 0))
             {
                 return;
             }
 
-            double kmWith1Cm = (viewModelCurrentEncScale / 100000.0);
+            double kmWith1Cm = (scale / 100000.0);
             double kmWith1px = kmWith1Cm / _dpcX;
 
             EchoOverlay.Children.Clear();
             EchoOverlay.Children.Add(EchoImageOverlay);
 
-            var size = 60 / kmWith1px;
+            var size = maxDistance / kmWith1px;
 
             EchoImageOverlay.Width = size;
             EchoImageOverlay.Height = size;

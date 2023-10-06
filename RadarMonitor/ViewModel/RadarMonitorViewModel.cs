@@ -60,6 +60,7 @@ namespace RadarMonitor.ViewModel
         private int _cellResolution;
         private int _cellCount;
         private int _videoBlockCount;
+        private int _maxDistance;
         
         public const int CartesianSzie = 2000;
         private int[,] _cartesianData = new int[CartesianSzie, CartesianSzie];
@@ -237,8 +238,16 @@ namespace RadarMonitor.ViewModel
                 SetField(ref _videoBlockCount, value, "VideoBlockCount");
             }
         }
-        #endregion
 
+        public int MaxDistance
+        {
+            get => _maxDistance;
+            set
+            {
+                SetField(ref _maxDistance, value, "MaxDistance");
+            }
+        }
+        #endregion
 
         public RadarMonitorViewModel()
         {
@@ -303,6 +312,7 @@ namespace RadarMonitor.ViewModel
             CellResolution = data.Items.VideoResolution;
             CellCount = (int)data.Items.ValidCellsInDataBlock;
             VideoBlockCount = (int)data.Items.ValidCellsInDataBlock;
+            MaxDistance = (int)(data.Items.CellDuration * data.Items.VideoCellDurationUnit * 300000 * data.Items.ValidCellsInDataBlock);
             //ExampleScene.OnReceivedCat240DataBlock(sender, data);
 
             var updatedPixels = PolarToCartesian(data);
