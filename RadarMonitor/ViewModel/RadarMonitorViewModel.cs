@@ -48,6 +48,7 @@ namespace RadarMonitor.ViewModel
 
         private double _radarLongitude;
         private double _radarLatitude;
+        private double _radarOrientation;
 
         private string _radarIpAddress;
         private int _radarPort;
@@ -141,6 +142,15 @@ namespace RadarMonitor.ViewModel
             set
             {
                 SetField(ref _radarLatitude, value, "RadarLatitude");
+            }
+        }
+
+        public double RadarOrientation
+        {
+            get => _radarOrientation;
+            set
+            {
+                SetField(ref _radarOrientation, value, "RadarOrientation");
             }
         }
 
@@ -309,7 +319,7 @@ namespace RadarMonitor.ViewModel
         {
             Cat240DataItems items = data.Items;
 
-            double angleInRadians = (items.StartAzimuthInDegree + 60.0) * Math.PI / 180.0;
+            double angleInRadians = (items.StartAzimuthInDegree + RadarOrientation) * Math.PI / 180.0;
             var cosAzi = Math.Cos(angleInRadians);
             var sinAzi = Math.Sin(angleInRadians);
 

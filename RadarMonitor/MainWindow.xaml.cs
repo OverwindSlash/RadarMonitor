@@ -201,6 +201,7 @@ namespace RadarMonitor
                 viewModel.IsRadarConnected = true;
                 viewModel.RadarLongitude = double.Parse(settings.Longitude);
                 viewModel.RadarLatitude = double.Parse(settings.Latitude);
+                viewModel.RadarOrientation = settings.Orientation;
 
                 viewModel.IsRingsDisplayed = true;
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
@@ -362,7 +363,7 @@ namespace RadarMonitor
             BaseMapView.SetViewpoint(newViewpoint);
         }
 
-        private void ZoomView(bool isZoomIn, double step = 1.5)
+        private void ZoomView(bool isZoomIn, double step = 1.1)
         {
             Viewpoint currentViewpoint = BaseMapView.GetCurrentViewpoint(ViewpointType.CenterAndScale);
 

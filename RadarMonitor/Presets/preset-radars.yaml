@@ -1,26 +1,31 @@
 ﻿-
    longitude: 121.793117
    latitude: 31.352440
+   orientation: 0.0
    ip: 127.0.0.1
    port: 20101
 -
-   longitude: 121.910411
-   latitude: 31.584525
+   longitude: 121.912592
+   latitude: 31.576394
+   orientation: 55.0
    ip: 127.0.0.1
    port: 20101
 -
    longitude: 114.18204291491558
    latitude: 22.302892412080823
+   orientation: 0.0
    ip: 192.168.0.110
    port: 34781
 -
    longitude: 114.16144515484015
    latitude: 22.304297843651625
+   orientation: 0.0
    ip: 192.168.0.120
    port: 8009
 -
    longitude: 114.2896737525539
    latitude: 22.190220071467014
+   orientation: 0.0
    ip: 192.168.0.130
    port: 9234
   

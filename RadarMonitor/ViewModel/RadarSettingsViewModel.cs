@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Controls;
 using RadarMonitor.Model;
 
 namespace RadarMonitor.ViewModel
@@ -9,6 +10,7 @@ namespace RadarMonitor.ViewModel
     {
         private string _longitude;
         private string _latitude;
+        private double _orientation;
         private int _ipPart1;
         private int _ipPart2;
         private int _ipPart3;
@@ -40,6 +42,20 @@ namespace RadarMonitor.ViewModel
                 }
             }
         }
+
+        public double Orientation
+        {
+            get => _orientation;
+            set
+            {
+                if (IsValidOrientation(value))
+                {
+                    SetField(ref _orientation, value, "Orientation");
+                }
+            }
+        }
+
+        
 
         public int IpPart1
         {
@@ -105,6 +121,7 @@ namespace RadarMonitor.ViewModel
         {
             _longitude = "118.82300101666256";
             _latitude = "32.03646416724121";
+            _orientation = 0;
 
             _ipPart1 = 127;
             _ipPart2 = 0;
@@ -117,6 +134,8 @@ namespace RadarMonitor.ViewModel
         {
             Longitude = settings.Longitude.ToString();
             Latitude = settings.Latitude.ToString();
+            Orientation = settings.Orientation;
+            
 
             IpPart1 = int.Parse(settings.Ip.Split('.')[0]);
             IpPart2 = int.Parse(settings.Ip.Split('.')[1]);
@@ -157,6 +176,11 @@ namespace RadarMonitor.ViewModel
                 return (latitude >= -90.0 && latitude <= 90.0);
             }
             return false;
+        }
+
+        private bool IsValidOrientation(double input)
+        {
+            return (input >= -180.0 && input <= 180.0);
         }
 
         private bool IsValidIpAddressPart(int input)
