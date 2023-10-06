@@ -15,7 +15,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Silk.NET.SDL;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Point = System.Windows.Point;
@@ -39,6 +38,9 @@ namespace RadarMonitor
         private WriteableBitmap _bitmap = new WriteableBitmap(ImageSize, ImageSize,96, 96, PixelFormats.Bgra32, null);
 
         private DispatcherTimer _timer = new DispatcherTimer();
+        private const int RefreshIntervalMs = 100;
+        private const int FadingIntervalSec = 10;
+        private const byte FaingStep = (byte)(255 / FadingIntervalSec / (1000 /RefreshIntervalMs));
 
         private bool _flag = false;
 
@@ -56,18 +58,36 @@ namespace RadarMonitor
 
             DataContext = viewModel;
 
-            _timer.Interval = TimeSpan.FromMilliseconds(100); // 每100毫秒更新一次
+            _timer.Interval = TimeSpan.FromMilliseconds(RefreshIntervalMs);
             _timer.Tick += Timer_Tick;
             _timer.Start();
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
         {
+            var viewModel = (RadarMonitorViewModel)DataContext;
+            if (!viewModel.IsEchoDisplayed)
+            {
+                return;
+            }
+
             int stride = RadarMonitorViewModel.CartesianSzie * 4;
             _bitmap.WritePixels(
                 new Int32Rect(0, 0, ImageSize, ImageSize), _echoData, stride, 0);
             EchoImageOverlay.Source = _bitmap;
             EchoImageOverlay.InvalidateVisual();
+
+            // Fading
+            for (int i = 0; i < _echoData.Length; i += 4)
+            {
+                byte alpha = _echoData[i + 3];
+                if (alpha == 0)
+                {
+                    continue;
+                }
+
+                _echoData[i + 3] = (byte)Math.Max((alpha - FaingStep), 0);
+            }
 
             //Mat mat = new Mat(ImageSize, ImageSize, MatType.CV_8UC4, _echoData);
             //mat.SaveImage("temp_gui.png");
