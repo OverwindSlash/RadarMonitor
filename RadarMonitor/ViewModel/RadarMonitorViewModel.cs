@@ -8,9 +8,25 @@ using CAT240Parser;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Silk.WPF.OpenGL.Scene;
+using Silk.NET.SDL;
+using System.Windows.Controls;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
+using Silk.NET.OpenGL;
+using PixelFormat = System.Windows.Media.PixelFormat;
+using System.Runtime.InteropServices;
+using System.Drawing;
 
 namespace RadarMonitor.ViewModel
 {
+    public delegate void PolarLineUpdatedEventHandler(object sender, List<Tuple<int, int, int>> updatedPixels);
+    public delegate void ImageUpdatedEventHandler(object sender, Mat image);
+
+
     public class RadarMonitorViewModel : INotifyPropertyChanged
     {
         #region Notify Property
@@ -57,7 +73,15 @@ namespace RadarMonitor.ViewModel
         private int _cellResolution;
         private int _cellCount;
         private int _videoBlockCount;
+        
+        public const int CartesianSzie = 2000;
+        private int[,] _cartesianData = new int[CartesianSzie, CartesianSzie];
 
+        private WriteableBitmap _bitmap = new WriteableBitmap(CartesianSzie, CartesianSzie, 96, 96, PixelFormats.Bgra32, null);
+
+        private DispatcherTimer _timer = new DispatcherTimer();
+        public event PolarLineUpdatedEventHandler OnPolarLineUpdated;
+        public event ImageUpdatedEventHandler OnImageUpdated;
 
         public bool IsEncLoaded
         {
@@ -221,6 +245,15 @@ namespace RadarMonitor.ViewModel
             }
         }
 
+        public WriteableBitmap RadarEcho
+        {
+            get => _bitmap;
+            set
+            {
+                SetField(ref _bitmap, value, "RadaEcho");
+            }
+        }
+
         public RadarMonitorViewModel()
         {
             _radarIpAddress = string.Empty;
@@ -264,6 +297,10 @@ namespace RadarMonitor.ViewModel
             _client.Multicast = "239.255.0.1";
             _client.OnCat240Received += OnReceivedCat240DataBlock;
             _client.Connect();
+
+            _timer.Interval = TimeSpan.FromMilliseconds(40); // 每30毫秒更新一次
+            _timer.Tick += Timer_Tick;
+            _timer.Start();
         }
 
         public void StopCaptureCat240NetworkPackage()
@@ -272,6 +309,8 @@ namespace RadarMonitor.ViewModel
             {
                 _client.DisconnectAndStop();
             }
+
+            _timer.Stop();
         }
 
         public void OnReceivedCat240DataBlock(object sender, Cat240DataBlock data)
@@ -284,7 +323,113 @@ namespace RadarMonitor.ViewModel
             CellResolution = data.Items.VideoResolution;
             CellCount = (int)data.Items.ValidCellsInDataBlock;
             VideoBlockCount = (int)data.Items.ValidCellsInDataBlock;
-            ExampleScene.OnReceivedCat240DataBlock(sender, data);
+            //ExampleScene.OnReceivedCat240DataBlock(sender, data);
+
+            var updatedPixels = PolarToCartesian(data);
+            OnPolarLineUpdated?.Invoke(this, updatedPixels);
+        }
+
+        private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)
+        {
+            Cat240DataItems items = data.Items;
+
+            double angleInRadians = (items.StartAzimuthInDegree) * Math.PI / 180.0;
+            var cosAzi = Math.Cos(angleInRadians);
+            var sinAzi = Math.Sin(angleInRadians);
+
+            double radiusIncrement = CartesianSzie / 2.0 / items.VideoBlocks.Count;
+
+            double cosAziStep = radiusIncrement * cosAzi;
+            double sinAziStep = radiusIncrement * sinAzi;
+
+            double halfSize = CartesianSzie / 2.0;
+
+            List<Tuple<int, int, int>> updatedPixels = new List<Tuple<int, int, int>>();
+            for (int i = 0; i < items.VideoBlocks.Count; i++)
+            {
+                int x = (int)(halfSize + i * cosAziStep);
+                int y = (int)(halfSize + i * sinAziStep);
+
+                if (x >= 0 && x < CartesianSzie && y >= 0 && y < CartesianSzie)
+                {
+                    int grayValue = (int)items.GetCellData(i);
+                    _cartesianData[x, y] = grayValue;
+                    updatedPixels.Add(new Tuple<int, int, int>(x, y, grayValue));
+                }
+            }
+
+            return updatedPixels;
+        }
+
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            Mat bitmap = UpdateBitmap();
+            OnImageUpdated?.Invoke(this, bitmap);
+        }
+
+        private Mat UpdateBitmap()
+        {
+            int width = _bitmap.PixelWidth;
+            int height = _bitmap.PixelHeight;
+
+            // 创建一个新的RGB图像
+            Mat rgbImage = new Mat(height, width, MatType.CV_8UC4);
+
+            // 定义颜色，例如蓝色，以及透明度
+            Scalar color = new Scalar(255, 0, 0); // BGR颜色值，这里为纯蓝色
+            byte alpha = 0; // 初始透明度为0
+
+            // 迭代图像的每个像素
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    byte grayValue = (byte)_cartesianData[x, y];
+
+                    // 将灰度值映射到透明度范围
+                    alpha = (byte)grayValue; // 较小的灰度值将产生更高的透明度
+
+                    // 设置像素颜色和透明度
+                    Vec4b pixel = new Vec4b((byte)color.Val0, (byte)color.Val1, (byte)color.Val2, alpha);
+                    rgbImage.Set<Vec4b>(y, x, pixel);
+                }
+            }
+
+            return rgbImage;
+        }
+
+
+        private static void SaveImage(int[,] cartesian, string filename)
+        {
+            // 读取灰度图像数据，假设grayData为您的二维数组
+            int width = cartesian.GetLength(0); // 图像宽度
+            int height = cartesian.GetLength(1); // 图像高度
+
+            // 创建一个新的RGB图像
+            Mat rgbImage = new Mat(height, width, MatType.CV_8UC4);
+
+            // 定义颜色，例如蓝色，以及透明度
+            Scalar color = new Scalar(0, 255, 0); // BGR颜色值，这里为纯蓝色
+            byte alpha = 0; // 初始透明度为0
+
+            // 迭代图像的每个像素
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    byte grayValue = (byte)cartesian[x, y];
+
+                    // 将灰度值映射到透明度范围
+                    alpha = (byte)grayValue; // 较小的灰度值将产生更高的透明度
+
+                    // 设置像素颜色和透明度
+                    Vec4b pixel = new Vec4b((byte)color.Val0, (byte)color.Val1, (byte)color.Val2, alpha);
+                    rgbImage.Set<Vec4b>(y, x, pixel);
+                }
+            }
+
+            // 保存处理后的图像
+            Cv2.ImWrite(filename, rgbImage);
         }
     }
 }

@@ -108,6 +108,9 @@
   <ItemGroup>
     <PackageReference Include="Esri.ArcGISRuntime.Hydrography" Version="200.2.0" />
     <PackageReference Include="Esri.ArcGISRuntime.WPF" Version="200.2.0" />
+    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.8.0.20230708" />
+    <PackageReference Include="OpenCvSharp4.Windows" Version="4.8.0.20230708" />
+    <PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.8.0.20230708" />
     <PackageReference Include="YamlDotNet" Version="13.4.0" />
   </ItemGroup>
 
