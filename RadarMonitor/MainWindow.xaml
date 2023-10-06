@@ -38,9 +38,10 @@
             <esri:MapView Name="BaseMapView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3"
                           ViewpointChanged="BaseMapView_OnViewpointChanged" MouseMove="BaseMapView_OnMouseMove"></esri:MapView>
             <Canvas Name="RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
-            <sampleGL:ExampleScene Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False" Visibility="Hidden"/>
-            <Image Name="EchoImageOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Image>
-            <!-- <Canvas Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas> -->
+            <!--<sampleGL:ExampleScene Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False" Visibility="Hidden"/>-->
+            <Canvas Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False">
+                <Image Name="EchoImageOverlay" IsHitTestVisible="False"></Image>
+            </Canvas>
             <Canvas Name="ScaleOverlay" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="300" Height="50" Margin="20, 0, 0, 70" IsHitTestVisible="False"></Canvas>
         </Grid>
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Width="120" DockPanel.Dock="Right" Margin="3, 3, 6, 3" ZIndex="1" Background="White">

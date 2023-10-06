@@ -99,6 +99,7 @@ namespace RadarMonitor
             BaseMapView.Map = new Map();
             BaseMapView.IsAttributionTextVisible = false;
 
+            #region Enc configuration
             // 海图显示配置：不显示 海床，深度点，地理名称
             _flag = false;
 
@@ -140,6 +141,7 @@ namespace RadarMonitor
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NamesForPositionReporting = _flag;
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NatureOfSeabed = _flag;
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NoteOnChartData = _flag;
+            #endregion
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
@@ -224,8 +226,11 @@ namespace RadarMonitor
                     $"{settings.IpPart1}.{settings.IpPart2}.{settings.IpPart3}.{settings.IpPart4}";
                 viewModel.RadarPort = settings.Port;
 
+                // 抓取 CAT240 网络包
                 viewModel.CaptureCat240NetworkPackage();
                 viewModel.IsEchoDisplayed = true;
+
+                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale);
             }
         }
 
@@ -237,6 +242,7 @@ namespace RadarMonitor
 
             DrawScaleLine();
             DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
+            TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale);
         }
 
         private void BaseMapView_OnMouseMove(object sender, MouseEventArgs e)
@@ -250,9 +256,11 @@ namespace RadarMonitor
                 return;
             }
 
+            // 鼠标当前经纬度
             CursorLongitude.Content = "Lon: " + location.X.ToString("F6");
             CursorLatitude.Content = "Lat:    " + location.Y.ToString("F6");
 
+            // 鼠标相对于雷达经纬度
             var viewModel = (RadarMonitorViewModel)DataContext;
             if ((viewModel.RadarLongitude != 0.0) && (viewModel.RadarLatitude != 0.0))
             {
@@ -602,6 +610,30 @@ namespace RadarMonitor
                 Canvas.SetTop(distanceText, radarY);
                 RingsOverlay.Children.Add(distanceText);
             }
+        }
+
+        private void TransformRadarEcho(double longitude, double latitude, double viewModelCurrentEncScale)
+        {
+            if ((longitude == 0) || (latitude == 0))
+            {
+                return;
+            }
+
+            double kmWith1Cm = (viewModelCurrentEncScale / 100000.0);
+            double kmWith1px = kmWith1Cm / _dpcX;
+
+            EchoOverlay.Children.Clear();
+            EchoOverlay.Children.Add(EchoImageOverlay);
+
+            var size = 60 / kmWith1px;
+
+            EchoImageOverlay.Width = size;
+            EchoImageOverlay.Height = size;
+
+            var point = BaseMapView.LocationToScreen(new MapPoint(longitude, latitude, SpatialReferences.Wgs84));
+
+            Canvas.SetLeft(EchoImageOverlay, point.X - size / 2.0);
+            Canvas.SetTop(EchoImageOverlay, point.Y - size / 2.0);
         }
         #endregion
 

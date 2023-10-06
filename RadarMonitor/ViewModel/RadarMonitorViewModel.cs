@@ -66,8 +66,6 @@ namespace RadarMonitor.ViewModel
 
         public event PolarLineUpdatedEventHandler OnPolarLineUpdated;
 
-        //private byte[] _echoData = new byte[CartesianSzie * CartesianSzie * 4];
-
         #region Properties
         public bool IsEncLoaded
         {
