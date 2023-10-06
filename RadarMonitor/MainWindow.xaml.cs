@@ -26,6 +26,8 @@ using System.Windows.Media.Imaging;
 using Brushes = System.Windows.Media.Brushes;
 using Brush = System.Windows.Media.Brush;
 using System.Threading.Channels;
+using System.Windows.Threading;
+using OpenCvSharp.Flann;
 
 namespace RadarMonitor
 {
@@ -34,16 +36,17 @@ namespace RadarMonitor
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const int ImageSize = RadarMonitorViewModel.CartesianSzie;
+
         private double _dpiX;
         private double _dpiY;
         private double _dpcX;
         private double _dpcY;
 
-        private int[] _echoData;
-        private WriteableBitmap _bitmap = new WriteableBitmap(RadarMonitorViewModel.CartesianSzie, RadarMonitorViewModel.CartesianSzie,
-            96, 96, PixelFormats.Bgra32, null);
+        private byte[] _echoData;
+        private WriteableBitmap _bitmap = new WriteableBitmap(ImageSize, ImageSize,96, 96, PixelFormats.Bgra32, null);
 
-        private int counter = 0;
+        private DispatcherTimer _timer = new DispatcherTimer();
 
         public MainWindow()
         {
@@ -52,13 +55,29 @@ namespace RadarMonitor
             InitializeMapView();
 
             int size = RadarMonitorViewModel.CartesianSzie;
-            _echoData = new int[size * size * 4];
+            _echoData = new byte[size * size * 4];
 
             var viewModel = new RadarMonitorViewModel();
-            //viewModel.OnPolarLineUpdated += ViewModelOnPolarLineUpdated;
-            viewModel.OnImageUpdated += ViewModelOnOnImageUpdated;
+            viewModel.OnPolarLineUpdated += ViewModelOnPolarLineUpdated;
+            //viewModel.OnImageUpdated += ViewModelOnOnImageUpdated;
 
             DataContext = viewModel;
+
+            _timer.Interval = TimeSpan.FromMilliseconds(100); // 每30毫秒更新一次
+            _timer.Tick += Timer_Tick;
+            _timer.Start();
+        }
+
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            int stride = RadarMonitorViewModel.CartesianSzie * 4;
+            _bitmap.WritePixels(
+                new Int32Rect(0, 0, ImageSize, ImageSize), _echoData, stride, 0);
+            EchoImageOverlay.Source = _bitmap;
+            EchoImageOverlay.InvalidateVisual();
+
+            //Mat mat = new Mat(ImageSize, ImageSize, MatType.CV_8UC4, _echoData);
+            //mat.SaveImage("temp_gui.png");
         }
 
         private void ViewModelOnOnImageUpdated(object sender, Mat image)
@@ -83,57 +102,20 @@ namespace RadarMonitor
 
                 int x = pixel.Item1;
                 int y = pixel.Item2;
-                int index = x * stride + y * 4;
+                int index = y * stride + x * 4;
 
-                _echoData[index] = b;
-                _echoData[index + 1] = g;
-                _echoData[index + 2] = r;
-                _echoData[index + 3] = a;
+                _echoData[index + 0] = 0;        // Blue
+                _echoData[index + 1] = 0;        // Green
+                _echoData[index + 2] = 255;      // Red
+                _echoData[index + 3] = a;        // Alpha
             }
 
-            if (counter == 2800)
-            {
-                // 创建一个新的RGB图像
-                Mat rgbImage = new Mat(RadarMonitorViewModel.CartesianSzie, RadarMonitorViewModel.CartesianSzie, MatType.CV_8UC4);
-
-                // 定义颜色，例如蓝色，以及透明度
-                Scalar color = new Scalar(255, 0, 0); // BGR颜色值，这里为纯蓝色
-                byte alpha = 0; // 初始透明度为0
-
-
-                // 迭代图像的每个像素
-                for (int x = 0; x < RadarMonitorViewModel.CartesianSzie; x++)
-                {
-                    for (int y = 0; y < RadarMonitorViewModel.CartesianSzie; y++)
-                    {
-                        int index = x * stride + y * 4;
-
-                        byte grayValue = (byte)_echoData[index];
-
-                        // 将灰度值映射到透明度范围
-                        alpha = (byte)grayValue; // 较小的灰度值将产生更高的透明度
-
-                        // 设置像素颜色和透明度
-                        Vec4b pixel = new Vec4b((byte)color.Val0, (byte)color.Val1, (byte)color.Val2, alpha);
-                        rgbImage.Set<Vec4b>(y, x, pixel);
-                    }
-                }
-
-                rgbImage.SaveImage("temp.png");
-            }
-
-            counter++;
-
-            Dispatcher.Invoke(() =>
-            {
-                // 更新 WriteableBitmap 的像素数据
-                _bitmap.WritePixels(
-                    new Int32Rect(0, 0, RadarMonitorViewModel.CartesianSzie, RadarMonitorViewModel.CartesianSzie),
-                    _echoData, stride, 0);
-
-                EchoImageOverlay.Source = _bitmap;
-                EchoImageOverlay.InvalidateVisual();
-            });
+            //Dispatcher.Invoke(() =>
+            //{
+            //    // 更新 WriteableBitmap 的像素数据
+            //    _bitmap.WritePixels(
+            //        new Int32Rect(0, 0, ImageSize, ImageSize), _echoData, stride, 0);
+            //});
         }
 
         private void InitializeMapView()
