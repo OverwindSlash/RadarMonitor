@@ -29,7 +29,7 @@
                     <MenuItem Name="ConnectRadar" Header="_Source..." Click="ConnectRadar_OnClick"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="_Config">
-                    <MenuItem Header="_Display Control"></MenuItem>
+                    <MenuItem Name="ConfigDisplay" Header="_Display Control" Click="ConfigDisplay_OnClick"></MenuItem>
                 </MenuItem>
             </Menu>
         </DockPanel>

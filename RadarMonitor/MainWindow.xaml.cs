@@ -12,22 +12,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using OpenCvSharp;
-using OpenCvSharp.Extensions;
-using OpenCvSharp.WpfExtensions;
+using System.Windows.Threading;
+using Brush = System.Windows.Media.Brush;
+using Brushes = System.Windows.Media.Brushes;
 using Point = System.Windows.Point;
 using Window = System.Windows.Window;
-using Silk.NET.Core;
-using System.Windows.Ink;
-using System.Windows.Media.Media3D;
-using System.Drawing;
-using System.Windows.Media.Imaging;
-using Brushes = System.Windows.Media.Brushes;
-using Brush = System.Windows.Media.Brush;
-using System.Threading.Channels;
-using System.Windows.Threading;
-using OpenCvSharp.Flann;
 
 namespace RadarMonitor
 {
@@ -48,6 +39,8 @@ namespace RadarMonitor
 
         private DispatcherTimer _timer = new DispatcherTimer();
 
+        private bool _flag = false;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -59,11 +52,10 @@ namespace RadarMonitor
 
             var viewModel = new RadarMonitorViewModel();
             viewModel.OnPolarLineUpdated += ViewModelOnPolarLineUpdated;
-            //viewModel.OnImageUpdated += ViewModelOnOnImageUpdated;
 
             DataContext = viewModel;
 
-            _timer.Interval = TimeSpan.FromMilliseconds(100); // 每30毫秒更新一次
+            _timer.Interval = TimeSpan.FromMilliseconds(100); // 每100毫秒更新一次
             _timer.Tick += Timer_Tick;
             _timer.Start();
         }
@@ -80,23 +72,14 @@ namespace RadarMonitor
             //mat.SaveImage("temp_gui.png");
         }
 
-        private void ViewModelOnOnImageUpdated(object sender, Mat image)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                EchoImageOverlay.Source = image.ToBitmapSource();
-                EchoImageOverlay.InvalidateVisual();
-            });
-        }
-
         private void ViewModelOnPolarLineUpdated(object sender, List<Tuple<int, int, int>> updatedPixels)
         {
             int stride = RadarMonitorViewModel.CartesianSzie * 4;
 
             foreach (var pixel in updatedPixels)
             {
-                byte r = 0;
-                byte g = 255;
+                byte r = 255;
+                byte g = 0;
                 byte b = 0;
                 byte a = (byte)pixel.Item3;
 
@@ -104,18 +87,11 @@ namespace RadarMonitor
                 int y = pixel.Item2;
                 int index = y * stride + x * 4;
 
-                _echoData[index + 0] = 0;        // Blue
-                _echoData[index + 1] = 0;        // Green
-                _echoData[index + 2] = 255;      // Red
+                _echoData[index + 0] = b;        // Blue
+                _echoData[index + 1] = g;        // Green
+                _echoData[index + 2] = r;        // Red
                 _echoData[index + 3] = a;        // Alpha
             }
-
-            //Dispatcher.Invoke(() =>
-            //{
-            //    // 更新 WriteableBitmap 的像素数据
-            //    _bitmap.WritePixels(
-            //        new Int32Rect(0, 0, ImageSize, ImageSize), _echoData, stride, 0);
-            //});
         }
 
         private void InitializeMapView()
@@ -124,9 +100,46 @@ namespace RadarMonitor
             BaseMapView.IsAttributionTextVisible = false;
 
             // 海图显示配置：不显示 海床，深度点，地理名称
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Seabed = false;
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.SpotSoundings = false;
-            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.GeographicNames = false;
+            _flag = false;
+
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.AllIsolatedDangers = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ArchipelagicSeaLanes = _flag;
+
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.BoundariesAndLimits = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.BuoysBeaconsAidsToNavigation = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.BuoysBeaconsStructures = _flag;
+
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ChartScaleBoundaries = _flag;
+
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.DepthContours = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.DryingLine = _flag;
+
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Lights = _flag;
+
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.MagneticVariation = _flag;
+
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.OtherMiscellaneous = _flag;
+
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ProhibitedAndRestrictedAreas = _flag;
+
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Seabed = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ShipsRoutingSystemsAndFerryRoutes = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.SpotSoundings = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.StandardMiscellaneous = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.SubmarineCablesAndPipelines = _flag;
+
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Tidal = _flag;
+
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.BerthNumber = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.CurrentVelocity = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.GeographicNames = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.HeightOfIsletOrLandFeature = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.ImportantText = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.LightDescription = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.MagneticVariationAndSweptDepth = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NamesForPositionReporting = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NatureOfSeabed = _flag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NoteOnChartData = _flag;
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
@@ -212,9 +225,7 @@ namespace RadarMonitor
                 viewModel.RadarPort = settings.Port;
 
                 viewModel.CaptureCat240NetworkPackage();
-
-                // 测试雷达颜色
-                EchoOverlay.EchoColor = Colors.White;
+                viewModel.IsEchoDisplayed = true;
             }
         }
 
@@ -259,11 +270,11 @@ namespace RadarMonitor
 
             if (displayEchoCheckBox.IsChecked.Value)
             {
-                EchoOverlay.Visibility = Visibility.Visible;
+                EchoImageOverlay.Visibility = Visibility.Visible;
             }
             else
             {
-                EchoOverlay.Visibility = Visibility.Hidden;
+                EchoImageOverlay.Visibility = Visibility.Hidden;
             }
         }
 
@@ -529,7 +540,9 @@ namespace RadarMonitor
         {
             RingsOverlay.Children.Clear();
 
-            Brush ringBrush = new SolidColorBrush(Colors.Chartreuse);   // 距离环的颜色
+            Brush ringBrush = new SolidColorBrush(Colors.PaleGreen);   // 距离环的颜色
+            DoubleCollection dashArray = new DoubleCollection(new double[] { 2, 4 });
+            int ringFontSize = 12;
 
             // 定义雷达回波的圆心坐标
             var point = BaseMapView.LocationToScreen(new MapPoint(longitude, latitude, SpatialReferences.Wgs84));
@@ -563,6 +576,7 @@ namespace RadarMonitor
                     Width = 2 * radius,
                     Height = 2 * radius,
                     Stroke = ringBrush,
+                    StrokeDashArray = dashArray,
                     StrokeThickness = 2,
                     Fill = Brushes.Transparent
                 };
@@ -574,10 +588,15 @@ namespace RadarMonitor
                 double radiusInKm = ringOffset * (BaseMapView.MapScale / 100000.0);
                 ringOffset += ringStep;
 
+                if (radiusInKm == 0)
+                {
+                    continue;   // 不显示 0KM
+                }
+
                 TextBlock distanceText = new TextBlock();
                 distanceText.Text = radiusInKm.ToString("F1") + "KM";
                 distanceText.Foreground = ringBrush;
-                distanceText.FontSize = 14;
+                distanceText.FontSize = ringFontSize;
 
                 Canvas.SetLeft(distanceText, radarX + radius + 2);
                 Canvas.SetTop(distanceText, radarY);
@@ -679,5 +698,10 @@ namespace RadarMonitor
             ZoomView(false);
         }
         #endregion
+
+        private void ConfigDisplay_OnClick(object sender, RoutedEventArgs e)
+        {
+            
+        }
     }
 }

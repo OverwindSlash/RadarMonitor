@@ -6,15 +6,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
 namespace RadarMonitor.ViewModel
 {
     public delegate void PolarLineUpdatedEventHandler(object sender, List<Tuple<int, int, int>> updatedPixels);
-    public delegate void ImageUpdatedEventHandler(object sender, Mat image);
 
     public class RadarMonitorViewModel : INotifyPropertyChanged
     {
@@ -68,7 +65,6 @@ namespace RadarMonitor.ViewModel
         private int[,] _cartesianData = new int[CartesianSzie, CartesianSzie];
 
         public event PolarLineUpdatedEventHandler OnPolarLineUpdated;
-        public event ImageUpdatedEventHandler OnImageUpdated;
 
         //private byte[] _echoData = new byte[CartesianSzie * CartesianSzie * 4];
 
