@@ -38,11 +38,13 @@
                 <TextBox Name="TbLongitude" Grid.Row="0" Grid.Column="1" Margin="5, 10, 5, 5" Height="20" HorizontalAlignment="Stretch" 
                  Text="{Binding Longitude, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
                 <Label Grid.Row="0" Grid.Column="2" Content="(-180~180)" Margin="5,10,5,5" HorizontalAlignment="Left"></Label>
-                <Label Grid.Row="1" Grid.Column="0" Content="Latitude:" Margin="10,5,5,10" HorizontalAlignment="Right"></Label>
-                <TextBox Name="TbLatitude" Grid.Row="1" Grid.Column="1" Margin="5, 5, 5, 10" Height="20" HorizontalAlignment="Stretch"
+                
+                <Label Grid.Row="1" Grid.Column="0" Content="Latitude:" Margin="10,5,5,5" HorizontalAlignment="Right"></Label>
+                <TextBox Name="TbLatitude" Grid.Row="1" Grid.Column="1" Margin="5, 5, 5, 5" Height="20" HorizontalAlignment="Stretch"
                  Text="{Binding Latitude, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
-                <Label Grid.Row="1" Grid.Column="2" Content="(-90~90)" Margin="5,5,5,10" HorizontalAlignment="Left"></Label>
-                <Label Grid.Row="2" Grid.Column="0" Content="Latitude:" Margin="10,5,5,10" HorizontalAlignment="Right"></Label>
+                <Label Grid.Row="1" Grid.Column="2" Content="(-90~90)" Margin="5,5,5,5" HorizontalAlignment="Left"></Label>
+                
+                <Label Grid.Row="2" Grid.Column="0" Content="Orientation:" Margin="10,5,5,10" HorizontalAlignment="Right"></Label>
                 <TextBox Name="TbOrientation" Grid.Row="2" Grid.Column="1" Margin="5, 5, 5, 10" Height="20" HorizontalAlignment="Stretch"
                          Text="{Binding Orientation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
                 <Label Grid.Row="2" Grid.Column="2" Content="(-180~180)" Margin="5,5,5,10" HorizontalAlignment="Left"></Label>

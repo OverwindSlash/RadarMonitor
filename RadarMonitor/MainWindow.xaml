@@ -37,8 +37,8 @@
         <Grid Grid.Row="1" Grid.Column="0" ZIndex="0">
             <esri:MapView Name="BaseMapView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3"
                           ViewpointChanged="BaseMapView_OnViewpointChanged" MouseMove="BaseMapView_OnMouseMove"></esri:MapView>
+            <sampleGL:ExampleScene Name="OpenGlEchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False" Visibility="Hidden"/>
             <Canvas Name="RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
-            <!--<sampleGL:ExampleScene Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False" Visibility="Hidden"/>-->
             <Canvas Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False">
                 <Image Name="EchoImageOverlay" IsHitTestVisible="False"></Image>
             </Canvas>
@@ -117,11 +117,13 @@
             </GroupBox>
             <GroupBox Header="Layer" Width="Auto">
                 <StackPanel Orientation="Vertical">
-                    <CheckBox Name="DisplayEcho" Content="Display Echo" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsEchoDisplayed}" 
+                    <CheckBox Name="DisplayOpenGlEcho" Content="OpenGL Echo" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsOpenGlEchoDisplayed}" 
+                              Click="DisplayOpenGlEcho_OnClick"></CheckBox>
+                    <CheckBox Name="DisplayEcho" Content="Image Echo" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsEchoDisplayed}" 
                               Click="DisplayEcho_OnClick"></CheckBox>
-                    <CheckBox Name="DisplayRings" Content="Display Rings" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsRingsDisplayed}" 
+                    <CheckBox Name="DisplayRings" Content="Distance Rings" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsRingsDisplayed}" 
                               Click="DisplayRings_OnClick"></CheckBox>
-                    <CheckBox Name="DisplayEnc" Content="Display Enc" IsEnabled="{Binding Path=IsEncLoaded}" IsChecked="{Binding Path=IsEncDisplayed}" 
+                    <CheckBox Name="DisplayEnc" Content="Enc" IsEnabled="{Binding Path=IsEncLoaded}" IsChecked="{Binding Path=IsEncDisplayed}" 
                               Click="DisplayEnc_OnClick"></CheckBox>
                 </StackPanel>
             </GroupBox>

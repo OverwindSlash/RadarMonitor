@@ -69,6 +69,8 @@ public class RadarDataReceivedEventArgs
     public float MapWidthOffCenter { get; set; } = 2f;
     public int UIHeight { get; set; } = 1000;
     public int UIWidth { get; set; } = 1600;
+    public double RadarMaxDistance { get; set; } = 60.0;
+    public bool IsDisplay { get; set; } = false;
 
     public System.Windows.Media.Color EchoColor
     {

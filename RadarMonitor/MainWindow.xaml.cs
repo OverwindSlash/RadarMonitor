@@ -252,6 +252,8 @@ namespace RadarMonitor
                 viewModel.IsEchoDisplayed = true;
 
                 TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 60);   // TODO: 如何在没有收到信号的时候确定maxdistance初始值
+                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
+                    60);
             }
         }
 
@@ -264,6 +266,8 @@ namespace RadarMonitor
             DrawScaleLine();
             DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
             TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
+            TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
+                60);
         }
 
         private void BaseMapView_OnMouseMove(object sender, MouseEventArgs e)
@@ -290,6 +294,23 @@ namespace RadarMonitor
 
                 var azimuth = CalculateAzimuth(viewModel.RadarLongitude, viewModel.RadarLatitude,location.X, location.Y);
                 CursorAzimuth.Content = "A2R:   " + azimuth.ToString("F2") + "°";
+            }
+        }
+
+        private void DisplayOpenGlEcho_OnClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox displayOpenGlEchoCheckBox = (CheckBox)sender;
+            var viewModel = (RadarMonitorViewModel)DataContext;
+
+            if (displayOpenGlEchoCheckBox.IsChecked.Value)
+            {
+                OpenGlEchoOverlay.Visibility = Visibility.Visible;
+                OpenGlEchoOverlay.IsDisplay = true;
+            }
+            else
+            {
+                OpenGlEchoOverlay.Visibility = Visibility.Hidden;
+                OpenGlEchoOverlay.IsDisplay = false;
             }
         }
 
@@ -328,10 +349,12 @@ namespace RadarMonitor
             if (displayEncCheckBox.IsChecked.Value)
             {
                 BaseMapView.Visibility = Visibility.Visible;
+                ScaleOverlay.Visibility = Visibility.Visible;
             }
             else
             {
                 BaseMapView.Visibility = Visibility.Hidden;
+                ScaleOverlay.Visibility = Visibility.Hidden;
             }
         }
 
@@ -656,6 +679,39 @@ namespace RadarMonitor
             Canvas.SetLeft(EchoImageOverlay, point.X - size / 2.0);
             Canvas.SetTop(EchoImageOverlay, point.Y - size / 2.0);
         }
+
+        private void TransformOpenGlRadarEcho(double longitude, double latitude, double scale, double maxDistance)
+        {
+            if ((longitude == 0) || (latitude == 0) || (scale == 0))
+            {
+                return;
+            }
+
+            double kmWith1Cm = (scale / 100000.0);
+            double kmWith1px = kmWith1Cm / _dpcX;
+
+            int uiWidth = (int)OpenGlEchoOverlay.ActualWidth;
+            int uiHeight = (int)OpenGlEchoOverlay.ActualHeight;
+            float mapWidth = (float)(uiWidth * kmWith1px);
+            float mapHeight = (float)(uiHeight * kmWith1px);
+
+            Viewpoint center = BaseMapView.GetCurrentViewpoint(ViewpointType.CenterAndScale);
+            MapPoint centerPoint = center.TargetGeometry as MapPoint;
+
+            double xOffset = longitude - centerPoint.X;
+            double yOffset = latitude - centerPoint.Y;
+
+            float mapWidthOffCenter = (float)(xOffset * 111f);
+            float mapHeightOffCenter = (float)(yOffset * 111f);
+
+            OpenGlEchoOverlay.UIWidth = uiWidth;
+            OpenGlEchoOverlay.UIHeight = uiHeight;
+            OpenGlEchoOverlay.MapWidth = mapWidth;
+            OpenGlEchoOverlay.MapHeight = mapHeight;
+            OpenGlEchoOverlay.MapWidthOffCenter = mapWidthOffCenter;
+            OpenGlEchoOverlay.MapHeightOffCenter = mapHeightOffCenter;
+            OpenGlEchoOverlay.RadarMaxDistance = maxDistance;
+        }
         #endregion
 
         #region Preset Locations
@@ -756,5 +812,7 @@ namespace RadarMonitor
         {
             
         }
+
+        
     }
 }

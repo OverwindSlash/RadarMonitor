@@ -1,6 +1,7 @@
 ﻿using CAT240Parser;
 using OpenCvSharp;
 using RadarMonitor.Model;
+using Silk.WPF.OpenGL.Scene;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,6 +41,7 @@ namespace RadarMonitor.ViewModel
         private bool _isEncDisplayed;
         private bool _isRingsDisplayed;
         private bool _isEchoDisplayed;
+        private bool _isOpenGlEchoDisplayed;
 
         private List<PresetLocation> _presetLocations = new List<PresetLocation>();
 
@@ -119,6 +121,15 @@ namespace RadarMonitor.ViewModel
             set
             {
                 SetField(ref _isEchoDisplayed, value, "IsEchoDisplayed");
+            }
+        }
+
+        public bool IsOpenGlEchoDisplayed
+        {
+            get => _isOpenGlEchoDisplayed;
+            set
+            {
+                SetField(ref _isOpenGlEchoDisplayed, value, "IsOpenGlEchoDisplayed");
             }
         }
 
@@ -313,10 +324,19 @@ namespace RadarMonitor.ViewModel
             CellCount = (int)data.Items.ValidCellsInDataBlock;
             VideoBlockCount = (int)data.Items.ValidCellsInDataBlock;
             MaxDistance = (int)(data.Items.CellDuration * data.Items.VideoCellDurationUnit * 300000 * data.Items.ValidCellsInDataBlock);
-            //ExampleScene.OnReceivedCat240DataBlock(sender, data);
 
-            var updatedPixels = PolarToCartesian(data);
-            OnPolarLineUpdated?.Invoke(this, updatedPixels);
+            // GDI 回波图像绘制
+            if (IsEchoDisplayed)
+            {
+                var updatedPixels = PolarToCartesian(data);
+                OnPolarLineUpdated?.Invoke(this, updatedPixels);
+            }
+
+            // OpenGL 回波图像绘制
+            if (IsOpenGlEchoDisplayed)
+            {
+                ExampleScene.OnReceivedCat240DataBlock(sender, data);
+            }
         }
 
         private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)
