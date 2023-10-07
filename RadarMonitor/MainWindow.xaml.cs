@@ -263,11 +263,38 @@ namespace RadarMonitor
             var viewModel = (RadarMonitorViewModel)DataContext;
             viewModel.CurrentEncScale = mapView.MapScale;
 
-            DrawScaleLine();
-            DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
-            TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
-            TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
-                60);
+            if (viewModel.IsEncLoaded)
+            {
+                DrawScaleLine();
+            }
+
+            if (viewModel.IsEchoDisplayed || viewModel.IsOpenGlEchoDisplayed)
+            {
+                DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
+                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
+                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
+                    60);
+            }
+        }
+
+        private void BaseMapView_OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            MapView mapView = (MapView)sender;
+            var viewModel = (RadarMonitorViewModel)DataContext;
+            viewModel.CurrentEncScale = mapView.MapScale;
+
+            if (viewModel.IsEncLoaded)
+            {
+                DrawScaleLine();
+            }
+
+            if (viewModel.IsEchoDisplayed || viewModel.IsOpenGlEchoDisplayed)
+            {
+                DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
+                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
+                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
+                    60);
+            }
         }
 
         private void BaseMapView_OnMouseMove(object sender, MouseEventArgs e)
@@ -688,12 +715,13 @@ namespace RadarMonitor
             }
 
             double kmWith1Cm = (scale / 100000.0);
-            double kmWith1px = kmWith1Cm / _dpcX;
+            double kmWith1Px = kmWith1Cm / _dpcX;
+            double kmWith1Lon = 111.32;
 
             int uiWidth = (int)OpenGlEchoOverlay.ActualWidth;
             int uiHeight = (int)OpenGlEchoOverlay.ActualHeight;
-            float mapWidth = (float)(uiWidth * kmWith1px);
-            float mapHeight = (float)(uiHeight * kmWith1px);
+            float mapWidth = (float)(uiWidth * kmWith1Px);
+            float mapHeight = (float)(uiHeight * kmWith1Px);
 
             Viewpoint center = BaseMapView.GetCurrentViewpoint(ViewpointType.CenterAndScale);
             MapPoint centerPoint = center.TargetGeometry as MapPoint;
@@ -701,8 +729,8 @@ namespace RadarMonitor
             double xOffset = longitude - centerPoint.X;
             double yOffset = latitude - centerPoint.Y;
 
-            float mapWidthOffCenter = (float)(xOffset * 111f);
-            float mapHeightOffCenter = (float)(yOffset * 111f);
+            float mapWidthOffCenter = (float)(xOffset * kmWith1Lon);
+            float mapHeightOffCenter = (float)(yOffset * kmWith1Lon);
 
             OpenGlEchoOverlay.UIWidth = uiWidth;
             OpenGlEchoOverlay.UIHeight = uiHeight;
@@ -711,6 +739,9 @@ namespace RadarMonitor
             OpenGlEchoOverlay.MapWidthOffCenter = mapWidthOffCenter;
             OpenGlEchoOverlay.MapHeightOffCenter = mapHeightOffCenter;
             OpenGlEchoOverlay.RadarMaxDistance = maxDistance;
+
+            var viewModel = (RadarMonitorViewModel)DataContext;
+            OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
         }
         #endregion
 
@@ -812,6 +843,7 @@ namespace RadarMonitor
         {
             
         }
+
 
         
     }

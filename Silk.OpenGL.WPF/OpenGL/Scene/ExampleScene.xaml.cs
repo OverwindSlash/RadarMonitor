@@ -31,7 +31,7 @@ public class RadarDataReceivedEventArgs
     uint vao;
     uint shaderProgram;
 
-    private System.Windows.Media.Color _echoColor = System.Windows.Media.Colors.White;
+    private System.Windows.Media.Color _echoColor = System.Windows.Media.Colors.Black;
 
 
     private static uint lastId = 0;
@@ -69,6 +69,7 @@ public class RadarDataReceivedEventArgs
     public float MapWidthOffCenter { get; set; } = 2f;
     public int UIHeight { get; set; } = 1000;
     public int UIWidth { get; set; } = 1600;
+    public double RadarOrientation { get; set; } = 0.0;
     public double RadarMaxDistance { get; set; } = 60.0;
     public bool IsDisplay { get; set; } = false;
 
