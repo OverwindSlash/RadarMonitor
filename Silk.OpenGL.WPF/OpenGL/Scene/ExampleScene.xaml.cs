@@ -242,7 +242,7 @@ public class RadarDataReceivedEventArgs
 
 
         var model = Matrix4x4.Identity;
-        CameraPosition.Z = MapHeight / l * heightScale;
+        CameraPosition.Z = (float)(MapHeight / RadarMaxDistance * heightScale);
         CameraPosition.X = -MapWidthOffCenter / l / heightScale *1.02f;
         //CameraPosition.X = -0.5f;
 

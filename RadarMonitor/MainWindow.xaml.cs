@@ -308,7 +308,7 @@ namespace RadarMonitor
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
                 TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
                 TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
-                    60);
+                    viewModel.MaxDistance);
             }
         }
 
@@ -328,7 +328,7 @@ namespace RadarMonitor
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
                 TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
                 TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
-                    60);
+                    viewModel.MaxDistance);
             }
         }
 
