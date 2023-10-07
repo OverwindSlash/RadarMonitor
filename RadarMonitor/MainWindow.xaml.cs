@@ -8,6 +8,7 @@ using RadarMonitor.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -15,8 +16,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Silk.NET.SDL;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
+using Color = System.Windows.Media.Color;
 using Point = System.Windows.Point;
 using Window = System.Windows.Window;
 
@@ -52,8 +55,7 @@ namespace RadarMonitor
 
             InitializeMapView();
 
-            int size = RadarMonitorViewModel.CartesianSzie;
-            _echoData = new byte[size * size * 4];
+            //_echoData = new byte[RadarMonitorViewModel.CartesianSzie * RadarMonitorViewModel.CartesianSzie * 4];
 
             var viewModel = new RadarMonitorViewModel();
             viewModel.OnPolarLineUpdated += ViewModelOnPolarLineUpdated;
@@ -254,12 +256,19 @@ namespace RadarMonitor
                 viewModel.RadarPort = settings.Port;
 
                 // 抓取 CAT240 网络包
+                _echoData = new byte[RadarMonitorViewModel.CartesianSzie * RadarMonitorViewModel.CartesianSzie * 4];
                 viewModel.CaptureCat240NetworkPackage();
                 viewModel.IsEchoDisplayed = true;
 
                 TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 30);   // TODO: 如何在没有收到信号的时候确定maxdistance初始值
                 TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
                     30);
+
+                Task.Factory.StartNew(() =>
+                {
+                    viewModel.IsEchoDisplayed = false;
+                    viewModel.IsEchoDisplayed = true;
+                });
             }
         }
 

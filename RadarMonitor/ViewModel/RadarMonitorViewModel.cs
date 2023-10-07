@@ -313,6 +313,7 @@ namespace RadarMonitor.ViewModel
                 _client.Dispose();
 
                 _cartesianData = new int[CartesianSzie, CartesianSzie];
+                
             }
         }
 
