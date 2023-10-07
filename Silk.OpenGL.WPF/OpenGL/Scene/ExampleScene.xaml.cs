@@ -60,7 +60,7 @@ public class RadarDataReceivedEventArgs
     private Vector3 CameraDirection = Vector3.Zero;
     private const float CameraZoom = 45f;
     private float heightScale = 0.5f / MathF.Tan(CameraZoom / 2 /180 *MathF.PI);
-    private float l = 2* 10 * CELLS / 1000f;
+    //private float l = 2* 10 * CELLS / 1000f;
 
     // properties to be modified by radar monitor viewmodel
     public float MapHeight { get; set; } = 10f;
@@ -243,11 +243,9 @@ public class RadarDataReceivedEventArgs
 
         var model = Matrix4x4.Identity;
         CameraPosition.Z = (float)(MapHeight / 2.0f / RadarMaxDistance * heightScale);
-        CameraPosition.X = -MapWidthOffCenter / l / heightScale /**1.02f*/;
-        //CameraPosition.X = -0.5f;
+        CameraPosition.X = -(float)(MapWidthOffCenter / 2.0f / RadarMaxDistance / heightScale * 1.03f);
 
-        CameraPosition.Y = -MapHeightOffCenter / l / heightScale /** 1.02f*/;
-        //CameraPosition.Y = -0.4f;
+        CameraPosition.Y = -(float)(MapHeightOffCenter / 2.0f / RadarMaxDistance / heightScale * 1.03f);
 
         var view = Matrix4x4.CreateLookAt(CameraPosition, CameraPosition + CameraFront, CameraUp);
         var projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(CameraZoom), (float)UIWidth / UIHeight, 0.01f, 100.0f);
