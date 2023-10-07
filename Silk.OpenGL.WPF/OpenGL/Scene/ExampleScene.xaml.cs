@@ -53,13 +53,13 @@ public class RadarDataReceivedEventArgs
     private OpenGLSharp.Shader Shader;
     private OpenGLSharp.Texture TextureData;
 
-    private Vector3 CameraPosition = new Vector3(0.0f, 0.0f, 0.5f / MathF.Tan(CameraZoom / 2));
+    private Vector3 CameraPosition = new Vector3(0.0f, 0.0f, 0.5f / MathF.Tan(CameraZoom / 2 / 180 * MathF.PI));
     private Vector3 CameraFront = new Vector3(0.0f, 0.0f, -1.0f);
     private Vector3 CameraUp = Vector3.UnitY;
     private Vector3 CameraRight = Vector3.UnitX;
     private Vector3 CameraDirection = Vector3.Zero;
     private const float CameraZoom = 45f;
-    private float heightScale = 0.5f / MathF.Tan(CameraZoom / 2);
+    private float heightScale = 0.5f / MathF.Tan(CameraZoom / 2 /180 *MathF.PI);
     private float l = 2* 10 * CELLS / 1000f;
 
     // properties to be modified by radar monitor viewmodel
@@ -69,7 +69,7 @@ public class RadarDataReceivedEventArgs
     public float MapWidthOffCenter { get; set; } = 2f;
     public int UIHeight { get; set; } = 1000;
     public int UIWidth { get; set; } = 1600;
-    public double RadarOrientation { get; set; } = 0.0;
+    //public double RadarOrientation { get; set; } = 0.0;
     public double RadarMaxDistance { get; set; } = 60.0;
     public bool IsDisplay { get; set; } = false;
 
@@ -81,7 +81,18 @@ public class RadarDataReceivedEventArgs
             _echoColor = value;
         }
     }
+    private double _orientation;
 
+    private static int IndexOffset = 0;
+    public double RadarOrientation
+    {
+        get { return _orientation; }
+        set
+        {
+            _orientation = value;
+            IndexOffset = (int)(value / 360 * SECTIONS);
+        }
+    }
 
     public ExampleScene()
     {
@@ -232,8 +243,12 @@ public class RadarDataReceivedEventArgs
 
         var model = Matrix4x4.Identity;
         CameraPosition.Z = MapHeight / l * heightScale;
-        CameraPosition.X = -MapWidthOffCenter / ((float)UIWidth / UIHeight * l);
-        CameraPosition.Y = -MapHeightOffCenter / ((float)UIWidth / UIHeight * l);
+        CameraPosition.X = -MapWidthOffCenter / l / heightScale *1.02f;
+        //CameraPosition.X = -0.5f;
+
+        CameraPosition.Y = -MapHeightOffCenter / l / heightScale * 1.02f;
+        //CameraPosition.Y = -0.4f;
+
         var view = Matrix4x4.CreateLookAt(CameraPosition, CameraPosition + CameraFront, CameraUp);
         var projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(CameraZoom), (float)UIWidth / UIHeight, 0.01f, 100.0f);
 
@@ -265,7 +280,11 @@ public class RadarDataReceivedEventArgs
             //{
 
                 List<float> DataArr = new List<float>(CELLS);
-                int idx = SECTIONS - 1 - (int)(dataBlock.Items.StartAzimuth / AZI_SPAN);
+                int idx = (SECTIONS - 1 - (int)(dataBlock.Items.StartAzimuth / AZI_SPAN) - IndexOffset);
+                if (idx < 0)
+            {
+                idx = idx + SECTIONS;
+            }
                 Console.WriteLine($"AziSpan:{idx}");
 
                 for (int i = 0; i < dataBlock.Items.ValidCellsInDataBlock; i++)
