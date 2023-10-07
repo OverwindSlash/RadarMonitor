@@ -16,7 +16,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Silk.NET.SDL;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
@@ -55,7 +54,7 @@ namespace RadarMonitor
 
             InitializeMapView();
 
-            //_echoData = new byte[RadarMonitorViewModel.CartesianSzie * RadarMonitorViewModel.CartesianSzie * 4];
+            _echoData = new byte[RadarMonitorViewModel.CartesianSzie * RadarMonitorViewModel.CartesianSzie * 4];
 
             var viewModel = new RadarMonitorViewModel();
             viewModel.OnPolarLineUpdated += ViewModelOnPolarLineUpdated;
@@ -232,6 +231,13 @@ namespace RadarMonitor
 
         private void ConnectRadar_OnClick(object sender, RoutedEventArgs e)
         {
+            var viewModel = (RadarMonitorViewModel)DataContext;
+            if (!viewModel.IsEncLoaded)
+            {
+                MessageBox.Show("Please load Enc first!", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             // 指定雷达参数对话框
             var radarDialog = new RadarDialog();
             bool? dialogResult = radarDialog.ShowDialog();
@@ -241,7 +247,7 @@ namespace RadarMonitor
                 var settings = (RadarSettingsViewModel)radarDialog.DataContext;
 
                 // 获取雷达经纬度信息
-                var viewModel = (RadarMonitorViewModel)DataContext;
+                
                 viewModel.IsRadarConnected = true;
                 viewModel.RadarLongitude = double.Parse(settings.Longitude);
                 viewModel.RadarLatitude = double.Parse(settings.Latitude);
