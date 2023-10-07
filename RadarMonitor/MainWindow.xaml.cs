@@ -39,8 +39,10 @@ namespace RadarMonitor
 
         private DispatcherTimer _timer = new DispatcherTimer();
         private const int RefreshIntervalMs = 100;
-        private const int FadingIntervalSec = 10;
-        private const byte FaingStep = (byte)(255 / FadingIntervalSec / (1000 /RefreshIntervalMs));
+
+        private Color _scanlineColor = DisplayConfigDialog.DefaultImageEchoColor;
+        private bool _isFadingEnabled = false;
+        private int _fadingInterval = 5;
 
         private bool _flag = false;
 
@@ -78,15 +80,19 @@ namespace RadarMonitor
             EchoImageOverlay.InvalidateVisual();
 
             // Fading
-            for (int i = 0; i < _echoData.Length; i += 4)
+            if (_isFadingEnabled)
             {
-                byte alpha = _echoData[i + 3];
-                if (alpha == 0)
+                byte fadingStep = (byte)(255 / _fadingInterval / (1000 / RefreshIntervalMs));
+                for (int i = 0; i < _echoData.Length; i += 4)
                 {
-                    continue;
-                }
+                    byte alpha = _echoData[i + 3];
+                    if (alpha == 0)
+                    {
+                        continue;
+                    }
 
-                _echoData[i + 3] = (byte)Math.Max((alpha - FaingStep), 0);
+                    _echoData[i + 3] = (byte)Math.Max((alpha - fadingStep), 0);
+                }
             }
 
             //Mat mat = new Mat(ImageSize, ImageSize, MatType.CV_8UC4, _echoData);
@@ -99,9 +105,9 @@ namespace RadarMonitor
 
             foreach (var pixel in updatedPixels)
             {
-                byte r = 255;
-                byte g = 0;
-                byte b = 0;
+                byte r = _scanlineColor.R;
+                byte g = _scanlineColor.G;
+                byte b = _scanlineColor.B;
                 byte a = (byte)pixel.Item3;
 
                 int x = pixel.Item1;
@@ -181,7 +187,7 @@ namespace RadarMonitor
         private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
         {
             var viewModel = (RadarMonitorViewModel)DataContext;
-            viewModel.StopCaptureCat240NetworkPackage();
+            viewModel.DisposeCat240Parser();
         }
 
         private async void LoadEnc_OnClick(object sender, RoutedEventArgs e)
@@ -254,6 +260,35 @@ namespace RadarMonitor
                 TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 60);   // TODO: 如何在没有收到信号的时候确定maxdistance初始值
                 TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
                     60);
+            }
+        }
+
+        private void ConfigDisplay_OnClick(object sender, RoutedEventArgs e)
+        {
+            var configDialog = new DisplayConfigDialog(_scanlineColor, _isFadingEnabled, _fadingInterval);
+            bool? dialogResult = configDialog.ShowDialog();
+
+            if (dialogResult == true)
+            {
+                var config = (DisplayConfigViewModel)configDialog.DataContext;
+
+                _scanlineColor = config.ScanlineColor;
+                // Change Color
+                for (int i = 0; i < _echoData.Length; i += 4)
+                {
+                    byte alpha = _echoData[i + 3];
+                    if (alpha == 0)
+                    {
+                        continue;
+                    }
+
+                    _echoData[i + 0] = _scanlineColor.B;
+                    _echoData[i + 1] = _scanlineColor.G;
+                    _echoData[i + 2] = _scanlineColor.R;
+                }
+
+                _isFadingEnabled = config.IsFadingEnabled;
+                _fadingInterval = config.FadingInterval;
             }
         }
 
@@ -838,13 +873,5 @@ namespace RadarMonitor
             ZoomView(false);
         }
         #endregion
-
-        private void ConfigDisplay_OnClick(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-
-        
     }
 }

@@ -309,6 +309,17 @@ namespace RadarMonitor.ViewModel
         {
             if (_client != null)
             {
+                _client.Disconnect();
+                _client.Dispose();
+
+                _cartesianData = new int[CartesianSzie, CartesianSzie];
+            }
+        }
+
+        public void DisposeCat240Parser()
+        {
+            if (_client != null)
+            {
                 _client.DisconnectAndStop();
             }
         }
