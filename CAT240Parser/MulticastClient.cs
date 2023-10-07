@@ -49,11 +49,19 @@ namespace CAT240Parser
 
         protected override void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
         {
-            Cat240DataBlock dataBlock = new Cat240DataBlock(buffer, size);
+            Task.Factory.StartNew(() =>
+            {
+                double lastAzimuth = 0.0;
 
-            OnCat240Received?.Invoke(this, dataBlock);
+                Cat240DataBlock dataBlock = new Cat240DataBlock(buffer, size);
 
-            // Continue receive datagrams
+                if (dataBlock.Items.StartAzimuth != lastAzimuth)
+                {
+                    OnCat240Received?.Invoke(this, dataBlock);
+                    lastAzimuth = dataBlock.Items.StartAzimuth;
+                }
+            });
+
             ReceiveAsync();
         }
 

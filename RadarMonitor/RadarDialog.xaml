@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RadarMonitor"
         mc:Ignorable="d"
-        Title="Radar Dialog" Height="320" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Icon="Assets/RadarSettings.png">
+        Title="Radar Dialog" Height="380" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Icon="Assets/RadarSettings.png" Topmost="True">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -27,6 +27,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -41,6 +42,10 @@
                 <TextBox Name="TbLatitude" Grid.Row="1" Grid.Column="1" Margin="5, 5, 5, 10" Height="20" HorizontalAlignment="Stretch"
                  Text="{Binding Latitude, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
                 <Label Grid.Row="1" Grid.Column="2" Content="(-90~90)" Margin="5,5,5,10" HorizontalAlignment="Left"></Label>
+                <Label Grid.Row="2" Grid.Column="0" Content="Latitude:" Margin="10,5,5,10" HorizontalAlignment="Right"></Label>
+                <TextBox Name="TbOrientation" Grid.Row="2" Grid.Column="1" Margin="5, 5, 5, 10" Height="20" HorizontalAlignment="Stretch"
+                         Text="{Binding Orientation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <Label Grid.Row="2" Grid.Column="2" Content="(-180~180)" Margin="5,5,5,10" HorizontalAlignment="Left"></Label>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="2" Header="CAT-240 IP Address" Margin="5">

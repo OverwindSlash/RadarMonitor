@@ -1,16 +1,18 @@
-﻿using RadarMonitor.Model;
+﻿using CAT240Parser;
+using OpenCvSharp;
+using RadarMonitor.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using CAT240Parser;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using Silk.WPF.OpenGL.Scene;
 
 namespace RadarMonitor.ViewModel
 {
+    public delegate void PolarLineUpdatedEventHandler(object sender, List<Tuple<int, int, int>> updatedPixels);
+
     public class RadarMonitorViewModel : INotifyPropertyChanged
     {
         #region Notify Property
@@ -43,6 +45,7 @@ namespace RadarMonitor.ViewModel
 
         private double _radarLongitude;
         private double _radarLatitude;
+        private double _radarOrientation;
 
         private string _radarIpAddress;
         private int _radarPort;
@@ -57,8 +60,14 @@ namespace RadarMonitor.ViewModel
         private int _cellResolution;
         private int _cellCount;
         private int _videoBlockCount;
+        private int _maxDistance;
+        
+        public const int CartesianSzie = 2000;
+        private int[,] _cartesianData = new int[CartesianSzie, CartesianSzie];
 
+        public event PolarLineUpdatedEventHandler OnPolarLineUpdated;
 
+        #region Properties
         public bool IsEncLoaded
         {
             get => _isEncLoaded;
@@ -128,6 +137,15 @@ namespace RadarMonitor.ViewModel
             set
             {
                 SetField(ref _radarLatitude, value, "RadarLatitude");
+            }
+        }
+
+        public double RadarOrientation
+        {
+            get => _radarOrientation;
+            set
+            {
+                SetField(ref _radarOrientation, value, "RadarOrientation");
             }
         }
 
@@ -221,6 +239,16 @@ namespace RadarMonitor.ViewModel
             }
         }
 
+        public int MaxDistance
+        {
+            get => _maxDistance;
+            set
+            {
+                SetField(ref _maxDistance, value, "MaxDistance");
+            }
+        }
+        #endregion
+
         public RadarMonitorViewModel()
         {
             _radarIpAddress = string.Empty;
@@ -284,7 +312,79 @@ namespace RadarMonitor.ViewModel
             CellResolution = data.Items.VideoResolution;
             CellCount = (int)data.Items.ValidCellsInDataBlock;
             VideoBlockCount = (int)data.Items.ValidCellsInDataBlock;
-            ExampleScene.OnReceivedCat240DataBlock(sender, data);
+            MaxDistance = (int)(data.Items.CellDuration * data.Items.VideoCellDurationUnit * 300000 * data.Items.ValidCellsInDataBlock);
+            //ExampleScene.OnReceivedCat240DataBlock(sender, data);
+
+            var updatedPixels = PolarToCartesian(data);
+            OnPolarLineUpdated?.Invoke(this, updatedPixels);
+        }
+
+        private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)
+        {
+            Cat240DataItems items = data.Items;
+
+            double angleInRadians = (items.StartAzimuthInDegree + RadarOrientation) * Math.PI / 180.0;
+            var cosAzi = Math.Cos(angleInRadians);
+            var sinAzi = Math.Sin(angleInRadians);
+
+            double radiusIncrement = CartesianSzie / 2.0 / items.VideoBlocks.Count;
+
+            double cosAziStep = radiusIncrement * cosAzi;
+            double sinAziStep = radiusIncrement * sinAzi;
+
+            double halfSize = CartesianSzie / 2.0;
+
+            int stride = RadarMonitorViewModel.CartesianSzie * 4;
+            List<Tuple<int, int, int>> updatedPixels = new List<Tuple<int, int, int>>();
+
+            int index = 0;
+            for (int i = 0; i < items.VideoBlocks.Count; i++)
+            {
+                int x = (int)(halfSize + i * cosAziStep);
+                int y = (int)(halfSize + i * sinAziStep);
+
+                if (x >= 0 && x < CartesianSzie && y >= 0 && y < CartesianSzie)
+                {
+                    int grayValue = (int)items.GetCellData(i);
+                    _cartesianData[x, y] = grayValue;
+                    updatedPixels.Add(new Tuple<int, int, int>(x, y, grayValue));
+                }
+            }
+
+            return updatedPixels;
+        }
+
+        private static void SaveImage(int[,] cartesian, string filename)
+        {
+            // 读取灰度图像数据，假设grayData为您的二维数组
+            int width = cartesian.GetLength(0); // 图像宽度
+            int height = cartesian.GetLength(1); // 图像高度
+
+            // 创建一个新的RGB图像
+            Mat rgbImage = new Mat(height, width, MatType.CV_8UC4);
+
+            // 定义颜色，例如蓝色，以及透明度
+            Scalar color = new Scalar(0, 255, 0); // BGR颜色值，这里为纯蓝色
+            byte alpha = 0; // 初始透明度为0
+
+            // 迭代图像的每个像素
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    byte grayValue = (byte)cartesian[x, y];
+
+                    // 将灰度值映射到透明度范围
+                    alpha = (byte)grayValue; // 较小的灰度值将产生更高的透明度
+
+                    // 设置像素颜色和透明度
+                    Vec4b pixel = new Vec4b((byte)color.Val0, (byte)color.Val1, (byte)color.Val2, alpha);
+                    rgbImage.Set<Vec4b>(y, x, pixel);
+                }
+            }
+
+            // 保存处理后的图像
+            Cv2.ImWrite(filename, rgbImage);
         }
     }
 }
