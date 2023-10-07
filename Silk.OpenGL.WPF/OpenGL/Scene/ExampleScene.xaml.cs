@@ -35,7 +35,7 @@ public class RadarDataReceivedEventArgs
 
 
     private static uint lastId = 0;
-    private const int SECTIONS = 4096;
+    private const int SECTIONS = 2048;
     private const int CELLS = 6000;
     private const float AZI_SPAN = 65536 / (float)SECTIONS;
 
@@ -53,18 +53,20 @@ public class RadarDataReceivedEventArgs
     private OpenGLSharp.Shader Shader;
     private OpenGLSharp.Texture TextureData;
 
-    private Vector3 CameraPosition = new Vector3(0.0f, 0.0f, 3.0f);
+    private Vector3 CameraPosition = new Vector3(0.0f, 0.0f, 0.5f / MathF.Tan(CameraZoom / 2));
     private Vector3 CameraFront = new Vector3(0.0f, 0.0f, -1.0f);
     private Vector3 CameraUp = Vector3.UnitY;
     private Vector3 CameraRight = Vector3.UnitX;
     private Vector3 CameraDirection = Vector3.Zero;
-    private float CameraZoom = 45f;
+    private const float CameraZoom = 45f;
+    private float heightScale = 0.5f / MathF.Tan(CameraZoom / 2);
+    private float l = 2* 10 * CELLS / 1000f;
 
     // properties to be modified by radar monitor viewmodel
-    public float MapHeight { get; set; }    
+    public float MapHeight { get; set; } = 10f;
     public float MapWidth { get; set; }
-    public float MapHeightOffCenter { get; set; }
-    public float MapWidthOffCenter { get; set; }
+    public float MapHeightOffCenter { get; set; } = 1f;
+    public float MapWidthOffCenter { get; set; } = 2f;
     public int UIHeight { get; set; } = 1000;
     public int UIWidth { get; set; } = 1600;
 
@@ -193,6 +195,8 @@ public class RadarDataReceivedEventArgs
         //gl.UseProgram(shaderProgram);
         //gl.BindVertexArray(vao);
         //gl.DrawArrays(GLEnum.Triangles, 0, 3);
+
+
         lock (lk)
         {
             foreach (var item in DataList)
@@ -205,6 +209,11 @@ public class RadarDataReceivedEventArgs
             }
             DataList.Clear();
         }
+
+        //fixed (void* d = &DataArray.ToArray()[0])
+        //{
+        //    gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, CELLS, SECTIONS, PixelFormat.Red, PixelType.Float, d);
+        //}
 
         Vao.Bind();
         TextureData.Bind(TextureUnit.Texture0);
@@ -219,6 +228,9 @@ public class RadarDataReceivedEventArgs
 
 
         var model = Matrix4x4.Identity;
+        CameraPosition.Z = MapHeight / l * heightScale;
+        CameraPosition.X = -MapHeightOffCenter / l;
+        CameraPosition.Y = -MapHeightOffCenter / ((float)UIWidth / UIHeight * l);
         var view = Matrix4x4.CreateLookAt(CameraPosition, CameraPosition + CameraFront, CameraUp);
         var projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(CameraZoom), (float)UIWidth / UIHeight, 0.01f, 100.0f);
 
@@ -257,7 +269,9 @@ public class RadarDataReceivedEventArgs
                 {
                     var color = (float)dataBlock.Items.GetCellData(i) / 255;
                     DataArr.Add(color);
+                    DataArray[idx * CELLS + i] = color;
                 }
+
 
             var e = new RadarDataReceivedEventArgs(idx, DataArr);
 
@@ -267,7 +281,7 @@ public class RadarDataReceivedEventArgs
                 LastSectionId = e.Id;
                 IsFilled[e.Id] = true;
                 // fill up 
-                for (int i = e.Id - 1; i >= e.Id - 2 && i > 0; i--)
+                for (int i = e.Id - 1; i >= e.Id - 3 && i > 0; i--)
                 {
                     if (e.Id > 1 && !IsFilled[i])
                     {
