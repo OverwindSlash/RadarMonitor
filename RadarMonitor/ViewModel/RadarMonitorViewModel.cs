@@ -334,7 +334,7 @@ namespace RadarMonitor.ViewModel
             CellResolution = data.Items.VideoResolution;
             CellCount = (int)data.Items.ValidCellsInDataBlock;
             VideoBlockCount = (int)data.Items.ValidCellsInDataBlock;
-            MaxDistance = (int)(data.Items.CellDuration * data.Items.VideoCellDurationUnit * 300000 * data.Items.ValidCellsInDataBlock);
+            MaxDistance = (int)(data.Items.CellDuration * data.Items.VideoCellDurationUnit * 300000 / 2 * data.Items.ValidCellsInDataBlock);
 
             // GDI 回波图像绘制
             if (IsEchoDisplayed)

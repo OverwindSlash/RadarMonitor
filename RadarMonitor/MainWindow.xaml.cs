@@ -257,9 +257,9 @@ namespace RadarMonitor
                 viewModel.CaptureCat240NetworkPackage();
                 viewModel.IsEchoDisplayed = true;
 
-                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 60);   // TODO: 如何在没有收到信号的时候确定maxdistance初始值
+                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 30);   // TODO: 如何在没有收到信号的时候确定maxdistance初始值
                 TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
-                    60);
+                    30);
             }
         }
 
@@ -731,7 +731,7 @@ namespace RadarMonitor
             EchoOverlay.Children.Clear();
             EchoOverlay.Children.Add(EchoImageOverlay);
 
-            var size = maxDistance / kmWith1px;
+            var size = 2* maxDistance / kmWith1px;
 
             EchoImageOverlay.Width = size;
             EchoImageOverlay.Height = size;
