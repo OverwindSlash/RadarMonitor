@@ -14,7 +14,10 @@ namespace CAT240Parser
         public event Cat240ReceivedEventHandler OnCat240Received;
 
 
-        public MulticastClient(string address, int port) : base(address, port) { }
+        public MulticastClient(string address, int port) : base(address, port) {
+            ThreadPool.SetMinThreads(1, 1);
+            ThreadPool.SetMaxThreads(16, 16);
+        }
 
         public void DisconnectAndStop()
         {
@@ -49,7 +52,7 @@ namespace CAT240Parser
 
         protected override void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
         {
-            Task.Factory.StartNew(() =>
+            ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
             {
                 double lastAzimuth = 0.0;
 
@@ -60,7 +63,9 @@ namespace CAT240Parser
                     OnCat240Received?.Invoke(this, dataBlock);
                     lastAzimuth = dataBlock.Items.StartAzimuth;
                 }
-            });
+
+
+            }));
 
             ReceiveAsync();
         }
