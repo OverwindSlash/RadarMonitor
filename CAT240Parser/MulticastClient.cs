@@ -15,8 +15,9 @@ namespace CAT240Parser
 
 
         public MulticastClient(string address, int port) : base(address, port) {
+            int coreCount = Environment.ProcessorCount;
             ThreadPool.SetMinThreads(1, 1);
-            ThreadPool.SetMaxThreads(16, 16);
+            ThreadPool.SetMaxThreads(coreCount, coreCount);
         }
 
         public void DisconnectAndStop()

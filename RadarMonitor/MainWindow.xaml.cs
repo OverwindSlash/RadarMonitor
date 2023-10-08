@@ -40,7 +40,7 @@ namespace RadarMonitor
         private WriteableBitmap _bitmap = new WriteableBitmap(ImageSize, ImageSize,96, 96, PixelFormats.Bgra32, null);
 
         private DispatcherTimer _timer = new DispatcherTimer();
-        private const int RefreshIntervalMs = 100;
+        private const int RefreshIntervalMs = 50;
 
         private Color _scanlineColor = DisplayConfigDialog.DefaultImageEchoColor;
         private bool _isFadingEnabled = false;
