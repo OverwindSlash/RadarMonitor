@@ -8,6 +8,7 @@ using RadarMonitor.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -116,10 +117,18 @@ namespace RadarMonitor
                 int index = y * stride + x * 4;
 
                 _echoData[index + 0] = b;        // Blue
-                _echoData[index + 1] = g;        // Green
+                _echoData[index + 1] = g;        // GreenOpenGlEchoOverlay.RadarMaxDistance
                 _echoData[index + 2] = r;        // Red
                 _echoData[index + 3] = a;        // Alpha
             }
+
+            //TODO：Refactoring
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                var viewModel = (RadarMonitorViewModel)DataContext;
+                OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
+                OpenGlEchoOverlay.RealCells = viewModel.CellCount;
+            }));      
         }
 
         private void InitializeMapView()
@@ -267,8 +276,7 @@ namespace RadarMonitor
                 viewModel.IsEchoDisplayed = true;
 
                 TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 30);   // TODO: 如何在没有收到信号的时候确定maxdistance初始值
-                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
-                    30);
+                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 30);
 
                 Task.Factory.StartNew(() =>
                 {
@@ -322,8 +330,7 @@ namespace RadarMonitor
             {
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
                 TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
-                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
-                    viewModel.MaxDistance);
+                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
             }
         }
 
@@ -788,7 +795,6 @@ namespace RadarMonitor
             OpenGlEchoOverlay.MapHeight = mapHeight;
             OpenGlEchoOverlay.MapWidthOffCenter = mapWidthOffCenter;
             OpenGlEchoOverlay.MapHeightOffCenter = mapHeightOffCenter;
-            OpenGlEchoOverlay.RadarMaxDistance = maxDistance;
 
             var viewModel = (RadarMonitorViewModel)DataContext;
             OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;

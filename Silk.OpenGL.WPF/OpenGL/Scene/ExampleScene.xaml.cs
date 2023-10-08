@@ -28,10 +28,10 @@ public class RadarDataReceivedEventArgs
     public partial class ExampleScene : UserControl
 {
     private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
-    uint vao;
-    uint shaderProgram;
+    //uint vao;
+    //uint shaderProgram;
 
-    private System.Windows.Media.Color _echoColor = System.Windows.Media.Colors.Black;
+    private System.Windows.Media.Color _echoColor = System.Windows.Media.Colors.Green;
 
 
     private static uint lastId = 0;
@@ -71,7 +71,48 @@ public class RadarDataReceivedEventArgs
     public int UIWidth { get; set; } = 1600;
     //public double RadarOrientation { get; set; } = 0.0;
     public double RadarMaxDistance { get; set; } = 60.0;
-    public bool IsDisplay { get; set; } = false;
+
+    private bool _isDisplay;
+
+    public bool IsDisplay
+    {
+        get { return _isDisplay; }
+        set 
+        { 
+            _isDisplay = value;
+            Array.Clear(DataArray);
+            TextureData = new OpenGLSharp.Texture(RenderContext.Gl, DataArray, (uint)_realCells, SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit.Texture0);
+            lastId = 0;
+
+        }
+    }
+
+    private static bool radarChanging = false;
+    private static int _realCells = CELLS;
+
+    public int RealCells
+    {
+        get { return _realCells; }
+        set 
+        {
+            if (value <= 0)
+            {
+                return;
+            }
+            if (value != _realCells)
+            {
+                radarChanging = true;
+                DataArray = new float[SECTIONS * value];
+                TextureData = new OpenGLSharp.Texture(RenderContext.Gl, DataArray, (uint)value, SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit.Texture0);
+                lastId = 0;
+                radarChanging = false;
+
+            }
+            _realCells = value; 
+        }
+    }
+
+
 
     public System.Windows.Media.Color EchoColor
     {
@@ -81,9 +122,8 @@ public class RadarDataReceivedEventArgs
             _echoColor = value;
         }
     }
-    private double _orientation;
-
     private static int IndexOffset = 0;
+    private double _orientation;
     public double RadarOrientation
     {
         get { return _orientation; }
@@ -188,21 +228,20 @@ public class RadarDataReceivedEventArgs
 
         Shader = new OpenGLSharp.Shader(gl, "shaders/vert.shader", "shaders/frag.shader");
 
-        TextureData = new OpenGLSharp.Texture(gl, DataArray, CELLS, SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit.Texture0);
+        TextureData = new OpenGLSharp.Texture(gl, DataArray, (uint)_realCells, SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit.Texture0);
 
 
     }
 
-    private unsafe void OnRender(TimeSpan obj)
+    private unsafe void OnRender(TimeSpan delta)
     {
+        if (!IsDisplay)
+        {
+            return;
+        }
         GL gl = RenderContext.Gl;
 
-        //float hue = (float)_stopwatch.Elapsed.TotalSeconds * 0.15f % 1;
-
-        //gl.ClearColor(SilkColor.ByDrawingColor(SilkColor.FromHsv(new Vector4(1.0f * hue, 1.0f * 0.75f, 1.0f * 0.75f, 1.0f))));
-        //gl.Clear(ClearBufferMask.ColorBufferBit);
-
-        gl.ClearColor(_echoColor.R / 255f, _echoColor.G / 255f, _echoColor.B / 255f, 0.0f);
+        gl.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         gl.Clear((uint)(ClearBufferMask.ColorBufferBit));
 
 
@@ -217,12 +256,14 @@ public class RadarDataReceivedEventArgs
             {
                 fixed (void* d = &item.DataArray.ToArray()[0])
                 {
-                    gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, item.Id, CELLS, 1, PixelFormat.Red, PixelType.Float, d);
+                    gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, item.Id, (uint)_realCells, 1, PixelFormat.Red, PixelType.Float, d);
 
                 }
             }
             DataList.Clear();
         }
+
+
 
         //fixed (void* d = &DataArray.ToArray()[0])
         //{
@@ -236,15 +277,15 @@ public class RadarDataReceivedEventArgs
 
         Shader.SetUniform("uTexture0", 0);
         Shader.SetUniform("uSection", SECTIONS);
-        Shader.SetUniform("uCell", CELLS);
+        Shader.SetUniform("uCell", (int)_realCells);
 
         Shader.SetUniform("uLastSection", LastSectionId);
-
+        Shader.SetUniform("uColor", new Vector3(EchoColor.R / 255.0f, EchoColor.G / 255.0f, EchoColor.B / 255.0f));
 
         var model = Matrix4x4.Identity;
         CameraPosition.Z = (float)(MapHeight / 2.0f / RadarMaxDistance * heightScale);
+        //Trace.WriteLine($"W:{MapWidth}, H:{MapHeight}, MD:{RadarMaxDistance}, UIW:{UIWidth}, UIH:{UIHeight}, MCW:{MapWidthOffCenter}, MCH:{MapHeightOffCenter} , Scale:{heightScale}");
         CameraPosition.X = -(float)(MapWidthOffCenter / 2.0f / RadarMaxDistance / heightScale * 1.03f);
-
         CameraPosition.Y = -(float)(MapHeightOffCenter / 2.0f / RadarMaxDistance / heightScale * 1.03f);
 
         var view = Matrix4x4.CreateLookAt(CameraPosition, CameraPosition + CameraFront, CameraUp);
@@ -268,6 +309,10 @@ public class RadarDataReceivedEventArgs
         {
             return;
         }
+        if (radarChanging)
+        {
+            return;
+        }
         if (dataBlock.Items.MessageIndex > lastId)
         {
             //Console.WriteLine($"SAzi:{dataBlock.Items.StartAzimuth},MsgId:{dataBlock.Items.MessageIndex}," +
@@ -277,8 +322,8 @@ public class RadarDataReceivedEventArgs
             //ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
             //{
 
-                List<float> DataArr = new List<float>(CELLS);
-                int idx = (SECTIONS - 1 - (int)(dataBlock.Items.StartAzimuth / AZI_SPAN) - IndexOffset);
+                List<float> DataArr = new List<float>((int)_realCells);
+                int idx = (SECTIONS - 1 - (int)(dataBlock.Items.StartAzimuth / 65536.0f * (float)SECTIONS) - IndexOffset);
                 if (idx < 0)
             {
                 idx = idx + SECTIONS;
@@ -289,7 +334,7 @@ public class RadarDataReceivedEventArgs
                 {
                     var color = (float)dataBlock.Items.GetCellData(i) / 255;
                     DataArr.Add(color);
-                    DataArray[idx * CELLS + i] = color;
+                    DataArray[idx * _realCells + i] = color;
                 }
 
 
