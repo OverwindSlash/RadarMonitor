@@ -41,13 +41,13 @@ namespace RadarMonitor
         private WriteableBitmap _bitmap = new WriteableBitmap(ImageSize, ImageSize,96, 96, PixelFormats.Bgra32, null);
 
         private DispatcherTimer _timer = new DispatcherTimer();
-        private const int RefreshIntervalMs = 50;
+        private const int RefreshIntervalMs = 30;
 
         private Color _scanlineColor = DisplayConfigDialog.DefaultImageEchoColor;
         private bool _isFadingEnabled = false;
         private int _fadingInterval = 5;
 
-        private bool _flag = false;
+        private bool _flag = true;
 
         public MainWindow()
         {
@@ -137,9 +137,7 @@ namespace RadarMonitor
             BaseMapView.IsAttributionTextVisible = false;
 
             #region Enc configuration
-            // 海图显示配置：不显示 海床，深度点，地理名称
-            _flag = false;
-
+            // 海图显示配置：不显示 海床，深度点，地理名称等
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.AllIsolatedDangers = _flag;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ArchipelagicSeaLanes = _flag;
 
@@ -273,6 +271,8 @@ namespace RadarMonitor
                 // 抓取 CAT240 网络包
                 _echoData = new byte[RadarMonitorViewModel.CartesianSzie * RadarMonitorViewModel.CartesianSzie * 4];
                 viewModel.CaptureCat240NetworkPackage();
+                // viewModel.IsOpenGlEchoDisplayed = true;
+                // OpenGlEchoOverlay.Visibility = Visibility.Visible;
                 viewModel.IsEchoDisplayed = true;
 
                 TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 30);   // TODO: 如何在没有收到信号的时候确定maxdistance初始值
@@ -280,8 +280,9 @@ namespace RadarMonitor
 
                 Task.Factory.StartNew(() =>
                 {
-                    viewModel.IsEchoDisplayed = false;
-                    viewModel.IsEchoDisplayed = true;
+                    // Refresh UI
+                    viewModel.IsEchoDisplayed = !viewModel.IsEchoDisplayed;
+                    viewModel.IsEchoDisplayed = !viewModel.IsEchoDisplayed;
                 });
             }
         }
@@ -676,7 +677,7 @@ namespace RadarMonitor
         {
             RingsOverlay.Children.Clear();
 
-            Brush ringBrush = new SolidColorBrush(Colors.PaleGreen);   // 距离环的颜色
+            Brush ringBrush = new SolidColorBrush(Colors.Chartreuse);   // 距离环的颜色
             DoubleCollection dashArray = new DoubleCollection(new double[] { 2, 4 });
             int ringFontSize = 12;
 
@@ -713,7 +714,7 @@ namespace RadarMonitor
                     Height = 2 * radius,
                     Stroke = ringBrush,
                     StrokeDashArray = dashArray,
-                    StrokeThickness = 2,
+                    StrokeThickness = 1,
                     Fill = Brushes.Transparent
                 };
                 Canvas.SetLeft(circle, radarX - radius);
