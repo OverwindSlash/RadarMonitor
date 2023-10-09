@@ -341,10 +341,10 @@ namespace RadarMonitor.ViewModel
                 OnCat240SpecChanged?.Invoke(this, new Cat240Spec(dataItems));
             }
 
+            _lastCat240DataItems = dataItems;
+
             var updatedPixels = PolarToCartesian(data);
             OnCat240PackageReceived?.Invoke(this, data, updatedPixels);
-
-            
         }
 
         private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)
