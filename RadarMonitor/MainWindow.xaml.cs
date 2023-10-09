@@ -1,9 +1,11 @@
-﻿using Esri.ArcGISRuntime.Geometry;
+﻿using CAT240Parser;
+using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Hydrography;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.UI.Controls;
 using RadarMonitor.Model;
 using RadarMonitor.ViewModel;
+using Silk.WPF.OpenGL.Scene;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -41,12 +43,13 @@ namespace RadarMonitor
 
         private byte[] _echoData;
         private int _echoDataStride;
+        private int _stride = RadarMonitorViewModel.CartesianSzie * 4;
         private WriteableBitmap _bitmap = new WriteableBitmap(ImageSize, ImageSize,96, 96, PixelFormats.Bgra32, null);
 
         private DispatcherTimer _timer = new DispatcherTimer();
         private const int RefreshIntervalMs = 30;
 
-        private Color _scanlineColor = DisplayConfigDialog.DefaultImageEchoColor;
+        private Color _scanlineColor;
         private bool _isFadingEnabled = false;
         private int _fadingInterval = 5;
 
@@ -56,16 +59,23 @@ namespace RadarMonitor
         {
             InitializeComponent();
 
-            InitializeMapView();
-
             // ViewModel 与事件注册
             var viewModel = new RadarMonitorViewModel();
+            viewModel.OnEncChanged += OnEncChanged;
+            viewModel.OnMainRadarChanged += OnMainRadarChanged;
+            viewModel.OnCat240SpecChanged += OnCat240SpecChanged;
             viewModel.OnCat240PackageReceived += OnCat240PackageReceived;
             DataContext = viewModel;
 
-            // 图片回波显示后台一维数组
+            InitializeMapView();
+
+            // 初始化图片回波显示后台一维数组
             _echoData = new byte[RadarMonitorViewModel.CartesianSzie * RadarMonitorViewModel.CartesianSzie * 4];
             _echoDataStride = RadarMonitorViewModel.CartesianSzie * 4;
+            _scanlineColor = DisplayConfigDialog.DefaultImageEchoColor;
+            InitializeEchoData();
+            
+            // 初始化刷新计时器
             _timer.Interval = TimeSpan.FromMilliseconds(RefreshIntervalMs);
             _timer.Tick += RefreshImageEcho;
             _timer.Start();
@@ -117,6 +127,21 @@ namespace RadarMonitor
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NatureOfSeabed = _encDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NoteOnChartData = _encDisplayFlag;
             #endregion
+
+            var viewModel = (RadarMonitorViewModel)DataContext;
+            viewModel.IsEncLoaded = false;
+            viewModel.IsEncDisplayed = false;
+        }
+
+        private void InitializeEchoData()
+        {
+            for (int i = 0; i < _echoData.Length; i += 4)
+            {
+                _echoData[i + 0] = _scanlineColor.B;    // Blue
+                _echoData[i + 1] = _scanlineColor.G;    // Green
+                _echoData[i + 2] = _scanlineColor.R;    // Red
+                _echoData[i + 3] = 0;                   // Alpha
+            }
         }
 
         private void RefreshImageEcho(object? sender, EventArgs e)
@@ -167,56 +192,25 @@ namespace RadarMonitor
             var viewModel = (RadarMonitorViewModel)DataContext;
             viewModel.DisposeCat240Parser();
         }
-
-        private void OnCat240PackageReceived(object sender, List<Tuple<int, int, int>> updatedPixels)
-        {
-            int stride = RadarMonitorViewModel.CartesianSzie * 4;
-
-            foreach (var pixel in updatedPixels)
-            {
-                byte r = _scanlineColor.R;
-                byte g = _scanlineColor.G;
-                byte b = _scanlineColor.B;
-                byte a = (byte)pixel.Item3;
-
-                int x = pixel.Item1;
-                int y = pixel.Item2;
-                int index = y * stride + x * 4;
-
-                _echoData[index + 0] = b;        // Blue
-                _echoData[index + 1] = g;        // Green
-                _echoData[index + 2] = r;        // Red
-                _echoData[index + 3] = a;        // Alpha
-            }
-
-            //TODO：Refactoring
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                var viewModel = (RadarMonitorViewModel)DataContext;
-                OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
-                OpenGlEchoOverlay.RealCells = viewModel.CellCount;
-            }));      
-        }
-
+        
+        #region Load ENC
         private async void LoadEnc_OnClick(object sender, RoutedEventArgs e)
         {
             // 指定海图文件
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Enc Catalog file (*.031)|*.031|All files (*.*)|*.*";
-
             if (openFileDialog.ShowDialog() != true)
             {
                 return;
             }
-
-            string selectedFilePath = openFileDialog.FileName;
+            string catalogFile = openFileDialog.FileName;
 
             try
             {
                 // 加载海图
-                BaseMapView.Map.OperationalLayers.Clear();
+                InitializeMapView();
 
-                EncExchangeSet encExchangeSet = new EncExchangeSet(selectedFilePath);
+                EncExchangeSet encExchangeSet = new EncExchangeSet(catalogFile);
                 await encExchangeSet.LoadAsync();
 
                 List<Envelope> dataSetExtents = new List<Envelope>();
@@ -234,8 +228,7 @@ namespace RadarMonitor
 
                 // 设置 ViewModel
                 var viewModel = (RadarMonitorViewModel)DataContext;
-                viewModel.IsEncLoaded = true;
-                viewModel.IsEncDisplayed = true;
+                viewModel.RecordNewEncUri(catalogFile);
             }
             catch (Exception ex)
             {
@@ -245,19 +238,19 @@ namespace RadarMonitor
 
         private void LoadCellDir_OnClick(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog();
+            System.Windows.Forms.FolderBrowserDialog folderDialog = new();
 
             folderDialog.RootFolder = Environment.SpecialFolder.MyComputer;
             if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                string path = folderDialog.SelectedPath;
+                string encDir = folderDialog.SelectedPath;
 
-                List<string> fileList = new List<string>();
-                GetAllFiles(path, fileList);
+                List<string> files = new List<string>();
+                GetAllFiles(encDir, files);
 
                 InitializeMapView();
 
-                foreach (string file in fileList)
+                foreach (string file in files)
                 {
                     if (!file.EndsWith(".000"))
                     {
@@ -271,7 +264,7 @@ namespace RadarMonitor
 
                         var idx = layer.Name[2];
                         int insertIndex = 0;
-                        
+
                         foreach (var l in BaseMapView.Map.OperationalLayers)
                         {
                             var name = l.Name[2];
@@ -282,17 +275,16 @@ namespace RadarMonitor
                             insertIndex++;
                         }
                         BaseMapView.Map.OperationalLayers.Insert(insertIndex, layer);
-
-                        // 设置 ViewModel
-                        var viewModel = (RadarMonitorViewModel)DataContext;
-                        viewModel.IsEncLoaded = true;
-                        viewModel.IsEncDisplayed = true;
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
+
+                // 设置 ViewModel
+                var viewModel = (RadarMonitorViewModel)DataContext;
+                viewModel.RecordNewEncUri(encDir);
             }
         }
 
@@ -301,20 +293,18 @@ namespace RadarMonitor
             // 指定海图文件
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Enc Cell file (*.000)|*.000|All files (*.*)|*.*";
-
             if (openFileDialog.ShowDialog() != true)
             {
                 return;
             }
-
-            string filename = openFileDialog.FileName;
+            string cellFile = openFileDialog.FileName;
 
             InitializeMapView();
 
             try
             {
-                var cell = new EncCell(filename);
-                var layer = new EncLayer(cell) { Name = new FileInfo(filename).Name };
+                var cell = new EncCell(cellFile);
+                var layer = new EncLayer(cell) { Name = new FileInfo(cellFile).Name };
 
                 var idx = layer.Name[2];
                 int insertIndex = 0;
@@ -332,8 +322,7 @@ namespace RadarMonitor
 
                 // 设置 ViewModel
                 var viewModel = (RadarMonitorViewModel)DataContext;
-                viewModel.IsEncLoaded = true;
-                viewModel.IsEncDisplayed = true;
+                viewModel.RecordNewEncUri(cellFile);
             }
             catch (Exception ex)
             {
@@ -341,6 +330,13 @@ namespace RadarMonitor
             }
         }
 
+        private void OnEncChanged(object sender, string encuri)
+        {
+            TbStatusInfo.Text = $"ENC {encuri} loaded successfully.";
+        }
+        #endregion
+
+        #region Connect Radar
         private void ConnectRadar_OnClick(object sender, RoutedEventArgs e)
         {
             var viewModel = (RadarMonitorViewModel)DataContext;
@@ -353,36 +349,31 @@ namespace RadarMonitor
             // 指定雷达参数对话框
             var radarDialog = new RadarDialog();
             bool? dialogResult = radarDialog.ShowDialog();
-
             if (dialogResult == true)
             {
                 var settings = (RadarSettingsViewModel)radarDialog.DataContext;
 
-                // 获取雷达经纬度信息
-                
+                // 获取雷达经纬度和网络信息
+                viewModel.MainRadarSettings = settings.ToRadarSettings();
+
                 viewModel.IsRadarConnected = true;
-                viewModel.RadarLongitude = double.Parse(settings.Longitude);
-                viewModel.RadarLatitude = double.Parse(settings.Latitude);
-                viewModel.RadarOrientation = settings.Orientation;
-
                 viewModel.IsRingsDisplayed = true;
-                DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
 
-                // 获取雷达网络信息
-                viewModel.RadarIpAddress =
-                    $"{settings.IpPart1}.{settings.IpPart2}.{settings.IpPart3}.{settings.IpPart4}";
-                viewModel.RadarPort = settings.Port;
+                // 默认显示 OpenGL 雷达回波, 不显示图片雷达回波
+                viewModel.IsEchoDisplayed = false;
+                viewModel.IsOpenGlEchoDisplayed = true;
+                OpenGlEchoOverlay.Visibility = viewModel.IsOpenGlEchoDisplayed ? Visibility.Visible : Visibility.Hidden;
+                OpenGlEchoOverlay.IsDisplay = true;
 
                 // 抓取 CAT240 网络包
-                _echoData = new byte[RadarMonitorViewModel.CartesianSzie * RadarMonitorViewModel.CartesianSzie * 4];
+                InitializeEchoData();
                 viewModel.CaptureCat240NetworkPackage();
-                // viewModel.IsOpenGlEchoDisplayed = true;
-                // OpenGlEchoOverlay.Visibility = Visibility.Visible;
-                viewModel.IsEchoDisplayed = true;
 
-                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 30);   // TODO: 如何在没有收到信号的时候确定maxdistance初始值
-                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 30);
+                DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
+                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 0);
+                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 0);
 
+                // TODO: 如何改善
                 Task.Factory.StartNew(() =>
                 {
                     // Refresh UI
@@ -391,6 +382,69 @@ namespace RadarMonitor
                 });
             }
         }
+
+        private void OnMainRadarChanged(object sender, RadarSettings radarSettings)
+        {
+            TbStatusInfo.Text = $"Listening radar on {radarSettings.Ip}:{radarSettings.Port}.";
+        }
+
+        private void OnCat240SpecChanged(object sender, Cat240Spec cat240spec)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    var viewModel = (RadarMonitorViewModel)DataContext;
+                    TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
+                        cat240spec.MaxDistance);
+                    TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
+                        cat240spec.MaxDistance);
+
+                    OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
+                    OpenGlEchoOverlay.RealCells = viewModel.CellCount;
+                });
+            }
+            catch (Exception e)
+            {
+                // TODO: 有没有更好的优雅结束的方法
+            }
+        }
+
+        private void OnCat240PackageReceived(object sender, Cat240DataBlock data, List<Tuple<int, int, int>> updatedPixels)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    var viewModel = (RadarMonitorViewModel)DataContext;
+
+                    // GDI 回波图像绘制
+                    if (viewModel.IsEchoDisplayed)
+                    {
+                        foreach (var pixel in updatedPixels)
+                        {
+                            int x = pixel.Item1;
+                            int y = pixel.Item2;
+                            int index = y * _stride + x * 4;
+
+                            _echoData[index + 3] = (byte)pixel.Item3;   // Update Alpha
+                        }
+                    }
+
+                    // OpenGL 回波图像绘制
+                    if (viewModel.IsOpenGlEchoDisplayed)
+                    {
+                        ExampleScene.OnReceivedCat240DataBlock(sender, data);
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                // TODO: 有没有更好的优雅结束的方法
+            }
+        }
+        #endregion
+
 
         private void ConfigDisplay_OnClick(object sender, RoutedEventArgs e)
         {

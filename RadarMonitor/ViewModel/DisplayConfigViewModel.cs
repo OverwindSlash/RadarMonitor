@@ -24,8 +24,6 @@ namespace RadarMonitor.ViewModel
         }
         #endregion
 
-        
-
         private Color _scanlineColor;
         private bool _isFadingEnabled;
         private int _fadingInterval;

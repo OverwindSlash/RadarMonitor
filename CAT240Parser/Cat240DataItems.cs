@@ -179,5 +179,50 @@ namespace CAT240Parser
                     return (uint)cellDefault;
             }
         }
+
+        public bool IsSpecChanged(Cat240DataItems other)
+        {
+            if (other == null)
+            {
+                return true;
+            }
+
+            if (this.CellDuration != other.CellDuration)
+            {
+                return true;
+            }
+
+            if (this.VideoCellDurationUnit != other.VideoCellDurationUnit)
+            {
+                return true;
+            }
+
+            if (this.IsDataCompressed != other.IsDataCompressed)
+            {
+                return true;
+            }
+
+            if (this.VideoResolution != other.VideoResolution)
+            {
+                return true;
+            }
+
+            if (this.ValidBytesInDataBlock != other.ValidBytesInDataBlock)
+            {
+                return true;
+            }
+
+            if (this.ValidCellsInDataBlock != other.ValidCellsInDataBlock)
+            {
+                return true;
+            }
+
+            if (this.VideoBlockLength != other.VideoBlockLength)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

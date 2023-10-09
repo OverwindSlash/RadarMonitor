@@ -1,11 +1,34 @@
-﻿namespace RadarMonitor.Model
+﻿using System;
+
+namespace RadarMonitor.Model
 {
     public class RadarSettings
     {
-        public double Longitude { get; set; } = 118.82301706827937;
-        public double Latitude { get; set; } = 32.03654116465898;
+        public double Longitude { get; set; } = 0;
+        public double Latitude { get; set; } = 0;
         public double Orientation { get; set; } = 0;
-        public string Ip { get; set; } = "239.192.43.78";
-        public int Port { get; set; } = 4378;
+        public string Ip { get; set; } = "127.0.0.1";
+        public int Port { get; set; } = 20101;
+
+        protected bool Equals(RadarSettings other)
+        {
+            return Longitude.Equals(other.Longitude) && Latitude.Equals(other.Latitude) 
+                                                     && Orientation.Equals(other.Orientation) 
+                                                     && Ip == other.Ip 
+                                                     && Port == other.Port;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((RadarSettings)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Longitude, Latitude, Orientation, Ip, Port);
+        }
     }
 }

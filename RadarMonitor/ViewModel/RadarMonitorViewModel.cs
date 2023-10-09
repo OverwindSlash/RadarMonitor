@@ -1,5 +1,4 @@
 ﻿using CAT240Parser;
-using OpenCvSharp;
 using RadarMonitor.Model;
 using Silk.WPF.OpenGL.Scene;
 using System;
@@ -15,7 +14,7 @@ namespace RadarMonitor.ViewModel
     public delegate void EncChangedEventHandler(object sender, string encUri);
     public delegate void MainRadarChangedEventHandler(object sender, RadarSettings radarSettings);
     public delegate void Cat240SpecChangedEventHandler(object sender, Cat240Spec cat240Spec);
-    public delegate void Cat240PackageReceivedEventHandler(object sender, List<Tuple<int, int, int>> updatedPixels);
+    public delegate void Cat240PackageReceivedEventHandler(object sender, Cat240DataBlock data, List<Tuple<int, int, int>> updatedPixels);
     public delegate void ViewPointChangedHandler(object sender, ViewPoint viewPoint);
 
     public class RadarMonitorViewModel : INotifyPropertyChanged
@@ -37,26 +36,24 @@ namespace RadarMonitor.ViewModel
         }
         #endregion
 
+        // 海图相关属性
         private bool _isEncLoaded;
-        private bool _isRadarConnected;
-
+        private string _encUri;
         private double _currentEncScale;
-
         private bool _isEncDisplayed;
+
+        private bool _isPresetLocationLoaded;
+        private List<PresetLocation> _presetLocations = new List<PresetLocation>();
+
+        // 雷达静态属性
+        private bool _isRadarConnected;
+        private RadarSettings _radarSettings;
         private bool _isRingsDisplayed;
         private bool _isEchoDisplayed;
         private bool _isOpenGlEchoDisplayed;
 
-        private List<PresetLocation> _presetLocations = new List<PresetLocation>();
-
-        private double _radarLongitude;
-        private double _radarLatitude;
-        private double _radarOrientation;
-        private string _radarIpAddress;
-        private int _radarPort;
-
-        private MulticastClient _client;
-
+        // 雷达动态属性
+        private Cat240DataItems _lastCat240DataItems = null;
         private double _startAzimuth;
         private double _endAzimuth;
         private int _startRange;
@@ -67,14 +64,18 @@ namespace RadarMonitor.ViewModel
         private int _videoBlockCount;
         private int _maxDistance;
         
+        // 雷达回波直角坐标系
         public const int CartesianSzie = 2000;
         private int[,] _cartesianData = new int[CartesianSzie, CartesianSzie];
 
+        // 事件
         public event EncChangedEventHandler OnEncChanged;
         public event MainRadarChangedEventHandler OnMainRadarChanged;
         public event Cat240SpecChangedEventHandler OnCat240SpecChanged;
         public event Cat240PackageReceivedEventHandler OnCat240PackageReceived;
         public event ViewPointChangedHandler OnViewPointChanged;
+
+        private MulticastClient _client;
 
         #region Properties
         public bool IsEncLoaded
@@ -83,15 +84,7 @@ namespace RadarMonitor.ViewModel
             set
             {
                 SetField(ref _isEncLoaded, value, "IsEncLoaded");
-            }
-        }
-
-        public bool IsRadarConnected
-        {
-            get => _isRadarConnected;
-            set
-            {
-                SetField(ref _isRadarConnected, value, "IsRadarConnected");
+                SetField(ref _isPresetLocationLoaded, value && _presetLocations.Count > 0, "IsPresetLocationsLoaded");
             }
         }
 
@@ -112,6 +105,35 @@ namespace RadarMonitor.ViewModel
                 SetField(ref _isEncDisplayed, value, "IsEncDisplayed");
             }
         }
+
+        public bool IsPresetLocationsLoaded => _isPresetLocationLoaded;
+
+        public bool IsRadarConnected
+        {
+            get => _isRadarConnected;
+            set
+            {
+                SetField(ref _isRadarConnected, value, "IsRadarConnected");
+            }
+        }
+
+        public RadarSettings MainRadarSettings
+        {
+            get => _radarSettings;
+            set
+            {
+                if (_radarSettings != value)
+                {
+                    SetField(ref _radarSettings, value, "MainRadarSettings");
+                    OnMainRadarChanged?.Invoke(this, _radarSettings);
+                }
+            }
+        }
+        public double RadarLongitude => _radarSettings.Longitude;
+        public double RadarLatitude => _radarSettings.Latitude;
+        public double RadarOrientation => _radarSettings.Orientation;
+        public string RadarIpAddress => _radarSettings.Ip;
+        public int RadarPort => _radarSettings.Port;
 
         public bool IsRingsDisplayed
         {
@@ -137,51 +159,6 @@ namespace RadarMonitor.ViewModel
             set
             {
                 SetField(ref _isOpenGlEchoDisplayed, value, "IsOpenGlEchoDisplayed");
-            }
-        }
-
-        public double RadarLongitude
-        {
-            get => _radarLongitude;
-            set
-            {
-                SetField(ref _radarLongitude, value, "RadarLongitude");
-            }
-        }
-
-        public double RadarLatitude
-        {
-            get => _radarLatitude;
-            set
-            {
-                SetField(ref _radarLatitude, value, "RadarLatitude");
-            }
-        }
-
-        public double RadarOrientation
-        {
-            get => _radarOrientation;
-            set
-            {
-                SetField(ref _radarOrientation, value, "RadarOrientation");
-            }
-        }
-
-        public string RadarIpAddress
-        {
-            get => _radarIpAddress;
-            set
-            {
-                SetField(ref _radarIpAddress, value, "RadarIpAddress");
-            }
-        }
-
-        public int RadarPort
-        {
-            get => _radarPort;
-            set
-            {
-                SetField(ref _radarPort, value, "RadarPort");
             }
         }
 
@@ -269,10 +246,10 @@ namespace RadarMonitor.ViewModel
 
         public RadarMonitorViewModel()
         {
-            _radarIpAddress = string.Empty;
             try
             {
                 LoadPresetLocations();
+                _radarSettings = new RadarSettings();
             }
             catch (Exception e)
             {
@@ -301,11 +278,22 @@ namespace RadarMonitor.ViewModel
             return _presetLocations[index];
         }
 
+        public void RecordNewEncUri(string encUri)
+        {
+            if (_encUri != encUri)
+            {
+                _encUri = encUri;
+                IsEncLoaded = true;
+                IsEncDisplayed = true;
+                OnEncChanged?.Invoke(this, _encUri);
+            }
+        }
+
         public void CaptureCat240NetworkPackage()
         {
             StopCaptureCat240NetworkPackage();
 
-            _client = new MulticastClient(_radarIpAddress, RadarPort);
+            _client = new MulticastClient(RadarIpAddress, RadarPort);
             _client.SetupMulticast(true);
             _client.Multicast = "239.255.0.1";
             _client.OnCat240Received += OnReceivedCat240DataBlock;
@@ -333,28 +321,30 @@ namespace RadarMonitor.ViewModel
 
         public void OnReceivedCat240DataBlock(object sender, Cat240DataBlock data)
         {
-            StartAzimuth = data.Items.StartAzimuthInDegree;
-            EndAzimuth = data.Items.EndAzimuthInDegree;
-            StartRange = (int)data.Items.StartRange;
-            CellCompression = data.Items.IsDataCompressed;
-            CellDuration = (int)data.Items.CellDuration;
-            CellResolution = data.Items.VideoResolution;
-            CellCount = (int)data.Items.ValidCellsInDataBlock;
-            VideoBlockCount = (int)data.Items.ValidCellsInDataBlock;
-            MaxDistance = (int)(data.Items.CellDuration * data.Items.VideoCellDurationUnit * 300000 / 2 * data.Items.ValidCellsInDataBlock);
+            var dataItems = data.Items;
 
-            // GDI 回波图像绘制
-            if (IsEchoDisplayed)
+            // 同一雷达每个数据包都会变的信息
+            StartAzimuth = dataItems.StartAzimuthInDegree;
+            EndAzimuth = dataItems.EndAzimuthInDegree;
+            StartRange = (int)dataItems.StartRange;
+
+            // 同一雷达每个数据包基本不变的信息
+            if (dataItems.IsSpecChanged(_lastCat240DataItems))
             {
-                var updatedPixels = PolarToCartesian(data);
-                OnCat240PackageReceived?.Invoke(this, updatedPixels);
+                CellCompression = dataItems.IsDataCompressed;
+                CellDuration = (int)dataItems.CellDuration;
+                CellResolution = dataItems.VideoResolution;
+                CellCount = (int)dataItems.ValidCellsInDataBlock;
+                VideoBlockCount = (int)dataItems.ValidCellsInDataBlock;
+                MaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * 300000 / 2 * dataItems.ValidCellsInDataBlock);
+
+                OnCat240SpecChanged?.Invoke(this, new Cat240Spec(dataItems));
             }
 
-            // OpenGL 回波图像绘制
-            if (IsOpenGlEchoDisplayed)
-            {
-                ExampleScene.OnReceivedCat240DataBlock(sender, data);
-            }
+            var updatedPixels = PolarToCartesian(data);
+            OnCat240PackageReceived?.Invoke(this, data, updatedPixels);
+
+            
         }
 
         private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)

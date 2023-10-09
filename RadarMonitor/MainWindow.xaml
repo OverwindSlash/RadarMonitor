@@ -22,7 +22,7 @@
         <!--菜单栏-->
         <DockPanel Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Dock="Top" ZIndex="1">
             <Menu>
-                <MenuItem Header="_Enc">
+                <MenuItem Header="_ENC">
                     <MenuItem Name="LoadEnc" Header="_Load Catalog..." Click="LoadEnc_OnClick"></MenuItem>
                     <MenuItem Name="LoadDir" Header="_Load Cells Dir..." Click="LoadCellDir_OnClick"></MenuItem>
                     <MenuItem Name="LoadCell" Header="_Load Cell..." Click="LoadCell_OnClick"></MenuItem>
@@ -110,11 +110,11 @@
             </GroupBox>
             <GroupBox Header="Preset Locations" Width="Auto">
                 <StackPanel Orientation="Vertical">
-                    <Button Name="BtnPresetLocation1" Content="Location 1" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsEncLoaded}" Click="BtnPresetLocation1_OnClick"></Button>
-                    <Button Name="BtnPresetLocation2" Content="Location 2" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsEncLoaded}" Click="BtnPresetLocation2_OnClick"></Button>
-                    <Button Name="BtnPresetLocation3" Content="Location 3" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsEncLoaded}" Click="BtnPresetLocation3_OnClick"></Button>
-                    <Button Name="BtnPresetLocation4" Content="Location 4" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsEncLoaded}" Click="BtnPresetLocation4_OnClick"></Button>
-                    <Button Name="BtnPresetLocation5" Content="Location 5" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsEncLoaded}" Click="BtnPresetLocation5_OnClick"></Button>
+                    <Button Name="BtnPresetLocation1" Content="Location 1" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation1_OnClick"></Button>
+                    <Button Name="BtnPresetLocation2" Content="Location 2" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation2_OnClick"></Button>
+                    <Button Name="BtnPresetLocation3" Content="Location 3" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation3_OnClick"></Button>
+                    <Button Name="BtnPresetLocation4" Content="Location 4" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation4_OnClick"></Button>
+                    <Button Name="BtnPresetLocation5" Content="Location 5" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation5_OnClick"></Button>
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Layer" Width="Auto">
@@ -178,7 +178,7 @@
         <!--状态栏-->
         <StatusBar Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0">
             <StatusBarItem>
-                <Label Content="Initialization done."></Label>
+                <TextBlock Name="TbStatusInfo" Text="Initialization done."></TextBlock>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
                 <Label Content="All rights reserved. CloudSense 2023"></Label>

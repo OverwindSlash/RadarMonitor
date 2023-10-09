@@ -1,13 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using RadarMonitor.Model;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Controls;
-using RadarMonitor.Model;
 
 namespace RadarMonitor.ViewModel
 {
     public class RadarSettingsViewModel : INotifyPropertyChanged
     {
+        #region Notify Property
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+        #endregion
+
         private string _longitude;
         private string _latitude;
         private double _orientation;
@@ -54,8 +70,6 @@ namespace RadarMonitor.ViewModel
                 }
             }
         }
-
-        
 
         public int IpPart1
         {
@@ -130,34 +144,18 @@ namespace RadarMonitor.ViewModel
             _port = 30101;
         }
 
-        public RadarSettingsViewModel(RadarSettings settings)
+        public RadarSettingsViewModel(RadarSettings current)
         {
-            Longitude = settings.Longitude.ToString();
-            Latitude = settings.Latitude.ToString();
-            Orientation = settings.Orientation;
-            
+            Longitude = current.Longitude.ToString();
+            Latitude = current.Latitude.ToString();
+            Orientation = current.Orientation;
 
-            IpPart1 = int.Parse(settings.Ip.Split('.')[0]);
-            IpPart2 = int.Parse(settings.Ip.Split('.')[1]);
-            IpPart3 = int.Parse(settings.Ip.Split('.')[2]);
-            IpPart4 = int.Parse(settings.Ip.Split('.')[3]);
+            IpPart1 = int.Parse(current.Ip.Split('.')[0]);
+            IpPart2 = int.Parse(current.Ip.Split('.')[1]);
+            IpPart3 = int.Parse(current.Ip.Split('.')[2]);
+            IpPart4 = int.Parse(current.Ip.Split('.')[3]);
 
-            Port = settings.Port;
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-            field = value;
-            OnPropertyChanged(propertyName);
-            return true;
+            Port = current.Port;
         }
 
         private bool IsLongitudeValid(string input)
@@ -199,6 +197,7 @@ namespace RadarMonitor.ViewModel
 
             result &= IsLongitudeValid(Longitude);
             result &= IsLatitudeValid(Latitude);
+            result &= IsValidOrientation(Orientation);
             result &= IsValidIpAddressPart(IpPart1);
             result &= IsValidIpAddressPart(IpPart2);
             result &= IsValidIpAddressPart(IpPart3);
@@ -206,6 +205,23 @@ namespace RadarMonitor.ViewModel
             result &= IsValidPort(Port);
 
             return result;
+        }
+
+        public RadarSettings ToRadarSettings()
+        {
+            if (!IsValidated())
+            {
+                return null;
+            }
+
+            return new RadarSettings()
+            {
+                Longitude = double.Parse(_longitude),
+                Latitude = double.Parse(_latitude),
+                Orientation = _orientation,
+                Ip = $"{_ipPart1}.{_ipPart2}.{_ipPart3}.{_ipPart4}",
+                Port = _port
+            };
         }
     }
 }
