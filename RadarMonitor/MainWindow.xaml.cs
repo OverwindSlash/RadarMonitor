@@ -9,6 +9,7 @@ using Silk.WPF.OpenGL.Scene;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -41,10 +42,9 @@ namespace RadarMonitor
         private double _dpcX;
         private double _dpcY;
 
+        private WriteableBitmap _bitmap;
         private byte[] _echoData;
         private int _echoDataStride;
-        private int _stride = RadarMonitorViewModel.CartesianSzie * 4;
-        private WriteableBitmap _bitmap = new WriteableBitmap(ImageSize, ImageSize,96, 96, PixelFormats.Bgra32, null);
 
         private DispatcherTimer _timer = new DispatcherTimer();
         private const int RefreshIntervalMs = 30;
@@ -70,8 +70,6 @@ namespace RadarMonitor
             InitializeMapView();
 
             // 初始化图片回波显示后台一维数组
-            _echoData = new byte[RadarMonitorViewModel.CartesianSzie * RadarMonitorViewModel.CartesianSzie * 4];
-            _echoDataStride = RadarMonitorViewModel.CartesianSzie * 4;
             _scanlineColor = DisplayConfigDialog.DefaultImageEchoColor;
             InitializeEchoData();
             
@@ -135,6 +133,9 @@ namespace RadarMonitor
 
         private void InitializeEchoData()
         {
+            _echoData = new byte[RadarMonitorViewModel.CartesianSzie * RadarMonitorViewModel.CartesianSzie * 4];
+            _echoDataStride = RadarMonitorViewModel.CartesianSzie * 4;
+
             for (int i = 0; i < _echoData.Length; i += 4)
             {
                 _echoData[i + 0] = _scanlineColor.B;    // Blue
@@ -142,6 +143,9 @@ namespace RadarMonitor
                 _echoData[i + 2] = _scanlineColor.R;    // Red
                 _echoData[i + 3] = 0;                   // Alpha
             }
+
+            _bitmap = new WriteableBitmap(ImageSize, ImageSize, 96, 96, PixelFormats.Bgra32, null);
+            EchoImageOverlay.Source = _bitmap;
         }
 
         private void RefreshImageEcho(object? sender, EventArgs e)
@@ -154,8 +158,7 @@ namespace RadarMonitor
             
             // 重绘图片雷达回波
             _bitmap.WritePixels(new Int32Rect(0, 0, ImageSize, ImageSize), _echoData, _echoDataStride, 0);
-            EchoImageOverlay.Source = _bitmap;
-            EchoImageOverlay.InvalidateVisual();
+            EchoOverlay.InvalidateVisual();
 
             // Fading
             if (_isFadingEnabled)
@@ -355,15 +358,15 @@ namespace RadarMonitor
 
                 // 获取雷达经纬度和网络信息
                 viewModel.MainRadarSettings = settings.ToRadarSettings();
-
                 viewModel.IsRadarConnected = true;
                 viewModel.IsRingsDisplayed = true;
 
-                // 默认显示 OpenGL 雷达回波, 不显示图片雷达回波
-                viewModel.IsEchoDisplayed = false;
-                viewModel.IsOpenGlEchoDisplayed = true;
+                // 默认显示图片雷达回波
+                bool showImageEchoFirst = false;
+                viewModel.IsEchoDisplayed = showImageEchoFirst;
+                viewModel.IsOpenGlEchoDisplayed = !showImageEchoFirst;
+                OpenGlEchoOverlay.IsDisplay = viewModel.IsOpenGlEchoDisplayed;
                 OpenGlEchoOverlay.Visibility = viewModel.IsOpenGlEchoDisplayed ? Visibility.Visible : Visibility.Hidden;
-                OpenGlEchoOverlay.IsDisplay = true;
 
                 // 抓取 CAT240 网络包
                 InitializeEchoData();
@@ -373,19 +376,21 @@ namespace RadarMonitor
                 TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 0);
                 TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 0);
 
-                // TODO: 如何改善
-                Task.Factory.StartNew(() =>
-                {
-                    // Refresh UI
-                    viewModel.IsEchoDisplayed = !viewModel.IsEchoDisplayed;
-                    viewModel.IsEchoDisplayed = !viewModel.IsEchoDisplayed;
-                });
+                //// TODO: 如何改善
+                //Task.Factory.StartNew(() =>
+                //{
+                //    // Refresh UI
+                //    viewModel.IsEchoDisplayed = !viewModel.IsEchoDisplayed;
+                //    viewModel.IsEchoDisplayed = !viewModel.IsEchoDisplayed;
+
+                //});
             }
         }
 
         private void OnMainRadarChanged(object sender, RadarSettings radarSettings)
         {
             TbStatusInfo.Text = $"Listening radar on {radarSettings.Ip}:{radarSettings.Port}.";
+            InitializeEchoData();
         }
 
         private void OnCat240SpecChanged(object sender, Cat240Spec cat240spec)
@@ -400,6 +405,8 @@ namespace RadarMonitor
                     TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
                         cat240spec.MaxDistance);
 
+                    // TODO: 疑问点
+                    OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
                     OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
                     OpenGlEchoOverlay.RealCells = viewModel.CellCount;
                 });
@@ -425,7 +432,7 @@ namespace RadarMonitor
                         {
                             int x = pixel.Item1;
                             int y = pixel.Item2;
-                            int index = y * _stride + x * 4;
+                            int index = y * _echoDataStride + x * 4;
 
                             _echoData[index + 3] = (byte)pixel.Item3;   // Update Alpha
                         }
@@ -434,6 +441,10 @@ namespace RadarMonitor
                     // OpenGL 回波图像绘制
                     if (viewModel.IsOpenGlEchoDisplayed)
                     {
+                        // TODO: 疑问点
+                        OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
+                        OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
+                        OpenGlEchoOverlay.RealCells = viewModel.CellCount;
                         ExampleScene.OnReceivedCat240DataBlock(sender, data);
                     }
                 });

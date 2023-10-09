@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using UdpClient = NetCoreServer.UdpClient;
 
@@ -30,7 +31,7 @@ namespace CAT240Parser
 
         protected override void OnConnected()
         {
-            Console.WriteLine($"Multicast UDP client connected a new session with Id {Id}");
+            Trace.WriteLine($"Multicast UDP client connected a new session with Id {Id}");
 
             // Join UDP multicast group
             JoinMulticastGroup(Multicast);
@@ -41,14 +42,17 @@ namespace CAT240Parser
 
         protected override void OnDisconnected()
         {
-            Console.WriteLine($"Multicast UDP client disconnected a session with Id {Id}");
+            Trace.WriteLine($"Multicast UDP client disconnected a session with Id {Id}");
 
             // Wait for a while...
             Thread.Sleep(1000);
 
             // Try to connect again
             if (!_stop)
+            {
+                Trace.WriteLine($"Reconnecting...");
                 Connect();
+            }
         }
 
         protected override void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
@@ -64,8 +68,6 @@ namespace CAT240Parser
                     OnCat240Received?.Invoke(this, dataBlock);
                     lastAzimuth = dataBlock.Items.StartAzimuth;
                 }
-
-
             }));
 
             ReceiveAsync();
@@ -73,7 +75,7 @@ namespace CAT240Parser
 
         protected override void OnError(SocketError error)
         {
-            //Console.WriteLine($"Multicast UDP client caught an error with code {error}");
+            Trace.WriteLine($"Multicast UDP client caught an error with code {error}");
         }
 
         private bool _stop;

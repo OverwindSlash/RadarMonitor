@@ -4,6 +4,7 @@ using Silk.WPF.OpenGL.Scene;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using YamlDotNet.Serialization;
@@ -54,6 +55,7 @@ namespace RadarMonitor.ViewModel
 
         // 雷达动态属性
         private Cat240DataItems _lastCat240DataItems = null;
+        private double _lastStartAzimuth = 0;
         private double _startAzimuth;
         private double _endAzimuth;
         private int _startRange;
@@ -323,25 +325,33 @@ namespace RadarMonitor.ViewModel
         {
             var dataItems = data.Items;
 
+            // 避免切换雷达数据源时，因为没能及时处理数据而重发导致的问题
+            if (_lastStartAzimuth == dataItems.StartAzimuthInDegree)
+            {
+                return;
+            }
+
             // 同一雷达每个数据包都会变的信息
             StartAzimuth = dataItems.StartAzimuthInDegree;
             EndAzimuth = dataItems.EndAzimuthInDegree;
             StartRange = (int)dataItems.StartRange;
 
-            // 同一雷达每个数据包基本不变的信息
-            if (dataItems.IsSpecChanged(_lastCat240DataItems))
-            {
-                CellCompression = dataItems.IsDataCompressed;
-                CellDuration = (int)dataItems.CellDuration;
-                CellResolution = dataItems.VideoResolution;
-                CellCount = (int)dataItems.ValidCellsInDataBlock;
-                VideoBlockCount = (int)dataItems.ValidCellsInDataBlock;
-                MaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * 300000 / 2 * dataItems.ValidCellsInDataBlock);
+            CellCompression = dataItems.IsDataCompressed;
+            CellDuration = (int)dataItems.CellDuration;
+            CellResolution = dataItems.VideoResolution;
+            CellCount = (int)dataItems.ValidCellsInDataBlock;
+            VideoBlockCount = (int)dataItems.ValidCellsInDataBlock;
+            MaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * 300000 / 2 * dataItems.ValidCellsInDataBlock);
 
+            // TODO: 疑问点
+            // 同一雷达每个数据包基本不变的信息
+            //if (dataItems.IsSpecChanged(_lastCat240DataItems))
+            {
                 OnCat240SpecChanged?.Invoke(this, new Cat240Spec(dataItems));
             }
 
             _lastCat240DataItems = dataItems;
+            _lastStartAzimuth = StartAzimuth;
 
             var updatedPixels = PolarToCartesian(data);
             OnCat240PackageReceived?.Invoke(this, data, updatedPixels);
