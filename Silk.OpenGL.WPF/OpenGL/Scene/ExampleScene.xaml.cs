@@ -35,7 +35,7 @@ public class RadarDataReceivedEventArgs
 
 
     private static uint lastId = 0;
-    private const int SECTIONS = 2048;
+    private const int SECTIONS = 1024;
     private const int CELLS = 6000;
     private const float AZI_SPAN = 65536 / (float)SECTIONS;
 
@@ -63,10 +63,10 @@ public class RadarDataReceivedEventArgs
     //private float l = 2* 10 * CELLS / 1000f;
 
     // properties to be modified by radar monitor viewmodel
-    public float MapHeight { get; set; } = 10f;
+    public float MapHeight { get; set; } = 50f;
     public float MapWidth { get; set; }
-    public float MapHeightOffCenter { get; set; } = 1f;
-    public float MapWidthOffCenter { get; set; } = 2f;
+    public float MapHeightOffCenter { get; set; } = 0f;
+    public float MapWidthOffCenter { get; set; } = 0f;
     public int UIHeight { get; set; } = 1000;
     public int UIWidth { get; set; } = 1600;
     //public double RadarOrientation { get; set; } = 0.0;
@@ -80,9 +80,9 @@ public class RadarDataReceivedEventArgs
         set 
         { 
             _isDisplay = value;
-            Array.Clear(DataArray);
-            TextureData = new OpenGLSharp.Texture(RenderContext.Gl, DataArray, (uint)_realCells, SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit.Texture0);
-            lastId = 0;
+            //Array.Clear(DataArray);
+            //TextureData = new OpenGLSharp.Texture(RenderContext.Gl, DataArray, (uint)_realCells, SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit.Texture0);
+            //lastId = 0;
 
         }
     }
@@ -156,6 +156,8 @@ public class RadarDataReceivedEventArgs
         gl.Enable(EnableCap.Blend);
         gl.BlendFunc(GLEnum.SrcAlpha, GLEnum.OneMinusSrcAlpha);
 
+        #region demo
+
         //float[] vertices = {
         //        -0.5f, -0.5f, 0.0f,
         //         0.5f, -0.5f, 0.0f,
@@ -205,6 +207,7 @@ public class RadarDataReceivedEventArgs
         //gl.DeleteShader(vertexShader);
         //gl.DeleteShader(fragmentShader);
 
+        #endregion
         float[] vertices =
             {
               // aPosition--------   aTexCoords
@@ -233,8 +236,17 @@ public class RadarDataReceivedEventArgs
 
     }
 
+    private const int fps = 25;
+    private int unit = 1000/fps;
+    private int durationMS = 0;
     private unsafe void OnRender(TimeSpan delta)
     {
+        durationMS += delta.Milliseconds;
+        if (durationMS < unit )
+        {
+            return;
+        }
+
         if (!IsDisplay)
         {
             return;
@@ -301,6 +313,7 @@ public class RadarDataReceivedEventArgs
 
         isInitialized = true;
 
+        durationMS = 0;
     }
 
     public static void OnReceivedCat240DataBlock(object sender, Cat240DataBlock dataBlock)
@@ -322,13 +335,18 @@ public class RadarDataReceivedEventArgs
             //ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
             //{
 
-                List<float> DataArr = new List<float>((int)_realCells);
-                int idx = (SECTIONS - 1 - (int)(dataBlock.Items.StartAzimuth / 65536.0f * (float)SECTIONS) - IndexOffset);
-                if (idx < 0)
+            List<float> DataArr = new List<float>((int)_realCells);
+            int idx = (SECTIONS - 1 - (int)(dataBlock.Items.StartAzimuth / 65536.0f * (float)SECTIONS) - IndexOffset);
+            if (idx < 0)
             {
                 idx = idx + SECTIONS;
             }
-                Console.WriteLine($"AziSpan:{idx}");
+            else if (idx > SECTIONS - 1)
+            {
+                idx -= SECTIONS;
+            }
+
+            Console.WriteLine($"AziSpan:{idx}");
 
                 for (int i = 0; i < dataBlock.Items.ValidCellsInDataBlock; i++)
                 {
