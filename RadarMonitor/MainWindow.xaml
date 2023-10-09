@@ -23,7 +23,8 @@
         <DockPanel Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Dock="Top" ZIndex="1">
             <Menu>
                 <MenuItem Header="_Enc">
-                    <MenuItem Name="LoadEnc" Header="_Load Enc..." Click="LoadEnc_OnClick"></MenuItem>
+                    <MenuItem Name="LoadEnc" Header="_Load Catalog..." Click="LoadEnc_OnClick"></MenuItem>
+                    <MenuItem Name="LoadDir" Header="_Load Cells Dir..." Click="LoadCellDir_OnClick"></MenuItem>
                     <MenuItem Name="LoadCell" Header="_Load Cell..." Click="LoadCell_OnClick"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="_Radar">

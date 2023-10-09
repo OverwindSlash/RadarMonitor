@@ -127,6 +127,7 @@
 		<Authors>CloudSense Intelligent</Authors>
 		<Copyright>© 2023 CloudSense. All Rights Reserved</Copyright>
 		<Description>Radar CAT240 &amp; S57 Enc viewer</Description>
+		<UseWindowsForms>True</UseWindowsForms>
 	</PropertyGroup>
 
 
