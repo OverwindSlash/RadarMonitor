@@ -19,6 +19,7 @@
 		<None Remove="Assets\RadarSettings.png" />
 		<None Remove="Assets\RadarSite.png" />
 		<None Remove="Assets\Right.png" />
+		<None Remove="Assets\Sinology.png" />
 		<None Remove="Assets\Up.png" />
 		<None Remove="Assets\UpLeft.png" />
 		<None Remove="Assets\UpRight.png" />
@@ -65,6 +66,9 @@
 		</Content>
 		<Content Include="Assets\Right.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Sinology.png">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Up.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -122,10 +126,16 @@
 		<ProjectReference Include="..\Silk.OpenGL.WPF\Silk.WPF.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="Assets\Sinology.jpg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 	<PropertyGroup>
-		<VersionPrefix>0.1.0</VersionPrefix>
-		<Authors>CloudSense Intelligent</Authors>
-		<Copyright>© 2023 CloudSense. All Rights Reserved</Copyright>
+		<VersionPrefix>1.0.0</VersionPrefix>
+		<Authors>Sinology International</Authors>
+		<Copyright>© 2023 Sinology. All Rights Reserved</Copyright>
 		<Description>Radar CAT240 &amp; S57 Enc viewer</Description>
 		<UseWindowsForms>True</UseWindowsForms>
 	</PropertyGroup>

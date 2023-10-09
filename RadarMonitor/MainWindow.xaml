@@ -7,7 +7,7 @@
         xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
         xmlns:sampleGL="clr-namespace:Silk.WPF.OpenGL.Scene;assembly=Silk.WPF"
         mc:Ignorable="d"
-        Title="CloudSense Radar Monitor (Evaluation Version)" Height="1000" Width="1600" Icon="Assets/Logo.png"
+        Title="Sinology Radar Monitor (Evaluation Version)" Height="1000" Width="1600" Icon="Assets/Logo.png"
         Loaded="MainWindow_OnLoaded" Closing="MainWindow_OnClosing">
     <Grid>
         <Grid.RowDefinitions>
@@ -173,7 +173,7 @@
                     </StackPanel>
                 </Grid>
             </GroupBox>
-            <Image Source="assets/CloudSense.png" Width="100" Stretch="Fill" Margin="0, 10, 0, 0"></Image>
+            <Image Source="assets/Sinology.png" Width="100" Stretch="Fill" Margin="0, 10, 0, 0"></Image>
         </StackPanel>
         <!--状态栏-->
         <StatusBar Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0">
@@ -181,7 +181,7 @@
                 <TextBlock Name="TbStatusInfo" Text="Initialization done."></TextBlock>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
-                <Label Content="All rights reserved. CloudSense 2023"></Label>
+                <Label Content="All rights reserved. Sinology 2023"></Label>
             </StatusBarItem>
         </StatusBar>
     </Grid>
