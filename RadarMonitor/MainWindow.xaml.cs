@@ -3,12 +3,14 @@ using Esri.ArcGISRuntime.Hydrography;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.UI.Controls;
 using Microsoft.Win32;
+using OpenCvSharp;
 using RadarMonitor.Model;
 using RadarMonitor.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -47,7 +49,7 @@ namespace RadarMonitor
         private bool _isFadingEnabled = false;
         private int _fadingInterval = 5;
 
-        private bool _flag = true;
+        private bool _flag = false;
 
         public MainWindow()
         {
@@ -177,6 +179,8 @@ namespace RadarMonitor
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NatureOfSeabed = _flag;
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NoteOnChartData = _flag;
             #endregion
+
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.GeographicNames = true;
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
@@ -895,5 +899,69 @@ namespace RadarMonitor
             ZoomView(false);
         }
         #endregion
+
+        private void LoadCell_OnClick(object sender, RoutedEventArgs e)
+        {
+            string path = @"D:\Temp\44";
+
+            List<string> fileList = new List<string>();
+            GetAllFiles(path, fileList);
+
+            int count = 0;
+            foreach (string file in fileList)
+            {
+                if (!file.EndsWith(".000"))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    Trace.WriteLine($"{count++}: {file}");
+
+                    var cell = new EncCell(file);
+                    var layer = new EncLayer(cell) { Name = new FileInfo(file).Name };
+
+                    //LoadingProgressPanel.Visibility = Visibility.Visible;
+
+                    var idx = layer.Name[2];
+                    int insertIndex = 0;
+                    foreach (var l in BaseMapView.Map.OperationalLayers)
+                    {
+                        var name = l.Name[2];
+                        if (name > idx)
+                        {
+                            break;
+                        }
+                        insertIndex++;
+                    }
+                    BaseMapView.Map.OperationalLayers.Insert(insertIndex, layer);
+
+                    // 设置 ViewModel
+                    var viewModel = (RadarMonitorViewModel)DataContext;
+                    viewModel.IsEncLoaded = true;
+                    viewModel.IsEncDisplayed = true;
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+
+        static void GetAllFiles(string path, List<string> fileList)
+        {
+            DirectoryInfo dir = new DirectoryInfo(path);
+            FileInfo[] allFile = dir.GetFiles();
+            foreach (FileInfo fi in allFile)
+            {
+                fileList.Add(fi.FullName);
+            }
+            DirectoryInfo[] allDir = dir.GetDirectories();
+            foreach (DirectoryInfo d in allDir)
+            {
+                GetAllFiles(d.FullName, fileList);
+            }
+        }
     }
 }

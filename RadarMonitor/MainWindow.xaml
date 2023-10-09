@@ -24,6 +24,7 @@
             <Menu>
                 <MenuItem Header="_Enc">
                     <MenuItem Name="LoadEnc" Header="_Load Enc..." Click="LoadEnc_OnClick"></MenuItem>
+                    <MenuItem Name="LoadCell" Header="_Load Cell..." Click="LoadCell_OnClick"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="_Radar">
                     <MenuItem Name="ConnectRadar" Header="_Source..." Click="ConnectRadar_OnClick"></MenuItem>

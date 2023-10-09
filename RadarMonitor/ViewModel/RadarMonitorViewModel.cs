@@ -12,7 +12,7 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace RadarMonitor.ViewModel
 {
-    public delegate void PolarLineUpdatedEventHandler(object sender, List<Tuple<int, int, int>> updatedPixels);
+    public delegate void Cat240PackageReceivedEventHandler(object sender, List<Tuple<int, int, int>> updatedPixels);
 
     public class RadarMonitorViewModel : INotifyPropertyChanged
     {
@@ -67,7 +67,7 @@ namespace RadarMonitor.ViewModel
         public const int CartesianSzie = 2000;
         private int[,] _cartesianData = new int[CartesianSzie, CartesianSzie];
 
-        public event PolarLineUpdatedEventHandler OnPolarLineUpdated;
+        public event Cat240PackageReceivedEventHandler OnPolarLineUpdated;
 
         #region Properties
         public bool IsEncLoaded
