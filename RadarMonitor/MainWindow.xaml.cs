@@ -47,7 +47,7 @@ namespace RadarMonitor
         private int _echoDataStride;
 
         private DispatcherTimer _timer = new DispatcherTimer();
-        private const int RefreshIntervalMs = 30;
+        private const int RefreshIntervalMs = 40;
 
         private Color _scanlineColor;
         private bool _isFadingEnabled = true;
@@ -157,7 +157,7 @@ namespace RadarMonitor
             {
                 return;
             }
-            
+
             // 重绘图片雷达回波
             _bitmap.WritePixels(new Int32Rect(0, 0, ImageSize, ImageSize), _echoData, _echoDataStride, 0);
             EchoOverlay.InvalidateVisual();
@@ -436,7 +436,7 @@ namespace RadarMonitor
                             int y = pixel.Item2;
                             int index = y * _echoDataStride + x * 4;
 
-                            _echoData[index + 3] = (byte)pixel.Item3;   // Update Alpha
+                            _echoData[index + 3] = (byte)pixel.Item3; // Update Alpha
                         }
                     }
 
@@ -449,7 +449,7 @@ namespace RadarMonitor
                         OpenGlEchoOverlay.RealCells = viewModel.CellCount;
                         ExampleScene.OnReceivedCat240DataBlock(sender, data);
                     }
-                });
+                }, DispatcherPriority.Render);
             }
             catch (Exception e)
             {

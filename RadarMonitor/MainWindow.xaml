@@ -8,7 +8,7 @@
         xmlns:sampleGL="clr-namespace:Silk.WPF.OpenGL.Scene;assembly=Silk.WPF"
         mc:Ignorable="d"
         Title="Sinology Radar Monitor (Evaluation Version)" Height="1000" Width="1600" Icon="Assets/Logo.png"
-        Loaded="MainWindow_OnLoaded" Closing="MainWindow_OnClosing">
+        Loaded="MainWindow_OnLoaded" Closing="MainWindow_OnClosing" WindowState="Maximized">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
