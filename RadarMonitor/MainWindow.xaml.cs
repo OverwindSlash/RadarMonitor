@@ -50,8 +50,8 @@ namespace RadarMonitor
         private const int RefreshIntervalMs = 30;
 
         private Color _scanlineColor;
-        private bool _isFadingEnabled = false;
-        private int _fadingInterval = 5;
+        private bool _isFadingEnabled = true;
+        private int _fadingInterval = 7;
 
         private bool _encDisplayFlag = false;
 
@@ -86,6 +86,8 @@ namespace RadarMonitor
 
             #region Enc configuration
             // 海图显示配置：不显示 海床，深度点，地理名称等
+            EncEnvironmentSettings.Default.DisplaySettings.MarinerSettings.ColorScheme = EncColorScheme.Night;
+
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.AllIsolatedDangers = _encDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ArchipelagicSeaLanes = _encDisplayFlag;
 
@@ -239,7 +241,7 @@ namespace RadarMonitor
             }
         }
 
-        private void LoadCellDir_OnClick(object sender, RoutedEventArgs e)
+        private async void LoadCellDir_OnClick(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.FolderBrowserDialog folderDialog = new();
 
@@ -362,7 +364,7 @@ namespace RadarMonitor
                 viewModel.IsRingsDisplayed = true;
 
                 // 默认显示图片雷达回波
-                bool showImageEchoFirst = false;
+                bool showImageEchoFirst = true;
                 viewModel.IsEchoDisplayed = showImageEchoFirst;
                 viewModel.IsOpenGlEchoDisplayed = !showImageEchoFirst;
                 OpenGlEchoOverlay.IsDisplay = viewModel.IsOpenGlEchoDisplayed;
@@ -749,7 +751,7 @@ namespace RadarMonitor
             double mapScale = BaseMapView.MapScale;
             double kmWith1Cm = (mapScale / 100000.0);
 
-            Brush scaleBrush = new SolidColorBrush(Colors.Black);
+            Brush scaleBrush = new SolidColorBrush(Colors.LimeGreen);
             int scaleLength = 3;
             int markHeight = 4;
             int labelXOffset = 5;
@@ -768,6 +770,7 @@ namespace RadarMonitor
             TextBlock zeroLabel = new TextBlock
             {
                 Text = "0",
+                Foreground = scaleBrush,
                 FontSize = labelFontSize,
                 Margin = new Thickness(0, canvasHeight / 2 + labelYOffset, 0, 0)
             };
@@ -777,6 +780,7 @@ namespace RadarMonitor
             TextBlock scaleLabel = new TextBlock
             {
                 Text = $"Scale 1:{(int)mapScale}",
+                Foreground = scaleBrush,
                 FontSize = labelFontSize,
                 Margin = new Thickness(0, 0, 0, 0)
             };
@@ -827,6 +831,7 @@ namespace RadarMonitor
                 TextBlock TailLabel = new TextBlock
                 {
                     Text = (end * kmWith1Cm).ToString("F1"),
+                    Foreground = scaleBrush,
                     FontSize = labelFontSize,
                     Margin = new Thickness(end * _dpcX - labelXOffset, canvasHeight / 2 + labelYOffset, 0, 0)
                 };
@@ -837,6 +842,7 @@ namespace RadarMonitor
             TextBlock kmLabel = new TextBlock
             {
                 Text = "(KM)",
+                Foreground = scaleBrush,
                 FontSize = labelFontSize,
                 Margin = new Thickness(scaleLength * _dpcX + labelXOffset, canvasHeight / 2 - labelYOffset, 0, 0)
             };

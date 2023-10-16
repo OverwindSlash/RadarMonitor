@@ -375,7 +375,9 @@ namespace RadarMonitor.ViewModel
             int stride = RadarMonitorViewModel.CartesianSzie * 4;
             List<Tuple<int, int, int>> updatedPixels = new List<Tuple<int, int, int>>();
 
-            int index = 0;
+            int prevX = 0;
+            int prevY = 0;
+
             for (int i = 0; i < items.VideoBlocks.Count; i++)
             {
                 int x = (int)(halfSize + i * cosAziStep);
@@ -386,10 +388,80 @@ namespace RadarMonitor.ViewModel
                     int grayValue = (int)items.GetCellData(i);
                     _cartesianData[x, y] = grayValue;
                     updatedPixels.Add(new Tuple<int, int, int>(x, y, grayValue));
+
+                    // Fill the gap with uniform distribution in azimuth
+                    if (i > 0)
+                    {
+                        UniformDistributionInAzimuth(prevX, prevY, x, y, items, updatedPixels);
+                    }
                 }
+
+                prevX = x;
+                prevY = y;
             }
 
             return updatedPixels;
         }
+
+        private void UniformDistributionInAzimuth(int x1, int y1, int x2, int y2, Cat240DataItems items, List<Tuple<int, int, int>> updatedPixels)
+        {
+            for (int i = x1 + 1; i < x2; i++)
+            {
+                for (int j = y1 + 1; j < y2; j++)
+                {
+                    int grayValue = (int)(items.GetCellData(i) + items.GetCellData(x2)) / 2; // Simple averaging
+                    _cartesianData[i, j] = grayValue;
+                    updatedPixels.Add(new Tuple<int, int, int>(i, j, grayValue));
+                }
+            }
+        }
+
+
+
+        // private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)
+        // {
+        //     Cat240DataItems items = data.Items;
+        //
+        //     List<Tuple<int, int, int>> updatedPixels = new List<Tuple<int, int, int>>();
+        //
+        //     double angleOffset = 0.1;
+        //
+        //     double angleInRadians = (items.StartAzimuthInDegree + RadarOrientation) * Math.PI / 180.0;
+        //     double angleInRadiansMinusOffset = (items.StartAzimuthInDegree - angleOffset + RadarOrientation) * Math.PI / 180.0;
+        //     double angleInRadiansPlusOffset = (items.StartAzimuthInDegree + angleOffset + RadarOrientation) * Math.PI / 180.0;
+        //
+        //     //UpdatePixelsByAzimuth(angleInRadiansMinusOffset, items, updatedPixels);
+        //     UpdatePixelsByAzimuth(angleInRadians, items, updatedPixels);
+        //     //UpdatePixelsByAzimuth(angleInRadiansPlusOffset, items, updatedPixels);
+        //
+        //     return updatedPixels;
+        // }
+        //
+        // private void UpdatePixelsByAzimuth(double angleInRadians, Cat240DataItems items, List<Tuple<int, int, int>> updatedPixels)
+        // {
+        //     var cosAzi = Math.Cos(angleInRadians);
+        //     var sinAzi = Math.Sin(angleInRadians);
+        //
+        //     double radiusIncrement = CartesianSzie / 2.0 / items.VideoBlocks.Count;
+        //
+        //     double cosAziStep = radiusIncrement * cosAzi;
+        //     double sinAziStep = radiusIncrement * sinAzi;
+        //
+        //     double halfSize = CartesianSzie / 2.0;
+        //
+        //     int index = 0;
+        //     for (int i = 0; i < items.VideoBlocks.Count; i++)
+        //     {
+        //         int x = (int)(halfSize + i * cosAziStep);
+        //         int y = (int)(halfSize + i * sinAziStep);
+        //
+        //         if (x >= 0 && x < CartesianSzie && y >= 0 && y < CartesianSzie)
+        //         {
+        //             int grayValue = (int)items.GetCellData(i);
+        //             _cartesianData[x, y] = grayValue;
+        //             updatedPixels.Add(new Tuple<int, int, int>(x, y, grayValue));
+        //         }
+        //     }
+        // }
     }
 }

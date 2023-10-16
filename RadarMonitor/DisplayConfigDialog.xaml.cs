@@ -20,7 +20,7 @@ namespace RadarMonitor
     /// </summary>
     public partial class DisplayConfigDialog : Window
     {
-        public static readonly Color DefaultImageEchoColor = Colors.Crimson;
+        public static readonly Color DefaultImageEchoColor = Color.FromRgb(0, 255, 0);
 
         public DisplayConfigDialog(Color scanlineColor, bool isFadingEnabled, int fadingInterval)
         {
