@@ -172,10 +172,10 @@ namespace RadarMonitor
 
                         _echoData[index + 3] = (byte)cartesianData[x, y]; // Update Alpha
 
-                        // if (_isFadingEnabled)
-                        // {
-                        //     cartesianData[x, y] = Math.Max(cartesianData[x, y] - _fadingStep, 0);
-                        // }
+                        if (_isFadingEnabled)
+                        {
+                            cartesianData[x, y] = Math.Max(cartesianData[x, y] - _fadingStep, 0);
+                        }
                     }
                 }
             }
