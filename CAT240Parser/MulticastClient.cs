@@ -11,14 +11,18 @@ namespace CAT240Parser
     {
         public string Multicast;
 
+        private bool _stop;
+        private double _lastAzimuth;
+        private long _index;
+
         // 定义事件
         public event Cat240ReceivedEventHandler OnCat240Received;
-
 
         public MulticastClient(string address, int port) : base(address, port) {
             int coreCount = Environment.ProcessorCount;
             ThreadPool.SetMinThreads(1, 1);
             ThreadPool.SetMaxThreads(coreCount, coreCount);
+            _lastAzimuth = 0.0;
         }
 
         public void DisconnectAndStop()
@@ -57,16 +61,18 @@ namespace CAT240Parser
 
         protected override void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
         {
-            ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
+            ThreadPool.QueueUserWorkItem(((obj) =>
             {
-                double lastAzimuth = 0.0;
-
                 Cat240DataBlock dataBlock = new Cat240DataBlock(buffer, size);
 
-                if (dataBlock.Items.StartAzimuth != lastAzimuth)
+                if (dataBlock.Items.StartAzimuth != _lastAzimuth)
                 {
-                    OnCat240Received?.Invoke(this, dataBlock);
-                    lastAzimuth = dataBlock.Items.StartAzimuth;
+                    if (_index++ % 2 == 0)  // For higher performance
+                    {
+                        //Trace.WriteLine(dataBlock.Items.StartAzimuth);
+                        OnCat240Received?.Invoke(this, dataBlock);
+                        _lastAzimuth = dataBlock.Items.StartAzimuth;
+                    }
                 }
             }));
 
@@ -77,7 +83,5 @@ namespace CAT240Parser
         {
             Trace.WriteLine($"Multicast UDP client caught an error with code {error}");
         }
-
-        private bool _stop;
     }
 }

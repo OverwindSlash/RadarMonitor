@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -67,8 +68,8 @@ namespace RadarMonitor.ViewModel
         private int _maxDistance;
         
         // 雷达回波直角坐标系
-        public const int CartesianSzie = 2000;
-        private int[,] _cartesianData = new int[CartesianSzie, CartesianSzie];
+        public const int CartesianSize = 2000;
+        private int[,] _cartesianData = new int[CartesianSize, CartesianSize];
 
         // 事件
         public event EncChangedEventHandler OnEncChanged;
@@ -136,6 +137,8 @@ namespace RadarMonitor.ViewModel
         public double RadarOrientation => _radarSettings.Orientation;
         public string RadarIpAddress => _radarSettings.Ip;
         public int RadarPort => _radarSettings.Port;
+
+        public int[,] CartesianData => _cartesianData;
 
         public bool IsRingsDisplayed
         {
@@ -309,7 +312,7 @@ namespace RadarMonitor.ViewModel
                 _client.Disconnect();
                 _client.Dispose();
 
-                _cartesianData = new int[CartesianSzie, CartesianSzie];
+                _cartesianData = new int[CartesianSize, CartesianSize];
             }
         }
 
@@ -325,130 +328,100 @@ namespace RadarMonitor.ViewModel
         {
             var dataItems = data.Items;
 
-            // 避免切换雷达数据源时，因为没能及时处理数据而重发导致的问题
-            if (_lastStartAzimuth == dataItems.StartAzimuthInDegree)
+            ThreadPool.QueueUserWorkItem((obj) =>
             {
-                return;
-            }
+                // 避免切换雷达数据源时，因为没能及时处理数据而重发导致的问题
+                if (_lastStartAzimuth == dataItems.StartAzimuthInDegree)
+                {
+                    return;
+                }
 
-            // 同一雷达每个数据包都会变的信息
-            StartAzimuth = dataItems.StartAzimuthInDegree;
-            EndAzimuth = dataItems.EndAzimuthInDegree;
-            StartRange = (int)dataItems.StartRange;
+                // 同一雷达每个数据包都会变的信息
+                StartAzimuth = dataItems.StartAzimuthInDegree;
+                EndAzimuth = dataItems.EndAzimuthInDegree;
+                StartRange = (int)dataItems.StartRange;
+                
+                CellCompression = dataItems.IsDataCompressed;
+                CellDuration = (int)dataItems.CellDuration;
+                CellResolution = dataItems.VideoResolution;
+                CellCount = (int)dataItems.ValidCellsInDataBlock;
+                VideoBlockCount = (int)dataItems.ValidCellsInDataBlock;
+                MaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * 300000 / 2 * dataItems.ValidCellsInDataBlock);
+                
+                // TODO: 疑问点
+                // 同一雷达每个数据包基本不变的信息
+                if (dataItems.IsSpecChanged(_lastCat240DataItems))
+                {
+                    OnCat240SpecChanged?.Invoke(this, new Cat240Spec(dataItems));
+                }
+                
+                _lastCat240DataItems = dataItems;
+                _lastStartAzimuth = StartAzimuth;
 
-            CellCompression = dataItems.IsDataCompressed;
-            CellDuration = (int)dataItems.CellDuration;
-            CellResolution = dataItems.VideoResolution;
-            CellCount = (int)dataItems.ValidCellsInDataBlock;
-            VideoBlockCount = (int)dataItems.ValidCellsInDataBlock;
-            MaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * 300000 / 2 * dataItems.ValidCellsInDataBlock);
-
-            // TODO: 疑问点
-            // 同一雷达每个数据包基本不变的信息
-            if (dataItems.IsSpecChanged(_lastCat240DataItems))
-            {
-                OnCat240SpecChanged?.Invoke(this, new Cat240Spec(dataItems));
-            }
-
-            _lastCat240DataItems = dataItems;
-            _lastStartAzimuth = StartAzimuth;
-
-            var updatedPixels = PolarToCartesian(data);
-            OnCat240PackageReceived?.Invoke(this, data, updatedPixels);
+                PolarToCartesian(dataItems);
+                //OnCat240PackageReceived?.Invoke(this, data, updatedPixels);   // 调整成只变更数据，不触发显示
+            });
         }
 
-        //private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)
-        //{
-        //    Cat240DataItems items = data.Items;
-
-        //    double angleInRadians = (items.StartAzimuthInDegree + RadarOrientation) * Math.PI / 180.0;
-        //    var cosAzi = Math.Cos(angleInRadians);
-        //    var sinAzi = Math.Sin(angleInRadians);
-
-        //    double radiusIncrement = CartesianSzie / 2.0 / items.VideoBlocks.Count;
-
-        //    double cosAziStep = radiusIncrement * cosAzi;
-        //    double sinAziStep = radiusIncrement * sinAzi;
-
-        //    double halfSize = CartesianSzie / 2.0;
-
-        //    int stride = RadarMonitorViewModel.CartesianSzie * 4;
-        //    List<Tuple<int, int, int>> updatedPixels = new List<Tuple<int, int, int>>();
-
-        //    int prevX = 0;
-        //    int prevY = 0;
-
-        //    for (int i = 0; i < items.VideoBlocks.Count; i++)
-        //    {
-        //        int x = (int)(halfSize + i * cosAziStep);
-        //        int y = (int)(halfSize + i * sinAziStep);
-
-        //        if (x >= 0 && x < CartesianSzie && y >= 0 && y < CartesianSzie)
-        //        {
-        //            int grayValue = (int)items.GetCellData(i);
-        //            _cartesianData[x, y] = grayValue;
-        //            updatedPixels.Add(new Tuple<int, int, int>(x, y, grayValue));
-
-        //            // Fill the gap with uniform distribution in azimuth
-        //            if (i > 0)
-        //            {
-        //                UniformDistributionInAzimuth(prevX, prevY, x, y, items, updatedPixels);
-        //            }
-        //        }
-
-        //        prevX = x;
-        //        prevY = y;
-        //    }
-
-        //    return updatedPixels;
-        //}
-
-        //private void UniformDistributionInAzimuth(int x1, int y1, int x2, int y2, Cat240DataItems items, List<Tuple<int, int, int>> updatedPixels)
-        //{
-        //    for (int i = x1 + 1; i < x2; i++)
-        //    {
-        //        for (int j = y1 + 1; j < y2; j++)
-        //        {
-        //            int grayValue = (int)(items.GetCellData(i) + items.GetCellData(x2)) / 2; // Simple averaging
-        //            _cartesianData[i, j] = grayValue;
-        //            updatedPixels.Add(new Tuple<int, int, int>(i, j, grayValue));
-        //        }
-        //    }
-        //}
-
-
-        private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)
+        private void PolarToCartesian(Cat240DataItems items)
         {
-            Cat240DataItems items = data.Items;
-
-            List<Tuple<int, int, int>> updatedPixels = new List<Tuple<int, int, int>>();
-
             double angleInRadians = (items.StartAzimuthInDegree + RadarOrientation) * Math.PI / 180.0;
 
             var cosAzi = Math.Cos(angleInRadians);
             var sinAzi = Math.Sin(angleInRadians);
 
-            double radiusIncrement = CartesianSzie / 2.0 / items.VideoBlocks.Count;
+            double radiusIncrement = CartesianSize / 2.0 / items.VideoBlocks.Count;
 
             double cosAziStep = radiusIncrement * cosAzi;
             double sinAziStep = radiusIncrement * sinAzi;
 
-            double halfSize = CartesianSzie / 2.0;
+            double halfSize = CartesianSize / 2.0;
 
-            for (int i = 0; i < items.VideoBlocks.Count; i++)
+            for (int i = 0; i < items.VideoBlocks.Count; i += 3)
             {
                 int x = (int)(halfSize + i * cosAziStep);
                 int y = (int)(halfSize + i * sinAziStep);
 
-                if (x >= 0 && x < CartesianSzie && y >= 0 && y < CartesianSzie)
+                if (x >= 0 && x < CartesianSize && y >= 0 && y < CartesianSize)
                 {
                     int grayValue = (int)items.GetCellData(i);
                     _cartesianData[x, y] = grayValue;
-                    updatedPixels.Add(new Tuple<int, int, int>(x, y, grayValue));
                 }
             }
-
-            return updatedPixels;
         }
+
+        // private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)
+        // {
+        //     Cat240DataItems items = data.Items;
+        //
+        //     List<Tuple<int, int, int>> updatedPixels = new List<Tuple<int, int, int>>();
+        //
+        //     double angleInRadians = (items.StartAzimuthInDegree + RadarOrientation) * Math.PI / 180.0;
+        //
+        //     var cosAzi = Math.Cos(angleInRadians);
+        //     var sinAzi = Math.Sin(angleInRadians);
+        //
+        //     double radiusIncrement = CartesianSize / 2.0 / items.VideoBlocks.Count;
+        //
+        //     double cosAziStep = radiusIncrement * cosAzi;
+        //     double sinAziStep = radiusIncrement * sinAzi;
+        //
+        //     double halfSize = CartesianSize / 2.0;
+        //
+        //     for (int i = 0; i < items.VideoBlocks.Count; i += 5)
+        //     {
+        //         int x = (int)(halfSize + i * cosAziStep);
+        //         int y = (int)(halfSize + i * sinAziStep);
+        //
+        //         if (x >= 0 && x < CartesianSize && y >= 0 && y < CartesianSize)
+        //         {
+        //             int grayValue = (int)items.GetCellData(i);
+        //             _cartesianData[x, y] = grayValue;
+        //             updatedPixels.Add(new Tuple<int, int, int>(x, y, grayValue));
+        //         }
+        //     }
+        //
+        //     return updatedPixels;
+        // }
     }
 }

@@ -9,9 +9,7 @@ using Silk.WPF.OpenGL.Scene;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -35,7 +33,7 @@ namespace RadarMonitor
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const int ImageSize = RadarMonitorViewModel.CartesianSzie;
+        private const int ImageSize = RadarMonitorViewModel.CartesianSize;
 
         private double _dpiX;
         private double _dpiY;
@@ -47,13 +45,15 @@ namespace RadarMonitor
         private int _echoDataStride;
 
         private DispatcherTimer _timer = new DispatcherTimer();
-        private const int RefreshIntervalMs = 40;
+        private const int RefreshIntervalMs = 16;   // 60 FPS
 
         private Color _scanlineColor;
         private bool _isFadingEnabled = true;
-        private int _fadingInterval = 7;
+        private int _fadingInterval = 3;
+        private byte _fadingStep;
 
         private bool _encDisplayFlag = false;
+        
 
         public MainWindow()
         {
@@ -135,8 +135,8 @@ namespace RadarMonitor
 
         private void InitializeEchoData()
         {
-            _echoData = new byte[RadarMonitorViewModel.CartesianSzie * RadarMonitorViewModel.CartesianSzie * 4];
-            _echoDataStride = RadarMonitorViewModel.CartesianSzie * 4;
+            _echoData = new byte[RadarMonitorViewModel.CartesianSize * RadarMonitorViewModel.CartesianSize * 4];
+            _echoDataStride = RadarMonitorViewModel.CartesianSize * 4;
 
             for (int i = 0; i < _echoData.Length; i += 4)
             {
@@ -148,6 +148,8 @@ namespace RadarMonitor
 
             _bitmap = new WriteableBitmap(ImageSize, ImageSize, 96, 96, PixelFormats.Bgra32, null);
             EchoImageOverlay.Source = _bitmap;
+
+            _fadingStep = (byte)Math.Max(1, 255 / _fadingInterval / (1000 / RefreshIntervalMs));
         }
 
         private void RefreshImageEcho(object? sender, EventArgs e)
@@ -159,24 +161,26 @@ namespace RadarMonitor
             }
 
             // 重绘图片雷达回波
-            _bitmap.WritePixels(new Int32Rect(0, 0, ImageSize, ImageSize), _echoData, _echoDataStride, 0);
-            EchoOverlay.InvalidateVisual();
-
-            // Fading
-            if (_isFadingEnabled)
+            if (viewModel.IsEchoDisplayed)
             {
-                byte fadingStep = (byte)(255 / _fadingInterval / (1000 / RefreshIntervalMs));
-                for (int i = 0; i < _echoData.Length; i += 4)
+                var cartesianData = viewModel.CartesianData;
+                for (int x = 0; x < cartesianData.GetLength(0) - 1; x++)
                 {
-                    byte alpha = _echoData[i + 3];
-                    if (alpha == 0)
+                    for (int y = 0; y < cartesianData.GetLength(1) - 1; y++)
                     {
-                        continue;
-                    }
+                        int index = y * _echoDataStride + x * 4;
 
-                    _echoData[i + 3] = (byte)Math.Max((alpha - fadingStep), 0);
+                        _echoData[index + 3] = (byte)cartesianData[x, y]; // Update Alpha
+
+                        // if (_isFadingEnabled)
+                        // {
+                        //     cartesianData[x, y] = Math.Max(cartesianData[x, y] - _fadingStep, 0);
+                        // }
+                    }
                 }
             }
+            _bitmap.WritePixels(new Int32Rect(0, 0, ImageSize, ImageSize), _echoData, _echoDataStride, 0);
+            EchoOverlay.InvalidateVisual();
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
