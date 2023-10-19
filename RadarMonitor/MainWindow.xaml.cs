@@ -86,7 +86,7 @@ namespace RadarMonitor
 
             #region Enc configuration
             // 海图显示配置：不显示 海床，深度点，地理名称等
-            EncEnvironmentSettings.Default.DisplaySettings.MarinerSettings.ColorScheme = EncColorScheme.Night;
+            EncEnvironmentSettings.Default.DisplaySettings.MarinerSettings.ColorScheme = EncColorScheme.Dusk;
 
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.AllIsolatedDangers = _encDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ArchipelagicSeaLanes = _encDisplayFlag;
@@ -100,7 +100,7 @@ namespace RadarMonitor
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.DepthContours = _encDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.DryingLine = _encDisplayFlag;
 
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Lights = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Lights = true;
 
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.MagneticVariation = _encDisplayFlag;
 
@@ -109,7 +109,7 @@ namespace RadarMonitor
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ProhibitedAndRestrictedAreas = _encDisplayFlag;
 
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Seabed = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ShipsRoutingSystemsAndFerryRoutes = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ShipsRoutingSystemsAndFerryRoutes = true;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.SpotSoundings = _encDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.StandardMiscellaneous = _encDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.SubmarineCablesAndPipelines = _encDisplayFlag;
@@ -179,6 +179,7 @@ namespace RadarMonitor
                     }
                 }
             }
+
             _bitmap.WritePixels(new Int32Rect(0, 0, ImageSize, ImageSize), _echoData, _echoDataStride, 0);
             EchoOverlay.InvalidateVisual();
         }
@@ -381,15 +382,6 @@ namespace RadarMonitor
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
                 TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 0);
                 TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 0);
-
-                //// TODO: 如何改善
-                //Task.Factory.StartNew(() =>
-                //{
-                //    // Refresh UI
-                //    viewModel.IsEchoDisplayed = !viewModel.IsEchoDisplayed;
-                //    viewModel.IsEchoDisplayed = !viewModel.IsEchoDisplayed;
-
-                //});
             }
         }
 
@@ -430,19 +422,6 @@ namespace RadarMonitor
                 Dispatcher.Invoke(() =>
                 {
                     var viewModel = (RadarMonitorViewModel)DataContext;
-
-                    // GDI 回波图像绘制
-                    if (viewModel.IsEchoDisplayed)
-                    {
-                        foreach (var pixel in updatedPixels)
-                        {
-                            int x = pixel.Item1;
-                            int y = pixel.Item2;
-                            int index = y * _echoDataStride + x * 4;
-
-                            _echoData[index + 3] = (byte)pixel.Item3; // Update Alpha
-                        }
-                    }
 
                     // OpenGL 回波图像绘制
                     if (viewModel.IsOpenGlEchoDisplayed)

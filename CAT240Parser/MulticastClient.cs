@@ -67,7 +67,7 @@ namespace CAT240Parser
 
                 if (dataBlock.Items.StartAzimuth != _lastAzimuth)
                 {
-                    if (_index++ % 2 == 0)  // For higher performance
+                    //if (_index++ % 2 == 0)  // For higher performance
                     {
                         //Trace.WriteLine(dataBlock.Items.StartAzimuth);
                         OnCat240Received?.Invoke(this, dataBlock);

@@ -69,6 +69,9 @@ namespace RadarMonitor.ViewModel
         
         // 雷达回波直角坐标系
         public const int CartesianSize = 2000;
+        private double _radiusIncrement;
+        private double _halfSize = CartesianSize / 2.0;
+        private int _scaledStep = 1;
         private int[,] _cartesianData = new int[CartesianSize, CartesianSize];
 
         // 事件
@@ -339,22 +342,25 @@ namespace RadarMonitor.ViewModel
                 // 同一雷达每个数据包都会变的信息
                 StartAzimuth = dataItems.StartAzimuthInDegree;
                 EndAzimuth = dataItems.EndAzimuthInDegree;
-                StartRange = (int)dataItems.StartRange;
-                
-                CellCompression = dataItems.IsDataCompressed;
-                CellDuration = (int)dataItems.CellDuration;
-                CellResolution = dataItems.VideoResolution;
-                CellCount = (int)dataItems.ValidCellsInDataBlock;
-                VideoBlockCount = (int)dataItems.ValidCellsInDataBlock;
-                MaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * 300000 / 2 * dataItems.ValidCellsInDataBlock);
                 
                 // TODO: 疑问点
                 // 同一雷达每个数据包基本不变的信息
                 if (dataItems.IsSpecChanged(_lastCat240DataItems))
                 {
                     OnCat240SpecChanged?.Invoke(this, new Cat240Spec(dataItems));
+
+                    StartRange = (int)dataItems.StartRange;
+                    CellCompression = dataItems.IsDataCompressed;
+                    CellDuration = (int)dataItems.CellDuration;
+                    CellResolution = dataItems.VideoResolution;
+                    CellCount = (int)dataItems.ValidCellsInDataBlock;
+                    VideoBlockCount = (int)dataItems.ValidCellsInDataBlock;
+                    MaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * 300000 / 2 * dataItems.ValidCellsInDataBlock);
+
+                    _radiusIncrement = CartesianSize / 2.0 / dataItems.VideoBlocks.Count;
+                    _scaledStep = dataItems.VideoBlocks.Count / CartesianSize;
                 }
-                
+
                 _lastCat240DataItems = dataItems;
                 _lastStartAzimuth = StartAzimuth;
 
@@ -370,17 +376,13 @@ namespace RadarMonitor.ViewModel
             var cosAzi = Math.Cos(angleInRadians);
             var sinAzi = Math.Sin(angleInRadians);
 
-            double radiusIncrement = CartesianSize / 2.0 / items.VideoBlocks.Count;
+            double cosAziStep = _radiusIncrement * cosAzi;
+            double sinAziStep = _radiusIncrement * sinAzi;
 
-            double cosAziStep = radiusIncrement * cosAzi;
-            double sinAziStep = radiusIncrement * sinAzi;
-
-            double halfSize = CartesianSize / 2.0;
-
-            for (int i = 0; i < items.VideoBlocks.Count; i += 3)
+            for (int i = 0; i < items.VideoBlocks.Count; i += _scaledStep)
             {
-                int x = (int)(halfSize + i * cosAziStep);
-                int y = (int)(halfSize + i * sinAziStep);
+                int x = (int)(_halfSize + i * cosAziStep);
+                int y = (int)(_halfSize + i * sinAziStep);
 
                 if (x >= 0 && x < CartesianSize && y >= 0 && y < CartesianSize)
                 {
@@ -389,39 +391,5 @@ namespace RadarMonitor.ViewModel
                 }
             }
         }
-
-        // private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)
-        // {
-        //     Cat240DataItems items = data.Items;
-        //
-        //     List<Tuple<int, int, int>> updatedPixels = new List<Tuple<int, int, int>>();
-        //
-        //     double angleInRadians = (items.StartAzimuthInDegree + RadarOrientation) * Math.PI / 180.0;
-        //
-        //     var cosAzi = Math.Cos(angleInRadians);
-        //     var sinAzi = Math.Sin(angleInRadians);
-        //
-        //     double radiusIncrement = CartesianSize / 2.0 / items.VideoBlocks.Count;
-        //
-        //     double cosAziStep = radiusIncrement * cosAzi;
-        //     double sinAziStep = radiusIncrement * sinAzi;
-        //
-        //     double halfSize = CartesianSize / 2.0;
-        //
-        //     for (int i = 0; i < items.VideoBlocks.Count; i += 5)
-        //     {
-        //         int x = (int)(halfSize + i * cosAziStep);
-        //         int y = (int)(halfSize + i * sinAziStep);
-        //
-        //         if (x >= 0 && x < CartesianSize && y >= 0 && y < CartesianSize)
-        //         {
-        //             int grayValue = (int)items.GetCellData(i);
-        //             _cartesianData[x, y] = grayValue;
-        //             updatedPixels.Add(new Tuple<int, int, int>(x, y, grayValue));
-        //         }
-        //     }
-        //
-        //     return updatedPixels;
-        // }
     }
 }
