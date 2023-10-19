@@ -415,7 +415,7 @@ namespace RadarMonitor
             }
         }
 
-        private void OnCat240PackageReceived(object sender, Cat240DataBlock data, List<Tuple<int, int, int>> updatedPixels)
+        private void OnCat240PackageReceived(object sender, Cat240DataBlock data)
         {
             try
             {
@@ -432,7 +432,7 @@ namespace RadarMonitor
                         OpenGlEchoOverlay.RealCells = viewModel.CellCount;
                         ExampleScene.OnReceivedCat240DataBlock(sender, data);
                     }
-                }, DispatcherPriority.Render);
+                });
             }
             catch (Exception e)
             {

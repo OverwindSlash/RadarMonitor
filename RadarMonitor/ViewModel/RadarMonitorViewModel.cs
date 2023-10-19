@@ -16,7 +16,7 @@ namespace RadarMonitor.ViewModel
     public delegate void EncChangedEventHandler(object sender, string encUri);
     public delegate void MainRadarChangedEventHandler(object sender, RadarSettings radarSettings);
     public delegate void Cat240SpecChangedEventHandler(object sender, Cat240Spec cat240Spec);
-    public delegate void Cat240PackageReceivedEventHandler(object sender, Cat240DataBlock data, List<Tuple<int, int, int>> updatedPixels);
+    public delegate void Cat240PackageReceivedEventHandler(object sender, Cat240DataBlock data);
     public delegate void ViewPointChangedHandler(object sender, ViewPoint viewPoint);
 
     public class RadarMonitorViewModel : INotifyPropertyChanged
@@ -365,7 +365,7 @@ namespace RadarMonitor.ViewModel
                 _lastStartAzimuth = StartAzimuth;
 
                 PolarToCartesian(dataItems);
-                //OnCat240PackageReceived?.Invoke(this, data, updatedPixels);   // 调整成只变更数据，不触发显示
+                //OnCat240PackageReceived?.Invoke(this, data);   // 调整成只变更数据，不触发显示
             });
         }
 
