@@ -4,18 +4,28 @@ namespace RadarMonitor.Model
 {
     public class RadarSettings
     {
-        public double Longitude { get; set; } = 0;
-        public double Latitude { get; set; } = 0;
-        public double Orientation { get; set; } = 0;
-        public string Ip { get; set; } = "127.0.0.1";
-        public int Port { get; set; } = 20101;
+        public string RadarName { get; set; } = @"Radar";
+        public double RadarLongitude { get; set; } = 0;
+        public double RadarLatitude { get; set; } = 0;
+        public double RadarOrientation { get; set; } = 0;
+        public double RadarScale { get; internal set; } = 500000;
+        public string RadarIpAddress { get; set; } = "127.0.0.1";
+        public int RadarPort { get; set; } = 20101;
+        public bool RadarEnabled { get; set; } = false;
+
+        public RadarSettings()
+        {
+        }
 
         protected bool Equals(RadarSettings other)
         {
-            return Longitude.Equals(other.Longitude) && Latitude.Equals(other.Latitude) 
-                                                     && Orientation.Equals(other.Orientation) 
-                                                     && Ip == other.Ip 
-                                                     && Port == other.Port;
+            return RadarName == other.RadarName 
+                   && RadarLongitude.Equals(other.RadarLongitude) 
+                   && RadarLatitude.Equals(other.RadarLatitude) 
+                   && RadarOrientation.Equals(other.RadarOrientation) 
+                   && RadarIpAddress == other.RadarIpAddress 
+                   && RadarPort == other.RadarPort 
+                   && RadarEnabled == other.RadarEnabled;
         }
 
         public override bool Equals(object? obj)
@@ -28,7 +38,7 @@ namespace RadarMonitor.Model
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Longitude, Latitude, Orientation, Ip, Port);
+            return HashCode.Combine(RadarName, RadarLongitude, RadarLatitude, RadarOrientation, RadarIpAddress, RadarPort, RadarEnabled);
         }
     }
 }

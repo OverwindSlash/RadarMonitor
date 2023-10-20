@@ -6,6 +6,7 @@
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
 		<ApplicationIcon>Assets\Logo.ico</ApplicationIcon>
+		<SatelliteResourceLanguages>zh-HK</SatelliteResourceLanguages>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -25,14 +26,13 @@
 		<None Remove="Assets\UpRight.png" />
 		<None Remove="Assets\ZoomIn.png" />
 		<None Remove="Assets\ZoomOut.png" />
+		<None Remove="Config\default.yaml" />
 		<None Remove="Encs\C1100103.000" />
 		<None Remove="Encs\C1313100.000" />
 		<None Remove="Encs\C1513179.000" />
 		<None Remove="Encs\C1515591.000" />
 		<None Remove="Encs\C1613182.000" />
 		<None Remove="Encs\CATALOG.031" />
-		<None Remove="Presets\preset-locations.yaml" />
-		<None Remove="Presets\preset-radars.yaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -85,6 +85,9 @@
 		<Content Include="Assets\ZoomOut.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Include="Config\default.yaml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 		<Content Include="Encs\C1100103.000">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
@@ -101,12 +104,6 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Encs\CATALOG.031">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Presets\preset-locations.yaml">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Presets\preset-radars.yaml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>

@@ -1,0 +1,53 @@
+﻿encConfiguration:
+   encType: Catalog
+   encUri: Encs\CATALOG.031
+   encLongitude: 121.912592
+   encLatitude: 31.576394
+   encScale: 275000
+   encEnabled: true
+radarConfigurations:
+-
+   radarName: radar1
+   radarLongitude: 121.912592
+   radarLatitude: 31.576394
+   radarOrientation: 55.0
+   radarScale: 275000
+   radarIpAddress: 127.0.0.1
+   radarPort: 20101
+   radarEnabled: true
+-
+   radarName: radar2
+   radarLongitude: 121.793117
+   radarLatitude: 31.352440
+   radarOrientation: 55.0
+   radarScale: 10000
+   radarIpAddress: 127.0.0.1
+   radarPort: 20102
+   radarEnabled: false
+-
+   radarName: radar3
+   radarLongitude: 121.496233
+   radarLatitude: 31.375250
+   radarOrientation: 55.0
+   radarScale: 68750
+   radarIpAddress: 127.0.0.1
+   radarPort: 20103
+   radarEnabled: false
+-
+   radarName: radar4
+   radarLongitude: 122.099197
+   radarLatitude: 31.416057
+   radarOrientation: 55.0
+   radarScale: 160000
+   radarIpAddress: 127.0.0.1
+   radarPort: 20104
+   radarEnabled: false
+-
+   radarName: radar5
+   radarLongitude: 122.471336
+   radarLatitude: 30.780275
+   radarOrientation: 55.0
+   radarScale: 30000
+   radarIpAddress: 127.0.0.1
+   radarPort: 20105
+   radarEnabled: false

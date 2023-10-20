@@ -146,16 +146,16 @@ namespace RadarMonitor.ViewModel
 
         public RadarSettingsViewModel(RadarSettings current)
         {
-            Longitude = current.Longitude.ToString();
-            Latitude = current.Latitude.ToString();
-            Orientation = current.Orientation;
+            Longitude = current.RadarLongitude.ToString();
+            Latitude = current.RadarLatitude.ToString();
+            Orientation = current.RadarOrientation;
 
-            IpPart1 = int.Parse(current.Ip.Split('.')[0]);
-            IpPart2 = int.Parse(current.Ip.Split('.')[1]);
-            IpPart3 = int.Parse(current.Ip.Split('.')[2]);
-            IpPart4 = int.Parse(current.Ip.Split('.')[3]);
+            IpPart1 = int.Parse(current.RadarIpAddress.Split('.')[0]);
+            IpPart2 = int.Parse(current.RadarIpAddress.Split('.')[1]);
+            IpPart3 = int.Parse(current.RadarIpAddress.Split('.')[2]);
+            IpPart4 = int.Parse(current.RadarIpAddress.Split('.')[3]);
 
-            Port = current.Port;
+            Port = current.RadarPort;
         }
 
         private bool IsLongitudeValid(string input)
@@ -216,11 +216,11 @@ namespace RadarMonitor.ViewModel
 
             return new RadarSettings()
             {
-                Longitude = double.Parse(_longitude),
-                Latitude = double.Parse(_latitude),
-                Orientation = _orientation,
-                Ip = $"{_ipPart1}.{_ipPart2}.{_ipPart3}.{_ipPart4}",
-                Port = _port
+                RadarLongitude = double.Parse(_longitude),
+                RadarLatitude = double.Parse(_latitude),
+                RadarOrientation = _orientation,
+                RadarIpAddress = $"{_ipPart1}.{_ipPart2}.{_ipPart3}.{_ipPart4}",
+                RadarPort = _port
             };
         }
     }

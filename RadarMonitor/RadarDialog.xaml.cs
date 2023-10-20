@@ -1,10 +1,7 @@
 ﻿using RadarMonitor.Model;
 using RadarMonitor.ViewModel;
 using System.Collections.Generic;
-using System.IO;
 using System.Windows;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace RadarMonitor
 {
@@ -15,25 +12,13 @@ namespace RadarMonitor
     {
         private List<RadarSettings> _settings;
 
-        public RadarDialog()
+        public RadarDialog(List<RadarSettings> radarSettings)
         {
             InitializeComponent();
 
-            LoadPresets();
+            _settings = radarSettings;
 
             DataContext = new RadarSettingsViewModel();
-        }
-
-        private void LoadPresets()
-        {
-            string contents = File.ReadAllText("Presets/preset-radars.yaml");
-
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build();
-
-            //yml contains a string containing your YAML
-            _settings = deserializer.Deserialize<List<RadarSettings>>(contents);
         }
 
         private void BtnLoadPreset1_Click(object sender, RoutedEventArgs e)

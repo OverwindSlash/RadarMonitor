@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -33,14 +34,13 @@ namespace RadarMonitor
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const int ImageSize = RadarMonitorViewModel.CartesianSize;
-
         private double _dpiX;
         private double _dpiY;
         private double _dpcX;
         private double _dpcY;
 
         private WriteableBitmap _bitmap;
+        private const int ImageSize = RadarMonitorViewModel.CartesianSize;
         private byte[] _echoData;
         private int _echoDataStride;
 
@@ -52,8 +52,8 @@ namespace RadarMonitor
         private int _fadingInterval = 3;
         private byte _fadingStep;
 
-        private bool _encDisplayFlag = false;
-        
+        private bool _encDetailDisplayFlag = false;
+
 
         public MainWindow()
         {
@@ -77,6 +77,8 @@ namespace RadarMonitor
             _timer.Interval = TimeSpan.FromMilliseconds(RefreshIntervalMs);
             _timer.Tick += RefreshImageEcho;
             _timer.Start();
+
+            LoadUserConfiguration();
         }
 
         private void InitializeMapView()
@@ -88,44 +90,44 @@ namespace RadarMonitor
             // 海图显示配置：不显示 海床，深度点，地理名称等
             EncEnvironmentSettings.Default.DisplaySettings.MarinerSettings.ColorScheme = EncColorScheme.Dusk;
 
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.AllIsolatedDangers = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ArchipelagicSeaLanes = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.AllIsolatedDangers = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ArchipelagicSeaLanes = _encDetailDisplayFlag;
 
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.BoundariesAndLimits = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.BuoysBeaconsAidsToNavigation = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.BuoysBeaconsStructures = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.BoundariesAndLimits = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.BuoysBeaconsAidsToNavigation = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.BuoysBeaconsStructures = _encDetailDisplayFlag;
 
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ChartScaleBoundaries = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ChartScaleBoundaries = _encDetailDisplayFlag;
 
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.DepthContours = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.DryingLine = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.DepthContours = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.DryingLine = _encDetailDisplayFlag;
 
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Lights = true;
 
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.MagneticVariation = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.MagneticVariation = _encDetailDisplayFlag;
 
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.OtherMiscellaneous = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.OtherMiscellaneous = _encDetailDisplayFlag;
 
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ProhibitedAndRestrictedAreas = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ProhibitedAndRestrictedAreas = _encDetailDisplayFlag;
 
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Seabed = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Seabed = _encDetailDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ShipsRoutingSystemsAndFerryRoutes = true;
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.SpotSoundings = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.StandardMiscellaneous = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.SubmarineCablesAndPipelines = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.SpotSoundings = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.StandardMiscellaneous = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.SubmarineCablesAndPipelines = _encDetailDisplayFlag;
 
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Tidal = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Tidal = _encDetailDisplayFlag;
 
-            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.BerthNumber = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.CurrentVelocity = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.BerthNumber = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.CurrentVelocity = _encDetailDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.GeographicNames = true;
-            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.HeightOfIsletOrLandFeature = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.ImportantText = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.LightDescription = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.MagneticVariationAndSweptDepth = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NamesForPositionReporting = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NatureOfSeabed = _encDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NoteOnChartData = _encDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.HeightOfIsletOrLandFeature = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.ImportantText = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.LightDescription = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.MagneticVariationAndSweptDepth = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NamesForPositionReporting = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NatureOfSeabed = _encDetailDisplayFlag;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NoteOnChartData = _encDetailDisplayFlag;
             #endregion
 
             var viewModel = (RadarMonitorViewModel)DataContext;
@@ -150,6 +152,44 @@ namespace RadarMonitor
             EchoImageOverlay.Source = _bitmap;
 
             _fadingStep = (byte)Math.Max(1, 255 / _fadingInterval / (1000 / RefreshIntervalMs));
+        }
+
+        private async Task LoadUserConfiguration()
+        {
+            var viewModel = (RadarMonitorViewModel)DataContext;
+
+            try
+            {
+                var configuration = viewModel.Configuration;
+
+                var encConfiguration = configuration.EncConfiguration;
+                if (encConfiguration != null && encConfiguration.EncEnabled)
+                {
+                    switch (encConfiguration.EncType.ToLower())
+                    {
+                        case "catalog":
+                            await LoadEncByCatalog(encConfiguration.EncUri);
+                            break;
+                        case "dir":
+                            LoadEncByDir(encConfiguration.EncUri);
+                            break;
+                        case "cell":
+                            LoadEncByCell(encConfiguration.EncUri);
+                            break;
+                        default:
+                            await LoadEncByCatalog(encConfiguration.EncUri);
+                            break;
+                    }
+
+                    BaseMapView.SetViewpointAsync(new Viewpoint(
+                        new MapPoint(encConfiguration.EncLongitude, encConfiguration.EncLatitude, SpatialReferences.Wgs84),
+                        encConfiguration.EncScale));
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         private void RefreshImageEcho(object? sender, EventArgs e)
@@ -217,33 +257,38 @@ namespace RadarMonitor
 
             try
             {
-                // 加载海图
-                InitializeMapView();
-
-                EncExchangeSet encExchangeSet = new EncExchangeSet(catalogFile);
-                await encExchangeSet.LoadAsync();
-
-                List<Envelope> dataSetExtents = new List<Envelope>();
-                foreach (EncDataset encDataset in encExchangeSet.Datasets)
-                {
-                    EncLayer encLayer = new EncLayer(new EncCell(encDataset));
-                    await encLayer.LoadAsync();
-                    dataSetExtents.Add(encLayer.FullExtent);
-
-                    BaseMapView.Map.OperationalLayers.Add(encLayer);
-                }
-
-                Envelope fullExtent = GeometryEngine.CombineExtents(dataSetExtents);
-                await BaseMapView.SetViewpointAsync(new Viewpoint(fullExtent));
-
-                // 设置 ViewModel
-                var viewModel = (RadarMonitorViewModel)DataContext;
-                viewModel.RecordNewEncUri(catalogFile);
+                await LoadEncByCatalog(catalogFile);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private async Task LoadEncByCatalog(string catalogFile)
+        {
+            // 加载海图
+            InitializeMapView();
+
+            EncExchangeSet encExchangeSet = new EncExchangeSet(catalogFile);
+            await encExchangeSet.LoadAsync();
+
+            List<Envelope> dataSetExtents = new List<Envelope>();
+            foreach (EncDataset encDataset in encExchangeSet.Datasets)
+            {
+                EncLayer encLayer = new EncLayer(new EncCell(encDataset));
+                await encLayer.LoadAsync();
+                dataSetExtents.Add(encLayer.FullExtent);
+
+                BaseMapView.Map.OperationalLayers.Add(encLayer);
+            }
+
+            Envelope fullExtent = GeometryEngine.CombineExtents(dataSetExtents);
+            await BaseMapView.SetViewpointAsync(new Viewpoint(fullExtent));
+
+            // 设置 ViewModel
+            var viewModel = (RadarMonitorViewModel)DataContext;
+            viewModel.RecordNewEncUri(catalogFile);
         }
 
         private async void LoadCellDir_OnClick(object sender, RoutedEventArgs e)
@@ -255,47 +300,53 @@ namespace RadarMonitor
             {
                 string encDir = folderDialog.SelectedPath;
 
-                List<string> files = new List<string>();
-                GetAllFiles(encDir, files);
+                LoadEncByDir(encDir);
+            }
+        }
 
-                InitializeMapView();
+        private void LoadEncByDir(string encDir)
+        {
+            InitializeMapView();
 
-                foreach (string file in files)
+            List<string> files = new List<string>();
+            GetAllFiles(encDir, files);
+            foreach (string file in files)
+            {
+                if (!file.EndsWith(".000"))
                 {
-                    if (!file.EndsWith(".000"))
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        var cell = new EncCell(file);
-                        var layer = new EncLayer(cell) { Name = new FileInfo(file).Name };
-
-                        var idx = layer.Name[2];
-                        int insertIndex = 0;
-
-                        foreach (var l in BaseMapView.Map.OperationalLayers)
-                        {
-                            var name = l.Name[2];
-                            if (name > idx)
-                            {
-                                break;
-                            }
-                            insertIndex++;
-                        }
-                        BaseMapView.Map.OperationalLayers.Insert(insertIndex, layer);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                    continue;
                 }
 
-                // 设置 ViewModel
-                var viewModel = (RadarMonitorViewModel)DataContext;
-                viewModel.RecordNewEncUri(encDir);
+                try
+                {
+                    var cell = new EncCell(file);
+                    var layer = new EncLayer(cell) { Name = new FileInfo(file).Name };
+
+                    var idx = layer.Name[2];
+                    int insertIndex = 0;
+
+                    foreach (var l in BaseMapView.Map.OperationalLayers)
+                    {
+                        var name = l.Name[2];
+                        if (name > idx)
+                        {
+                            break;
+                        }
+
+                        insertIndex++;
+                    }
+
+                    BaseMapView.Map.OperationalLayers.Insert(insertIndex, layer);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
+
+            // 设置 ViewModel
+            var viewModel = (RadarMonitorViewModel)DataContext;
+            viewModel.RecordNewEncUri(encDir);
         }
 
         private void LoadCell_OnClick(object sender, RoutedEventArgs e)
@@ -309,6 +360,11 @@ namespace RadarMonitor
             }
             string cellFile = openFileDialog.FileName;
 
+            LoadEncByCell(cellFile);
+        }
+
+        private void LoadEncByCell(string cellFile)
+        {
             InitializeMapView();
 
             try
@@ -326,8 +382,10 @@ namespace RadarMonitor
                     {
                         break;
                     }
+
                     insertIndex++;
                 }
+
                 BaseMapView.Map.OperationalLayers.Insert(insertIndex, layer);
 
                 // 设置 ViewModel
@@ -357,7 +415,7 @@ namespace RadarMonitor
             }
 
             // 指定雷达参数对话框
-            var radarDialog = new RadarDialog();
+            var radarDialog = new RadarDialog(viewModel.Configuration.RadarConfigurations);
             bool? dialogResult = radarDialog.ShowDialog();
             if (dialogResult == true)
             {
@@ -387,7 +445,7 @@ namespace RadarMonitor
 
         private void OnMainRadarChanged(object sender, RadarSettings radarSettings)
         {
-            TbStatusInfo.Text = $"Listening radar on {radarSettings.Ip}:{radarSettings.Port}.";
+            TbStatusInfo.Text = $"Listening radar on {radarSettings.RadarIpAddress}:{radarSettings.RadarPort}.";
             InitializeEchoData();
         }
 

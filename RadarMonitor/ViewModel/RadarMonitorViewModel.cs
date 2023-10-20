@@ -1,4 +1,6 @@
 ﻿using CAT240Parser;
+using Esri.ArcGISRuntime.Geometry;
+using Esri.ArcGISRuntime.Mapping;
 using RadarMonitor.Model;
 using Silk.WPF.OpenGL.Scene;
 using System;
@@ -8,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -38,21 +41,26 @@ namespace RadarMonitor.ViewModel
         }
         #endregion
 
-        // 海图相关属性
-        private bool _isEncLoaded;
-        private string _encUri;
-        private double _currentEncScale;
-        private bool _isEncDisplayed;
+        // 用户配置信息
+        private UserConfiguration _userConfiguration;
 
         private bool _isPresetLocationLoaded;
         private List<PresetLocation> _presetLocations = new List<PresetLocation>();
 
+        // 海图相关属性
+        private bool _isEncLoaded;
+        private bool _isEncDisplayed;
+        private string _encUri;
+        private double _encScale;
+        private double _encLongitude;
+        private double _encLatitude;
+
         // 雷达静态属性
         private bool _isRadarConnected;
-        private RadarSettings _radarSettings;
         private bool _isRingsDisplayed;
         private bool _isEchoDisplayed;
         private bool _isOpenGlEchoDisplayed;
+        private RadarSettings _radarSettings;
 
         // 雷达动态属性
         private Cat240DataItems _lastCat240DataItems = null;
@@ -84,6 +92,17 @@ namespace RadarMonitor.ViewModel
         private MulticastClient _client;
 
         #region Properties
+
+        public UserConfiguration Configuration
+        {
+            get => _userConfiguration;
+            set
+            {
+                SetField(ref _userConfiguration, value, "UserConfiguration");
+            }
+        }
+
+
         public bool IsEncLoaded
         {
             get => _isEncLoaded;
@@ -96,10 +115,10 @@ namespace RadarMonitor.ViewModel
 
         public double CurrentEncScale
         {
-            get => _currentEncScale;
+            get => _encScale;
             set
             {
-                SetField(ref _currentEncScale, value, "CurrentEncScale");
+                SetField(ref _encScale, value, "CurrentEncScale");
             }
         }
 
@@ -135,11 +154,11 @@ namespace RadarMonitor.ViewModel
                 }
             }
         }
-        public double RadarLongitude => _radarSettings.Longitude;
-        public double RadarLatitude => _radarSettings.Latitude;
-        public double RadarOrientation => _radarSettings.Orientation;
-        public string RadarIpAddress => _radarSettings.Ip;
-        public int RadarPort => _radarSettings.Port;
+        public double RadarLongitude => _radarSettings.RadarLongitude;
+        public double RadarLatitude => _radarSettings.RadarLatitude;
+        public double RadarOrientation => _radarSettings.RadarOrientation;
+        public string RadarIpAddress => _radarSettings.RadarIpAddress;
+        public int RadarPort => _radarSettings.RadarPort;
 
         public int[,] CartesianData => _cartesianData;
 
@@ -254,26 +273,24 @@ namespace RadarMonitor.ViewModel
 
         public RadarMonitorViewModel()
         {
-            try
-            {
-                LoadPresetLocations();
-                _radarSettings = new RadarSettings();
-            }
-            catch (Exception e)
-            {
-                // TODO: Show exception message.
-            }
+            LoadUserConfiguration();
         }
 
-        private void LoadPresetLocations()
+        private async Task LoadUserConfiguration()
         {
-            string contents = File.ReadAllText("Presets/preset-locations.yaml");
+            _userConfiguration = UserConfiguration.LoadConfiguration("Config/default.yaml");
 
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build();
+            foreach (var radarConfig in _userConfiguration.RadarConfigurations)
+            {
+                _presetLocations.Add(new PresetLocation()
+                {
+                    Longitude = radarConfig.RadarLongitude,
+                    Latitude = radarConfig.RadarLatitude,
+                    Scale = radarConfig.RadarScale
+                });
+            }
 
-            _presetLocations = deserializer.Deserialize<List<PresetLocation>>(contents);
+            _radarSettings = new RadarSettings();
         }
 
         public PresetLocation GetPresetLocation(int index)
