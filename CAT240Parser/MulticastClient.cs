@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using UdpClient = NetCoreServer.UdpClient;
@@ -11,22 +12,23 @@ namespace CAT240Parser
     {
         public string Multicast;
 
-        private int _index;
+        private int _clientIndex;
         private bool _stop;
-        private double _lastAzimuth;
-        
+        private ConcurrentDictionary<uint, int> _dataBlockIds = new();
+
+        private int _dataBlockCount;
+
         // 定义事件
         public event Cat240ReceivedEventHandler OnCat240Received;
 
-        public MulticastClient(int index, string address, int port) 
+        public MulticastClient(int clientIndex, string address, int port) 
             : base(address, port) 
         {
             int coreCount = Environment.ProcessorCount;
             ThreadPool.SetMinThreads(1, 1);
             ThreadPool.SetMaxThreads(coreCount, coreCount);
 
-            _index = index;
-            _lastAzimuth = 0.0;
+            _clientIndex = clientIndex;
         }
 
         public void DisconnectAndStop()
@@ -53,7 +55,7 @@ namespace CAT240Parser
             Trace.WriteLine($"Multicast UDP client disconnected a session with Id {Id}");
 
             // Wait for a while...
-            Thread.Sleep(1000);
+            Thread.Sleep(200);
 
             // Try to connect again
             if (!_stop)
@@ -69,15 +71,18 @@ namespace CAT240Parser
             {
                 Cat240DataBlock dataBlock = new Cat240DataBlock(buffer, size);
 
-                if (dataBlock.Items.StartAzimuth != _lastAzimuth)
+                if (_dataBlockCount++ % 500 == 0)
                 {
-                    //if (_index++ % 2 == 0)  // For higher performance
-                    {
-                        //Trace.WriteLine(dataBlock.Items.StartAzimuth);
-                        OnCat240Received?.Invoke(this, _index, dataBlock);
-                        _lastAzimuth = dataBlock.Items.StartAzimuth;
-                    }
+                    _dataBlockIds.Clear();
                 }
+
+                if (_dataBlockIds.ContainsKey(dataBlock.Items.MessageIndex))
+                {
+                    return;
+                }
+
+                _dataBlockIds.TryAdd(dataBlock.Items.MessageIndex, 1);
+                OnCat240Received?.Invoke(this, _clientIndex, dataBlock);
             }));
 
             ReceiveAsync();

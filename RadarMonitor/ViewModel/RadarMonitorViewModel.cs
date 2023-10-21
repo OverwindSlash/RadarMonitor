@@ -4,6 +4,7 @@ using RadarMonitor.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Esri.ArcGISRuntime.Geometry;
@@ -29,13 +30,6 @@ namespace RadarMonitor.ViewModel
         protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
             if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-            field = value;
-            OnPropertyChanged(propertyName);
-            return true;
-        }
-
-        protected bool SetField<T>(T field, T value, [CallerMemberName] string? propertyName = null)
-        {
             field = value;
             OnPropertyChanged(propertyName);
             return true;
@@ -182,7 +176,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[0].IsConnected;
             set
             {
-                SetField(_radarSettings[0].IsConnected, value, "IsRadar1Connected");
+                _radarSettings[0].IsConnected = value;
+                OnPropertyChanged("IsRadar1Connected");
             }
         }
 
@@ -191,7 +186,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[0].IsRingsDisplayed;
             set
             {
-                SetField(_radarSettings[0].IsRingsDisplayed, value, "IsRadar1RingsDisplayed");
+                _radarSettings[0].IsRingsDisplayed = value;
+                OnPropertyChanged("IsRadar1RingsDisplayed");
             }
         }
 
@@ -200,7 +196,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[0].IsEchoDisplayed;
             set
             {
-                SetField(_radarSettings[0].IsEchoDisplayed, value, "IsRadar1EchoDisplayed");
+                _radarSettings[0].IsEchoDisplayed = value;
+                OnPropertyChanged("IsRadar1EchoDisplayed");
             }
         }
 
@@ -209,7 +206,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[0].IsOpenGlEchoDisplayed;
             set
             {
-                SetField(_radarSettings[0].IsOpenGlEchoDisplayed, value, "IsRadar1OpenGlEchoDisplayed");
+                _radarSettings[0].IsOpenGlEchoDisplayed = value;
+                OnPropertyChanged("IsRadar1OpenGlEchoDisplayed");
             }
         }
 
@@ -219,7 +217,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[1].IsConnected;
             set
             {
-                SetField(_radarSettings[1].IsConnected, value, "IsRadar2Connected");
+                _radarSettings[1].IsConnected = value;
+                OnPropertyChanged("IsRadar2Connected");
             }
         }
 
@@ -228,7 +227,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[1].IsRingsDisplayed;
             set
             {
-                SetField(_radarSettings[1].IsRingsDisplayed, value, "IsRadar2RingsDisplayed");
+                _radarSettings[1].IsRingsDisplayed = value;
+                OnPropertyChanged("IsRadar2RingsDisplayed");
             }
         }
 
@@ -237,7 +237,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[1].IsEchoDisplayed;
             set
             {
-                SetField(_radarSettings[1].IsEchoDisplayed, value, "IsRadar2EchoDisplayed");
+                _radarSettings[1].IsEchoDisplayed = value;
+                OnPropertyChanged("IsRadar2EchoDisplayed");
             }
         }
 
@@ -246,7 +247,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[1].IsOpenGlEchoDisplayed;
             set
             {
-                SetField(_radarSettings[1].IsOpenGlEchoDisplayed, value, "IsRadar2OpenGlEchoDisplayed");
+                _radarSettings[1].IsOpenGlEchoDisplayed = value;
+                OnPropertyChanged("IsRadar2OpenGlEchoDisplayed");
             }
         }
 
@@ -256,7 +258,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[2].IsConnected;
             set
             {
-                SetField(_radarSettings[2].IsConnected, value, "IsRadar3Connected");
+                _radarSettings[2].IsConnected = value;
+                OnPropertyChanged("IsRadar3Connected");
             }
         }
 
@@ -265,7 +268,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[2].IsRingsDisplayed;
             set
             {
-                SetField(_radarSettings[2].IsRingsDisplayed, value, "IsRadar3RingsDisplayed");
+                _radarSettings[2].IsRingsDisplayed = value;
+                OnPropertyChanged("IsRadar3RingsDisplayed");
             }
         }
 
@@ -274,7 +278,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[2].IsEchoDisplayed;
             set
             {
-                SetField(_radarSettings[2].IsEchoDisplayed, value, "IsRadar3EchoDisplayed");
+                _radarSettings[2].IsEchoDisplayed = value;
+                OnPropertyChanged("IsRadar3EchoDisplayed");
             }
         }
 
@@ -283,7 +288,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[2].IsOpenGlEchoDisplayed;
             set
             {
-                SetField(_radarSettings[2].IsOpenGlEchoDisplayed, value, "IsRadar3OpenGlEchoDisplayed");
+                _radarSettings[2].IsOpenGlEchoDisplayed = value;
+                OnPropertyChanged("IsRadar3OpenGlEchoDisplayed");
             }
         }
 
@@ -293,7 +299,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[3].IsConnected;
             set
             {
-                SetField(_radarSettings[3].IsConnected, value, "IsRadar4Connected");
+                _radarSettings[3].IsConnected = value;
+                OnPropertyChanged("IsRadar4Connected");
             }
         }
 
@@ -302,7 +309,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[3].IsRingsDisplayed;
             set
             {
-                SetField(_radarSettings[3].IsRingsDisplayed, value, "IsRadar4RingsDisplayed");
+                _radarSettings[3].IsRingsDisplayed = value;
+                OnPropertyChanged("IsRadar4RingsDisplayed");
             }
         }
 
@@ -311,7 +319,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[3].IsEchoDisplayed;
             set
             {
-                SetField(_radarSettings[3].IsEchoDisplayed, value, "IsRadar4EchoDisplayed");
+                _radarSettings[3].IsEchoDisplayed = value;
+                OnPropertyChanged("IsRadar4EchoDisplayed");
             }
         }
 
@@ -320,7 +329,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[3].IsOpenGlEchoDisplayed;
             set
             {
-                SetField(_radarSettings[3].IsOpenGlEchoDisplayed, value, "IsRadar4OpenGlEchoDisplayed");
+                _radarSettings[3].IsOpenGlEchoDisplayed = value;
+                OnPropertyChanged("IsRadar4OpenGlEchoDisplayed");
             }
         }
 
@@ -330,7 +340,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[4].IsConnected;
             set
             {
-                SetField(_radarSettings[4].IsConnected, value, "IsRadar5Connected");
+                _radarSettings[4].IsConnected = value;
+                OnPropertyChanged("IsRadar5Connected");
             }
         }
 
@@ -339,7 +350,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[4].IsRingsDisplayed;
             set
             {
-                SetField(_radarSettings[4].IsRingsDisplayed, value, "IsRadar5RingsDisplayed");
+                _radarSettings[4].IsRingsDisplayed = value;
+                OnPropertyChanged("IsRadar5RingsDisplayed");
             }
         }
 
@@ -348,7 +360,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[4].IsEchoDisplayed;
             set
             {
-                SetField(_radarSettings[4].IsEchoDisplayed, value, "IsRadar5EchoDisplayed");
+                _radarSettings[4].IsEchoDisplayed = value;
+                OnPropertyChanged("IsRadar5EchoDisplayed");
             }
         }
 
@@ -357,7 +370,8 @@ namespace RadarMonitor.ViewModel
             get => _radarSettings[4].IsOpenGlEchoDisplayed;
             set
             {
-                SetField(_radarSettings[4].IsOpenGlEchoDisplayed, value, "IsRadar5OpenGlEchoDisplayed");
+                _radarSettings[4].IsOpenGlEchoDisplayed = value;
+                OnPropertyChanged("IsRadar5OpenGlEchoDisplayed");
             }
         }
         #endregion
@@ -504,19 +518,35 @@ namespace RadarMonitor.ViewModel
         public void OnReceivedCat240DataBlock(object sender, int radarId, Cat240DataBlock data)
         {
             var dataItems = data.Items;
-
+            
             ThreadPool.QueueUserWorkItem((obj) =>
             {
-                // 避免切换雷达数据源时，因为没能及时处理数据而重发导致的问题
-                if (_lastCat240DataItems[radarId] == null || 
+                if (_lastCat240DataItems[radarId] != null && 
                     _lastCat240DataItems[radarId].StartAzimuthInDegree == dataItems.StartAzimuthInDegree)
                 {
+                    // 避免切换雷达数据源时，因为没能及时处理数据而重发导致的问题
                     return;
                 }
-         
-                // 雷达特征信息是否改变
+
+                // 首个数据包 或 数据包发生了变化
                 if (dataItems.IsSpecChanged(_lastCat240DataItems[radarId]))
                 {
+                    switch (radarId)
+                    {
+                        case 0:
+                            IsRadar1Connected = true; break;
+                        case 1:
+                            IsRadar2Connected = true; break;
+                        case 2:
+                            IsRadar3Connected = true; break;
+                        case 3:
+                            IsRadar4Connected = true; break;
+                        case 4:
+                            IsRadar5Connected = true; break;
+                        default:
+                            return;
+                    }
+
                     OnCat240SpecChanged?.Invoke(this, radarId, new Cat240Spec(dataItems));
 
                     _radarRadiusIncrements[radarId] = HalfCartesianSize / dataItems.VideoBlocks.Count;

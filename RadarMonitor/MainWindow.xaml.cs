@@ -41,6 +41,8 @@ namespace RadarMonitor
         private double _dpcX;
         private double _dpcY;
 
+        private readonly List<Canvas> _ringsOverlays = new();
+
         private WriteableBitmap _bitmap;
         private const int ImageSize = RadarMonitorViewModel.CartesianSize;
         private byte[] _echoData;
@@ -69,6 +71,7 @@ namespace RadarMonitor
 
             // 初始化 ArcGIS 地图控件
             InitializeMapView();
+            InitializeMapOverlays();
 
             // 初始化图片回波显示后台一维数组
             InitializeEchoData();
@@ -79,7 +82,7 @@ namespace RadarMonitor
             // 如果有用户配置文件，则加载并预载入指定海图和雷达
             LoadUserConfiguration();
         }
-        
+
         private void InitializeDisplayMetric()
         {
             _dpiX = 96;
@@ -150,6 +153,15 @@ namespace RadarMonitor
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NatureOfSeabed = _encDetailDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NoteOnChartData = _encDetailDisplayFlag;
             #endregion
+        }
+
+        private void InitializeMapOverlays()
+        {
+            _ringsOverlays.Add(Radar1RingsOverlay);
+            _ringsOverlays.Add(Radar2RingsOverlay);
+            _ringsOverlays.Add(Radar3RingsOverlay);
+            _ringsOverlays.Add(Radar4RingsOverlay);
+            _ringsOverlays.Add(Radar5RingsOverlay);
         }
 
         // TODO: 多雷达支持
@@ -392,7 +404,7 @@ namespace RadarMonitor
         #region Connect Radar
         private void ConnectRadar_OnClick(object sender, RoutedEventArgs e)
         {
-            var viewModel = (RadarMonitorViewModel)DataContext;
+            var viewModel = GetViewModel();
             if (!viewModel.IsEncLoaded)
             {
                 MessageBox.Show("Please load Enc first!", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -402,49 +414,36 @@ namespace RadarMonitor
             // 指定雷达参数对话框
             var radarDialog = new RadarDialog(viewModel.Configuration.RadarSettings);
             bool? dialogResult = radarDialog.ShowDialog();
-            if (dialogResult == true)
+            if (dialogResult != true)
             {
-                var dialogViewModel = (RadarSettingsViewModel)radarDialog.DataContext;
+                return;
+            }
 
-                // 获取雷达经纬度和网络信息
-                viewModel.RadarSettings = dialogViewModel.RadarSettings;
-                viewModel.IsRadar1Connected = true;
-                viewModel.IsRadar1RingsDisplayed = true;
 
-                // 默认显示图片雷达回波
-                bool showImageEchoFirst = true;
-                foreach (var radarSetting in viewModel.RadarSettings)
-                {
-                    radarSetting.IsEchoDisplayed = showImageEchoFirst;
-                    radarSetting.IsOpenGlEchoDisplayed = !showImageEchoFirst;
+            // 获取雷达静态信息
+            var dialogViewModel = (RadarSettingsViewModel)radarDialog.DataContext;
+            viewModel.RadarSettings = dialogViewModel.RadarSettings;
 
-                    // TODO: 添加多层图层
-                    OpenGlEchoOverlay.IsDisplay = radarSetting.IsOpenGlEchoDisplayed;
-                    OpenGlEchoOverlay.Visibility = radarSetting.IsOpenGlEchoDisplayed ? Visibility.Visible : Visibility.Hidden;
-                }
+            // 默认显示图片雷达回波
+            bool showImageEchoFirst = true;
+            foreach (var radarSetting in viewModel.RadarSettings)
+            {
+                radarSetting.IsEchoDisplayed = showImageEchoFirst;
+                radarSetting.IsOpenGlEchoDisplayed = !showImageEchoFirst;
 
-                // 抓取 CAT240 网络包
-                InitializeEchoData();
-                int radarIndex = 0;
-                foreach (var radarSetting in viewModel.RadarSettings)
-                {
-                    viewModel.CaptureCat240NetworkPackage(radarIndex++, radarSetting.RadarIpAddress, radarSetting.RadarPort);
+                // TODO: 添加多层图层
+                OpenGlEchoOverlay.IsDisplay = radarSetting.IsOpenGlEchoDisplayed;
+                OpenGlEchoOverlay.Visibility = radarSetting.IsOpenGlEchoDisplayed ? Visibility.Visible : Visibility.Hidden;
+            }
 
-                    if (radarSetting.IsRingsDisplayed)
-                    {
-                        DrawRings(radarSetting.RadarLongitude, radarSetting.RadarLatitude);
-                    }
-
-                    if (radarSetting.IsEchoDisplayed)
-                    {
-                        TransformRadarEcho(radarSetting.RadarLongitude, radarSetting.RadarLatitude, radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
-                    }
-
-                    if (radarSetting.IsOpenGlEchoDisplayed)
-                    {
-                        TransformOpenGlRadarEcho(radarSetting.RadarLongitude, radarSetting.RadarLatitude, radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
-                    }
-                }
+            // 抓取 CAT240 网络包
+            InitializeEchoData();
+            int radarIndex = 0;
+            foreach (var radarSetting in viewModel.RadarSettings)
+            {
+                viewModel.CaptureCat240NetworkPackage(radarIndex, radarSetting.RadarIpAddress, radarSetting.RadarPort);
+                
+                radarIndex++;
             }
         }
 
@@ -461,11 +460,23 @@ namespace RadarMonitor
             {
                 Dispatcher.Invoke(() =>
                 {
-                    var viewModel = (RadarMonitorViewModel)DataContext;
+                    var viewModel = GetViewModel();
                     var radarSetting = viewModel.RadarSettings[radarId];
 
-                    TransformRadarEcho(radarSetting.RadarLongitude, radarSetting.RadarLatitude, radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
-                    TransformOpenGlRadarEcho(radarSetting.RadarLongitude, radarSetting.RadarLatitude, radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
+                    if (radarSetting.IsRingsDisplayed)
+                    {
+                        DrawRings(radarId, radarSetting.RadarLongitude, radarSetting.RadarLatitude);
+                    }
+
+                    if (radarSetting.IsEchoDisplayed)
+                    {
+                        TransformRadarEcho(radarSetting.RadarLongitude, radarSetting.RadarLatitude, radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
+                    }
+
+                    if (radarSetting.IsOpenGlEchoDisplayed)
+                    {
+                        TransformOpenGlRadarEcho(radarSetting.RadarLongitude, radarSetting.RadarLatitude, radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
+                    }
 
                     // TODO: 疑问点
                     // OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
@@ -485,7 +496,7 @@ namespace RadarMonitor
             {
                 Dispatcher.Invoke(() =>
                 {
-                    var viewModel = (RadarMonitorViewModel)DataContext;
+                    var viewModel = GetViewModel();
 
                     // OpenGL 回波图像绘制
                     if (viewModel.IsRadar1OpenGlEchoDisplayed)
@@ -543,16 +554,14 @@ namespace RadarMonitor
             }
             
             var viewModel = GetViewModel();
-            var mapPoint = viewpoint.TargetGeometry as MapPoint;
-            viewModel.EncLongitude = mapPoint.X;
-            viewModel.EncLatitude = mapPoint.Y;
-            viewModel.EncScale = viewpoint.TargetScale;
+            viewModel.RecordEncViewPoint(viewpoint);
 
             if (viewModel.IsEncLoaded)
             {
                 DrawScaleLine();
             }
 
+            int radarIndex = 0;
             foreach (var radarSetting in viewModel.RadarSettings)
             {
                 if (!radarSetting.IsConnected)
@@ -562,7 +571,7 @@ namespace RadarMonitor
 
                 if (radarSetting.IsRingsDisplayed)
                 {
-                    DrawRings(radarSetting.RadarLongitude, radarSetting.RadarLatitude);
+                    DrawRings(radarIndex, radarSetting.RadarLongitude, radarSetting.RadarLatitude);
                 }
 
                 if (radarSetting.IsEchoDisplayed)
@@ -574,13 +583,15 @@ namespace RadarMonitor
                 {
                     TransformOpenGlRadarEcho(radarSetting.RadarLongitude, radarSetting.RadarLatitude, radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
                 }
+
+                radarIndex++;
             }
         }
 
         private void BaseMapView_OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
             MapView mapView = (MapView)sender;
-            var viewModel = (RadarMonitorViewModel)DataContext;
+            var viewModel = GetViewModel();
             viewModel.EncScale = mapView.MapScale;
 
             if (viewModel.IsEncLoaded)
@@ -588,6 +599,7 @@ namespace RadarMonitor
                 DrawScaleLine();
             }
 
+            int radarIndex = 0;
             foreach (var radarSetting in viewModel.RadarSettings)
             {
                 if (!radarSetting.IsConnected)
@@ -597,7 +609,7 @@ namespace RadarMonitor
 
                 if (radarSetting.IsRingsDisplayed)
                 {
-                    DrawRings(radarSetting.RadarLongitude, radarSetting.RadarLatitude);
+                    DrawRings(radarIndex, radarSetting.RadarLongitude, radarSetting.RadarLatitude);
                 }
 
                 if (radarSetting.IsEchoDisplayed)
@@ -609,15 +621,15 @@ namespace RadarMonitor
                 {
                     TransformOpenGlRadarEcho(radarSetting.RadarLongitude, radarSetting.RadarLatitude, radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
                 }
+
+                radarIndex++;
             }
         }
-
-        
 
         private void DisplayOpenGlEcho_OnClick(object sender, RoutedEventArgs e)
         {
             CheckBox displayOpenGlEchoCheckBox = (CheckBox)sender;
-            var viewModel = (RadarMonitorViewModel)DataContext;
+            var viewModel = GetViewModel();
 
             if (displayOpenGlEchoCheckBox.IsChecked.Value)
             {
@@ -651,11 +663,11 @@ namespace RadarMonitor
 
             if (displayRingsCheckBox.IsChecked.Value)
             {
-                RingsOverlay.Visibility = Visibility.Visible;
+                Radar1RingsOverlay.Visibility = Visibility.Visible;
             }
             else
             {
-                RingsOverlay.Visibility = Visibility.Hidden;
+                Radar1RingsOverlay.Visibility = Visibility.Hidden;
             }
         }
 
@@ -754,56 +766,6 @@ namespace RadarMonitor
 
             Viewpoint newViewpoint = new Viewpoint(mapPoint, newScale);
             BaseMapView.SetViewpoint(newViewpoint);
-        }
-
-        private double CalculateDistance(double lon1, double lat1, double lon2, double lat2)
-        {
-            lat1 = lat1 * (Math.PI / 180);
-            lon1 = lon1 * (Math.PI / 180);
-            lat2 = lat2 * (Math.PI / 180);
-            lon2 = lon2 * (Math.PI / 180);
-
-            double earthRadius = 6371.0; // 地球半径（以公里为单位）
-
-            double dlon = lon2 - lon1;
-            double dlat = lat2 - lat1;
-
-            double a = Math.Sin(dlat / 2) * Math.Sin(dlat / 2) +
-                       Math.Cos(lat1) * Math.Cos(lat2) *
-                       Math.Sin(dlon / 2) * Math.Sin(dlon / 2);
-
-            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-
-            double distance = earthRadius * c;
-
-            return distance;
-        }
-
-        static double CalculateAzimuth(double lon1, double lat1, double lon2, double lat2)
-        {
-            lat1 = lat1 * (Math.PI / 180);
-            lon1 = lon1 * (Math.PI / 180);
-            lat2 = lat2 * (Math.PI / 180);
-            lon2 = lon2 * (Math.PI / 180);
-
-            // 计算差值
-            double dlon = lon2 - lon1;
-
-            // 使用反正切函数计算方位角
-            double y = Math.Sin(dlon) * Math.Cos(lat2);
-            double x = Math.Cos(lat1) * Math.Sin(lat2) - Math.Sin(lat1) * Math.Cos(lat2) * Math.Cos(dlon);
-            double azimuth = Math.Atan2(y, x);
-
-            // 将弧度转换为度数
-            azimuth = azimuth * (180.0 / Math.PI);
-
-            // 将负角度转换为正角度
-            if (azimuth < 0)
-            {
-                azimuth += 360.0;
-            }
-
-            return azimuth;
         }
 
         private void DrawScaleLine()
@@ -909,9 +871,11 @@ namespace RadarMonitor
             ScaleOverlay.Children.Add(kmLabel);
         }
 
-        private void DrawRings(double longitude, double latitude)
+        private void DrawRings(int radarId, double longitude, double latitude)
         {
-            RingsOverlay.Children.Clear();
+            Canvas ringsOverlay = _ringsOverlays[radarId];
+
+            ringsOverlay.Children.Clear();
 
             Brush ringBrush = new SolidColorBrush(Colors.Chartreuse);   // 距离环的颜色
             DoubleCollection dashArray = new DoubleCollection(new double[] { 2, 4 });
@@ -922,7 +886,7 @@ namespace RadarMonitor
             double radarX = point.X;
             double radarY = point.Y;
 
-            double maxDistance = Math.Max(RingsOverlay.ActualWidth, RingsOverlay.ActualHeight) / 2;
+            double maxDistance = Math.Max(ringsOverlay.ActualWidth, ringsOverlay.ActualHeight) / 2;
             
             // 绘制雷达点
             double radarPointRadius = 1.0;
@@ -936,7 +900,7 @@ namespace RadarMonitor
             };
             Canvas.SetLeft(center, radarX - radarPointRadius);
             Canvas.SetTop(center, radarY - radarPointRadius);
-            RingsOverlay.Children.Add(center);
+            ringsOverlay.Children.Add(center);
 
             // 绘制距离环 (以下所有单位缺省都为像素)
             int ringOffset = 0;
@@ -955,7 +919,7 @@ namespace RadarMonitor
                 };
                 Canvas.SetLeft(circle, radarX - radius);
                 Canvas.SetTop(circle, radarY - radius);
-                RingsOverlay.Children.Add(circle);
+                ringsOverlay.Children.Add(circle);
 
                 // 添加距离文字
                 double radiusInKm = ringOffset * (BaseMapView.MapScale / 100000.0);
@@ -973,7 +937,7 @@ namespace RadarMonitor
 
                 Canvas.SetLeft(distanceText, radarX + radius + 2);
                 Canvas.SetTop(distanceText, radarY);
-                RingsOverlay.Children.Add(distanceText);
+                ringsOverlay.Children.Add(distanceText);
             }
         }
 
@@ -1143,7 +1107,7 @@ namespace RadarMonitor
         #region Windows EventHandler
         private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
         {
-            var viewModel = (RadarMonitorViewModel)DataContext;
+            var viewModel = GetViewModel();
             viewModel.DisposeCat240Parser();
         }
 
@@ -1163,7 +1127,7 @@ namespace RadarMonitor
             CursorLatitude.Content = "Lat:    " + location.Y.ToString("F6");
 
             // 鼠标相对于雷达经纬度
-            //var viewModel = (RadarMonitorViewModel)DataContext;
+            //var viewModel = GetViewModel();
             //if ((viewModel.EncLongitude != 0.0) && (viewModel.EncLatitude != 0.0))
             //{
             //    var distance = CalculateDistance(viewModel.EncLongitude, viewModel.EncLatitude, location.X, location.Y);
@@ -1190,6 +1154,56 @@ namespace RadarMonitor
             {
                 GetAllFiles(d.FullName, fileList);
             }
+        }
+
+        private double CalculateDistance(double lon1, double lat1, double lon2, double lat2)
+        {
+            lat1 = lat1 * (Math.PI / 180);
+            lon1 = lon1 * (Math.PI / 180);
+            lat2 = lat2 * (Math.PI / 180);
+            lon2 = lon2 * (Math.PI / 180);
+
+            double earthRadius = 6371.0; // 地球半径（以公里为单位）
+
+            double dlon = lon2 - lon1;
+            double dlat = lat2 - lat1;
+
+            double a = Math.Sin(dlat / 2) * Math.Sin(dlat / 2) +
+                       Math.Cos(lat1) * Math.Cos(lat2) *
+                       Math.Sin(dlon / 2) * Math.Sin(dlon / 2);
+
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            double distance = earthRadius * c;
+
+            return distance;
+        }
+
+        private static double CalculateAzimuth(double lon1, double lat1, double lon2, double lat2)
+        {
+            lat1 = lat1 * (Math.PI / 180);
+            lon1 = lon1 * (Math.PI / 180);
+            lat2 = lat2 * (Math.PI / 180);
+            lon2 = lon2 * (Math.PI / 180);
+
+            // 计算差值
+            double dlon = lon2 - lon1;
+
+            // 使用反正切函数计算方位角
+            double y = Math.Sin(dlon) * Math.Cos(lat2);
+            double x = Math.Cos(lat1) * Math.Sin(lat2) - Math.Sin(lat1) * Math.Cos(lat2) * Math.Cos(dlon);
+            double azimuth = Math.Atan2(y, x);
+
+            // 将弧度转换为度数
+            azimuth = azimuth * (180.0 / Math.PI);
+
+            // 将负角度转换为正角度
+            if (azimuth < 0)
+            {
+                azimuth += 360.0;
+            }
+
+            return azimuth;
         }
     }
 }

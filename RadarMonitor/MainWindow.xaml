@@ -40,7 +40,11 @@
             <esri:MapView Name="BaseMapView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3"
                           ViewpointChanged="BaseMapView_OnViewpointChanged" SizeChanged="BaseMapView_OnSizeChanged" MouseMove="BaseMapView_OnMouseMove"></esri:MapView>
             <sampleGL:ExampleScene Name="OpenGlEchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False" Visibility="Hidden"/>
-            <Canvas Name="RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
+            <Canvas Name="Radar1RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
+            <Canvas Name="Radar2RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
+            <Canvas Name="Radar3RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
+            <Canvas Name="Radar4RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
+            <Canvas Name="Radar5RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
             <Canvas Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False">
                 <Image Name="EchoImageOverlay" IsHitTestVisible="False"></Image>
             </Canvas>
