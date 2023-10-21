@@ -5,23 +5,27 @@ using UdpClient = NetCoreServer.UdpClient;
 
 namespace CAT240Parser
 {
-    public delegate void Cat240ReceivedEventHandler(object sender, Cat240DataBlock data);
+    public delegate void Cat240ReceivedEventHandler(object sender, int clientId, Cat240DataBlock data);
 
     public class MulticastClient : UdpClient
     {
         public string Multicast;
 
+        private int _index;
         private bool _stop;
         private double _lastAzimuth;
-        private long _index;
-
+        
         // 定义事件
         public event Cat240ReceivedEventHandler OnCat240Received;
 
-        public MulticastClient(string address, int port) : base(address, port) {
+        public MulticastClient(int index, string address, int port) 
+            : base(address, port) 
+        {
             int coreCount = Environment.ProcessorCount;
             ThreadPool.SetMinThreads(1, 1);
             ThreadPool.SetMaxThreads(coreCount, coreCount);
+
+            _index = index;
             _lastAzimuth = 0.0;
         }
 
@@ -70,7 +74,7 @@ namespace CAT240Parser
                     //if (_index++ % 2 == 0)  // For higher performance
                     {
                         //Trace.WriteLine(dataBlock.Items.StartAzimuth);
-                        OnCat240Received?.Invoke(this, dataBlock);
+                        OnCat240Received?.Invoke(this, _index, dataBlock);
                         _lastAzimuth = dataBlock.Items.StartAzimuth;
                     }
                 }

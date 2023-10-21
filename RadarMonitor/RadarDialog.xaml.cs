@@ -10,40 +10,45 @@ namespace RadarMonitor
     /// </summary>
     public partial class RadarDialog : Window
     {
-        private List<RadarSettings> _settings;
+        private List<RadarSetting> _settings;
 
-        public RadarDialog(List<RadarSettings> radarSettings)
+        public RadarDialog(List<RadarSetting> radarSettings)
         {
             InitializeComponent();
 
             _settings = radarSettings;
 
-            DataContext = new RadarSettingsViewModel();
+            DataContext = new RadarSettingsViewModel(_settings);
         }
 
         private void BtnLoadPreset1_Click(object sender, RoutedEventArgs e)
         {
-            DataContext = new RadarSettingsViewModel(_settings[0]);
+            var viewModel = (RadarSettingsViewModel)DataContext;
+            viewModel.CurrentEditRadarSetting = viewModel.RadarSettings[0];
         }
 
         private void BtnLoadPreset2_Click(object sender, RoutedEventArgs e)
         {
-            DataContext = new RadarSettingsViewModel(_settings[1]);
+            var viewModel = (RadarSettingsViewModel)DataContext;
+            viewModel.CurrentEditRadarSetting = viewModel.RadarSettings[1];
         }
 
         private void BtnLoadPreset3_Click(object sender, RoutedEventArgs e)
         {
-            DataContext = new RadarSettingsViewModel(_settings[2]);
+            var viewModel = (RadarSettingsViewModel)DataContext;
+            viewModel.CurrentEditRadarSetting = viewModel.RadarSettings[2];
         }
 
         private void BtnLoadPreset4_Click(object sender, RoutedEventArgs e)
         {
-            DataContext = new RadarSettingsViewModel(_settings[3]);
+            var viewModel = (RadarSettingsViewModel)DataContext;
+            viewModel.CurrentEditRadarSetting = viewModel.RadarSettings[3];
         }
 
         private void BtnLoadPreset5_Click(object sender, RoutedEventArgs e)
         {
-            DataContext = new RadarSettingsViewModel(_settings[4]);
+            var viewModel = (RadarSettingsViewModel)DataContext;
+            viewModel.CurrentEditRadarSetting = viewModel.RadarSettings[4];
         }
 
         private void BtnOK_Click(object sender, RoutedEventArgs e)

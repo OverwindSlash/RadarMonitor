@@ -2,7 +2,7 @@
 
 namespace RadarMonitor.Model
 {
-    public class EncSettings
+    public class EncSetting
     {
         public string EncType { get; set; } = "Catalog";
         public string EncUri { get; set; } = @"Enc\CATALOG.031";
@@ -11,11 +11,11 @@ namespace RadarMonitor.Model
         public double EncScale { get; set; } = 500000;
         public bool EncEnabled { get; set; } = false;
 
-        public EncSettings()
+        public EncSetting()
         {
         }
 
-        protected bool Equals(EncSettings other)
+        protected bool Equals(EncSetting other)
         {
             return EncType == other.EncType 
                    && EncUri == other.EncUri 
@@ -30,7 +30,7 @@ namespace RadarMonitor.Model
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((EncSettings)obj);
+            return Equals((EncSetting)obj);
         }
 
         public override int GetHashCode()

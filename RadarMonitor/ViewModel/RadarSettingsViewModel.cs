@@ -22,140 +22,157 @@ namespace RadarMonitor.ViewModel
             OnPropertyChanged(propertyName);
             return true;
         }
+
+        protected bool SetField<T>(T field, T value, [CallerMemberName] string? propertyName = null)
+        {
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
         #endregion
 
-        private string _longitude;
-        private string _latitude;
-        private double _orientation;
-        private int _ipPart1;
-        private int _ipPart2;
-        private int _ipPart3;
-        private int _ipPart4;
-        private int _port;
+        private List<RadarSetting> _radarSettings;
+        private RadarSetting _currentEditRadarSetting;
 
-        private bool _validated;
-
-        public string Longitude
+        #region Radar Properties
+        public List<RadarSetting> RadarSettings
         {
-            get { return _longitude; }
+            get => _radarSettings;
             set
             {
-                if (IsLongitudeValid(value))
-                {
-                    SetField(ref _longitude, value, "Longitude");
-                }
+                SetField(ref _radarSettings, value, "RadarSettings");
             }
         }
 
-        public string Latitude
+        public RadarSetting CurrentEditRadarSetting
         {
-            get { return _latitude; }
+            get => _currentEditRadarSetting;
             set
             {
-                if (IsLatitudeValid(value))
-                {
-                    SetField(ref _latitude, value, "Latitude");
-                }
+                SetField(ref _currentEditRadarSetting, value, "CurrentEditRadarSetting");
+                Name = _currentEditRadarSetting.RadarName;
+                Enabled = _currentEditRadarSetting.RadarEnabled;
+                Longitude = _currentEditRadarSetting.RadarLongitude;
+                Latitude = _currentEditRadarSetting.RadarLatitude;
+                Orientation = _currentEditRadarSetting.RadarOrientation;
+                MaxDistance = _currentEditRadarSetting.RadarMaxDistance;
+                IpPart1 = _currentEditRadarSetting.RadarIpAddress.Split('.')[0];
+                IpPart2 = _currentEditRadarSetting.RadarIpAddress.Split('.')[1];
+                IpPart3 = _currentEditRadarSetting.RadarIpAddress.Split('.')[2];
+                IpPart4 = _currentEditRadarSetting.RadarIpAddress.Split('.')[3];
+                Port = _currentEditRadarSetting.RadarPort;
+            }
+        }
+
+        public string Name
+        {
+            get => _currentEditRadarSetting.RadarName;
+            set
+            {
+                SetField(_currentEditRadarSetting.RadarName, value, "Name");
+            }
+        }
+
+        public bool Enabled
+        {
+            get => _currentEditRadarSetting.RadarEnabled;
+            set
+            {
+                SetField(_currentEditRadarSetting.RadarEnabled, value, "Enabled");
+            }
+        }
+
+        public double Longitude
+        {
+            get => _currentEditRadarSetting.RadarLongitude;
+            set
+            {
+                SetField(_currentEditRadarSetting.RadarLongitude, value, "Longitude");
+            }
+        }
+
+        public double Latitude
+        {
+            get => _currentEditRadarSetting.RadarLatitude;
+            set
+            {
+                SetField(_currentEditRadarSetting.RadarLatitude, value, "Latitude");
             }
         }
 
         public double Orientation
         {
-            get => _orientation;
+            get => _currentEditRadarSetting.RadarOrientation;
             set
             {
-                if (IsValidOrientation(value))
-                {
-                    SetField(ref _orientation, value, "Orientation");
-                }
+                SetField(_currentEditRadarSetting.RadarOrientation, value, "Orientation");
             }
         }
 
-        public int IpPart1
+        public double MaxDistance
         {
-            get { return _ipPart1; }
+            get => _currentEditRadarSetting.RadarMaxDistance;
             set
             {
-                if (IsValidIpAddressPart(value))
-                {
-                    SetField(ref _ipPart1, value, "IpPart1");
-                }
+                SetField(_currentEditRadarSetting.RadarMaxDistance, value, "MaxDistance");
             }
         }
 
-        public int IpPart2
+        public string IpPart1
         {
-            get { return _ipPart2; }
+            get => _currentEditRadarSetting.RadarIpAddress.Split('.')[0];
             set
             {
-                if (IsValidIpAddressPart(value))
-                {
-                    SetField(ref _ipPart2, value, "IpPart2");
-                }
+                string ip = $"{value}.{IpPart2}.{IpPart3}.{IpPart4}";
+                SetField(_currentEditRadarSetting.RadarIpAddress, ip, "IpPart1");
             }
         }
 
-        public int IpPart3
+        public string IpPart2
         {
-            get { return _ipPart3; }
+            get => _currentEditRadarSetting.RadarIpAddress.Split('.')[1];
             set
             {
-                if (IsValidIpAddressPart(value))
-                {
-                    SetField(ref _ipPart3, value, "IpPart3");
-                }
+                string ip = $"{IpPart1}.{value}.{IpPart3}.{IpPart4}";
+                SetField(_currentEditRadarSetting.RadarIpAddress, ip, "IpPart2");
             }
         }
 
-        public int IpPart4
+        public string IpPart3
         {
-            get { return _ipPart4; }
+            get => _currentEditRadarSetting.RadarIpAddress.Split('.')[2];
             set
             {
-                if (IsValidIpAddressPart(value))
-                {
-                    SetField(ref _ipPart4, value, "IpPart4");
-                }
+                string ip = $"{IpPart1}.{IpPart2}.{value}.{IpPart4}";
+                SetField(_currentEditRadarSetting.RadarIpAddress, ip, "IpPart3");
+            }
+        }
+
+        public string IpPart4
+        {
+            get => _currentEditRadarSetting.RadarIpAddress.Split('.')[3];
+            set
+            {
+                string ip = $"{IpPart1}.{IpPart2}.{IpPart3}.{value}";
+                SetField(_currentEditRadarSetting.RadarIpAddress, ip, "IpPart4");
             }
         }
 
         public int Port
         {
-            get { return _port; }
+            get => _currentEditRadarSetting.RadarPort;
             set
             {
-                if (IsValidPort(value))
-                {
-                    SetField(ref _port, value, "Port");
-                }
+                SetField(_currentEditRadarSetting.RadarPort, value, "Port");
             }
         }
+        #endregion
 
-        public RadarSettingsViewModel()
+
+        public RadarSettingsViewModel(List<RadarSetting> radarSettings)
         {
-            _longitude = "118.82300101666256";
-            _latitude = "32.03646416724121";
-            _orientation = 0;
-
-            _ipPart1 = 127;
-            _ipPart2 = 0;
-            _ipPart3 = 0;
-            _ipPart4 = 1;
-            _port = 30101;
-        }
-
-        public RadarSettingsViewModel(RadarSettings current)
-        {
-            Longitude = current.RadarLongitude.ToString();
-            Latitude = current.RadarLatitude.ToString();
-            Orientation = current.RadarOrientation;
-
-            IpPart1 = int.Parse(current.RadarIpAddress.Split('.')[0]);
-            IpPart2 = int.Parse(current.RadarIpAddress.Split('.')[1]);
-            IpPart3 = int.Parse(current.RadarIpAddress.Split('.')[2]);
-            IpPart4 = int.Parse(current.RadarIpAddress.Split('.')[3]);
-
-            Port = current.RadarPort;
+            RadarSettings = radarSettings;
+            CurrentEditRadarSetting = RadarSettings[0];
         }
 
         private bool IsLongitudeValid(string input)
@@ -195,33 +212,16 @@ namespace RadarMonitor.ViewModel
         {
             bool result = true;
 
-            result &= IsLongitudeValid(Longitude);
-            result &= IsLatitudeValid(Latitude);
-            result &= IsValidOrientation(Orientation);
-            result &= IsValidIpAddressPart(IpPart1);
-            result &= IsValidIpAddressPart(IpPart2);
-            result &= IsValidIpAddressPart(IpPart3);
-            result &= IsValidIpAddressPart(IpPart4);
-            result &= IsValidPort(Port);
+            // result &= IsLongitudeValid(Longitude);
+            // result &= IsLatitudeValid(Latitude);
+            // result &= IsValidOrientation(Orientation);
+            // result &= IsValidIpAddressPart(IpPart1);
+            // result &= IsValidIpAddressPart(IpPart2);
+            // result &= IsValidIpAddressPart(IpPart3);
+            // result &= IsValidIpAddressPart(IpPart4);
+            // result &= IsValidPort(Port);
 
             return result;
-        }
-
-        public RadarSettings ToRadarSettings()
-        {
-            if (!IsValidated())
-            {
-                return null;
-            }
-
-            return new RadarSettings()
-            {
-                RadarLongitude = double.Parse(_longitude),
-                RadarLatitude = double.Parse(_latitude),
-                RadarOrientation = _orientation,
-                RadarIpAddress = $"{_ipPart1}.{_ipPart2}.{_ipPart3}.{_ipPart4}",
-                RadarPort = _port
-            };
         }
     }
 }

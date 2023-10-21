@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -8,13 +9,13 @@ namespace RadarMonitor.Model
 {
     public class UserConfiguration
     {
-        public EncSettings EncConfiguration { get; set; }
-        public List<RadarSettings> RadarConfigurations { get; set; }
+        public EncSetting EncSetting { get; set; }
+        public List<RadarSetting> RadarSettings { get; set; }
 
         public UserConfiguration()
         {
-            EncConfiguration = new EncSettings();
-            RadarConfigurations = new List<RadarSettings>();
+            EncSetting = new EncSetting();
+            RadarSettings = new List<RadarSetting>();
         }
 
         public static UserConfiguration LoadConfiguration(string configFileName)
@@ -33,6 +34,7 @@ namespace RadarMonitor.Model
             }
             catch (Exception e)
             {
+                Trace.WriteLine(e.Message);
                 return new UserConfiguration();
             }
         }

@@ -8,7 +8,7 @@
         xmlns:sampleGL="clr-namespace:Silk.WPF.OpenGL.Scene;assembly=Silk.WPF"
         mc:Ignorable="d"
         Title="Sinology Radar Monitor (Evaluation Version)" Height="1000" Width="1600" Icon="Assets/Logo.png"
-        Loaded="MainWindow_OnLoaded" Closing="MainWindow_OnClosing" WindowStartupLocation="CenterScreen">
+        Closing="MainWindow_OnClosing" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -108,68 +108,78 @@
                     </StackPanel>
                 </Grid>
             </GroupBox>
-            <GroupBox Header="Preset Locations" Width="Auto">
+            <GroupBox Header="Radar Locations" Width="Auto">
                 <StackPanel Orientation="Vertical">
-                    <Button Name="BtnPresetLocation1" Content="Location 1" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation1_OnClick"></Button>
-                    <Button Name="BtnPresetLocation2" Content="Location 2" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation2_OnClick"></Button>
-                    <Button Name="BtnPresetLocation3" Content="Location 3" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation3_OnClick"></Button>
-                    <Button Name="BtnPresetLocation4" Content="Location 4" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation4_OnClick"></Button>
-                    <Button Name="BtnPresetLocation5" Content="Location 5" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation5_OnClick"></Button>
+                    <Button Name="BtnPresetLocation1" Content="Radar 1" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation1_OnClick"></Button>
+                    <Button Name="BtnPresetLocation2" Content="Radar 2" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation2_OnClick"></Button>
+                    <Button Name="BtnPresetLocation3" Content="Radar 3" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation3_OnClick"></Button>
+                    <Button Name="BtnPresetLocation4" Content="Radar 4" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation4_OnClick"></Button>
+                    <Button Name="BtnPresetLocation5" Content="Radar 5" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation5_OnClick"></Button>
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Layer" Width="Auto">
                 <StackPanel Orientation="Vertical">
-                    <CheckBox Name="DisplayOpenGlEcho" Content="OpenGL Echo" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsOpenGlEchoDisplayed}" 
-                              Click="DisplayOpenGlEcho_OnClick"></CheckBox>
-                    <CheckBox Name="DisplayEcho" Content="Image Echo" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsEchoDisplayed}" 
-                              Click="DisplayEcho_OnClick"></CheckBox>
-                    <CheckBox Name="DisplayRings" Content="Distance Rings" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsRingsDisplayed}" 
-                              Click="DisplayRings_OnClick"></CheckBox>
                     <CheckBox Name="DisplayEnc" Content="Enc" IsEnabled="{Binding Path=IsEncLoaded}" IsChecked="{Binding Path=IsEncDisplayed}" 
                               Click="DisplayEnc_OnClick"></CheckBox>
+                    <TextBlock Name="TbRadar1" Text="Radar1" Margin="0, 4, 0, 2"></TextBlock>
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar1Connected}">
+                        <CheckBox Name="CbRadar1Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar1EchoDisplayed}"></CheckBox>
+                        <CheckBox Name="CbRadar1Rings" Content="Rings" IsChecked="{Binding Path=IsRadar1RingsDisplayed}"></CheckBox>
+                    </StackPanel>
+                    <TextBlock Name="TbRadar2" Text="Radar2" Margin="0, 4, 0, 2"></TextBlock>
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar2Connected}">
+                        <CheckBox Name="CbRadar2Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar2EchoDisplayed}"></CheckBox>
+                        <CheckBox Name="CbRadar2Rings" Content="Rings" IsChecked="{Binding Path=IsRadar2RingsDisplayed}"></CheckBox>
+                    </StackPanel>
+                    <TextBlock Name="TbRadar3" Text="Radar3" Margin="0, 4, 0, 2"></TextBlock>
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar3Connected}">
+                        <CheckBox Name="CbRadar3Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar3EchoDisplayed}"></CheckBox>
+                        <CheckBox Name="CbRadar3Rings" Content="Rings" IsChecked="{Binding Path=IsRadar3RingsDisplayed}"></CheckBox>
+                    </StackPanel>
+                    <TextBlock Name="TbRadar4" Text="Radar4" Margin="0, 4, 0, 2"></TextBlock>
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar4Connected}">
+                        <CheckBox Name="CbRadar4Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar4EchoDisplayed}"></CheckBox>
+                        <CheckBox Name="CbRadar4Rings" Content="Rings" IsChecked="{Binding Path=IsRadar4RingsDisplayed}"></CheckBox>
+                    </StackPanel>
+                    <TextBlock Name="TbRadar5" Text="Radar5" Margin="0, 4, 0, 2"></TextBlock>
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar5Connected}">
+                        <CheckBox Name="CbRadar5Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar5EchoDisplayed}"></CheckBox>
+                        <CheckBox Name="CbRadar5Rings" Content="Rings" IsChecked="{Binding Path=IsRadar5RingsDisplayed}"></CheckBox>
+                    </StackPanel>
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Cursor" Width="Auto">
                 <StackPanel Orientation="Vertical">
                     <Label Name="CursorLongitude" ToolTip="Longitude"  Content="Lon:"/>
                     <Label Name="CursorLatitude" ToolTip="Latitude" Content="Lat:"/>
-                    <Label Name="CursorDistance" ToolTip="Distance to Radar" Content="D2R:"/>
-                    <Label Name="CursorAzimuth" ToolTip="Azimuth to Radar" Content="A2R:"/>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Header="Radar Info" Width="Auto">
+            <GroupBox Header="Radar Azimuth" Width="Auto">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Vertical">
-                        <Label Name="LblStartAzimuth" ToolTip="Start Azimuth" Content="SA:"></Label>
-                        <Label Name="LblEndAzimuth" ToolTip="End Azimuth" Content="EA:"></Label>
-                        <Label Name="LblStartRange" ToolTip="Start Range" Content="SR:"></Label>
-                        <Label Name="LblCellDuration" ToolTip="Cell Duration" Content="CD:"></Label>
-                        <Label Name="LblCellCompression" ToolTip="Compression Indicator" Content="CI:"></Label>
-                        <Label Name="LblCellResolution" ToolTip="Cells Resolution" Content="CR:"></Label>
-                        <Label Name="LblCellCount" ToolTip="Cells Count" Content="CC:"></Label>
-                        <Label Name="LblVideoBlockCount" ToolTip="VideoBlock Count" Content="VC:"></Label>
+                        <Label Name="LblRadar1SA" ToolTip="Radar1 Start Azimuth" Content="Radar1:"></Label>
+                        <Label Name="LblRadar2SA" ToolTip="Radar2 Start Azimuth" Content="Radar2:"></Label>
+                        <Label Name="LblRadar3SA" ToolTip="Radar3 Start Azimuth" Content="Radar3:"></Label>
+                        <Label Name="LblRadar4SA" ToolTip="Radar4 Start Azimuth" Content="Radar4:"></Label>
+                        <Label Name="LblRadar5SA" ToolTip="Radar5 Start Azimuth" Content="Radar5:"></Label>
+                        
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical">
-                        <TextBlock Name="TbStartAzimuth" ToolTip="Start Azimuth" Height="{Binding ElementName=LblStartAzimuth, Path=ActualHeight}" Margin="0, 5, 0, 0"
-                                   Text="{Binding StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
-                        <TextBlock Name="TbEndAzimuth" ToolTip="End Azimuth" Height="{Binding ElementName=LblEndAzimuth, Path=ActualHeight}" 
-                                   Text="{Binding EndAzimuth, StringFormat={}{0:F2}}"></TextBlock>
-                        <TextBlock Name="TbStartRange" ToolTip="Start Range" Height="{Binding ElementName=LblStartRange, Path=ActualHeight}" 
-                                   Text="{Binding StartRange}"></TextBlock>
-                        <TextBlock Name="TbCellDuration" ToolTip="Cell Duration" Height="{Binding ElementName=LblCellDuration, Path=ActualHeight}" 
-                                   Text="{Binding CellDuration}"></TextBlock>
-                        <TextBlock Name="TbCellCompression" ToolTip="Compression Indicator" Height="{Binding ElementName=LblCellCompression, Path=ActualHeight}" 
-                                   Text="{Binding CellCompression}"></TextBlock>
-                        <TextBlock Name="TbCellResolution" ToolTip="Cells Resolution" Height="{Binding ElementName=LblCellResolution, Path=ActualHeight}" 
-                                   Text="{Binding CellResolution}"></TextBlock>
-                        <TextBlock Name="TbCellCount" ToolTip="Cells Count" Height="{Binding ElementName=LblCellCount, Path=ActualHeight}" 
-                                   Text="{Binding CellCount}"></TextBlock>
-                        <TextBlock Name="TbVideoBlockCount" ToolTip="VideoBlock Count" Height="{Binding ElementName=LblVideoBlockCount, Path=ActualHeight}" 
-                                   Text="{Binding VideoBlockCount}"></TextBlock>
+                        <TextBlock Name="TbRadar1SA" Height="{Binding ElementName=LblRadar1SA, Path=ActualHeight}" Margin="0, 5, 0, 0"
+                                   Text="{Binding Radar1StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
+                        <TextBlock Name="TbRadar2SA" Height="{Binding ElementName=LblRadar2SA, Path=ActualHeight}" 
+                                   Text="{Binding Radar2StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
+                        <TextBlock Name="TbRadar3SA" Height="{Binding ElementName=LblRadar3SA, Path=ActualHeight}" 
+                                   Text="{Binding Radar3StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
+                        <TextBlock Name="TbRadar4SA" Height="{Binding ElementName=LblRadar4SA, Path=ActualHeight}" 
+                                   Text="{Binding Radar4StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
+                        <TextBlock Name="TbRadar5SA" Height="{Binding ElementName=LblRadar5SA, Path=ActualHeight}" 
+                                   Text="{Binding Radar5StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
+                        
                     </StackPanel>
                 </Grid>
             </GroupBox>
