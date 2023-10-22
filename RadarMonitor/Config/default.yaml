@@ -1,9 +1,9 @@
 ﻿encSetting:
    encType: Catalog
    encUri: Encs\CATALOG.031
-   encLongitude: 121.912592
-   encLatitude: 31.576394
-   encScale: 275000
+   encLongitude: 121.723234
+   encLatitude: 31.350226
+   encScale: 320000
    encEnabled: true
 radarSettings:
 -
@@ -15,20 +15,20 @@ radarSettings:
    radarMaxDistance: 60
    radarIpAddress: 127.0.0.1
    radarPort: 20101
-   radarEnabled: true
+   isRadarEnabled: true
    isRingsDisplayed: true
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: false
 -
-   radarName: radar2
-   radarLongitude: 121.793117
-   radarLatitude: 31.352440
-   radarOrientation: -89.0
-   radarScale: 10000
+   radarName: 世博公园
+   radarLongitude: 121.489728
+   radarLatitude: 31.192678
+   radarOrientation: -85.0
+   radarScale: 20000
    radarMaxDistance: 30
    radarIpAddress: 127.0.0.1
    radarPort: 20102
-   radarEnabled: true
+   isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: false
@@ -41,7 +41,7 @@ radarSettings:
    radarMaxDistance: 60
    radarIpAddress: 127.0.0.1
    radarPort: 20103
-   radarEnabled: false
+   isRadarEnabled: false
    isRingsDisplayed: false
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: false
@@ -54,7 +54,7 @@ radarSettings:
    radarMaxDistance: 60
    radarIpAddress: 127.0.0.1
    radarPort: 20104
-   radarEnabled: false
+   isRadarEnabled: false
    isRingsDisplayed: false
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: false
@@ -66,8 +66,8 @@ radarSettings:
    radarScale: 30000
    radarMaxDistance: 60
    radarIpAddress: 127.0.0.1
-   radarPort: 20105
-   radarEnabled: false
+   radarPort: 20106
+   isRadarEnabled: false
    isRingsDisplayed: false
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: false

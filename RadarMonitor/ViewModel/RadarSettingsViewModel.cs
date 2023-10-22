@@ -51,7 +51,7 @@ namespace RadarMonitor.ViewModel
             {
                 SetField(ref _currentEditRadarSetting, value, "CurrentEditRadarSetting");
                 Name = _currentEditRadarSetting.RadarName;
-                Enabled = _currentEditRadarSetting.RadarEnabled;
+                Enabled = _currentEditRadarSetting.IsRadarEnabled;
                 Longitude = _currentEditRadarSetting.RadarLongitude;
                 Latitude = _currentEditRadarSetting.RadarLatitude;
                 Orientation = _currentEditRadarSetting.RadarOrientation;
@@ -75,10 +75,10 @@ namespace RadarMonitor.ViewModel
 
         public bool Enabled
         {
-            get => _currentEditRadarSetting.RadarEnabled;
+            get => _currentEditRadarSetting.IsRadarEnabled;
             set
             {
-                SetField(_currentEditRadarSetting.RadarEnabled, value, "Enabled");
+                SetField(_currentEditRadarSetting.IsRadarEnabled, value, "Enabled");
             }
         }
 

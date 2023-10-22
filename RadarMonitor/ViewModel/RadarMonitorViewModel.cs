@@ -429,11 +429,6 @@ namespace RadarMonitor.ViewModel
 
         // 雷达数据及参数
         public List<int[,]> RadarCartesianDatas => _radarCartesianDatas;
-        //public int[,] Radar1CartesianData => _radarCartesianDatas[0];
-        //public int[,] Radar2CartesianData => _radarCartesianDatas[1];
-        //public int[,] Radar3CartesianData => _radarCartesianDatas[2];
-        //public int[,] Radar4CartesianData => _radarCartesianDatas[3];
-        //public int[,] Radar5CartesianData => _radarCartesianDatas[4];
 
 
         // UDP Clients
@@ -522,6 +517,11 @@ namespace RadarMonitor.ViewModel
             
             ThreadPool.QueueUserWorkItem((obj) =>
             {
+                if (!RadarSettings[radarId].IsRadarEnabled)
+                {
+                    return;
+                }
+
                 if (_lastCat240DataItems[radarId] != null && 
                     _lastCat240DataItems[radarId].StartAzimuthInDegree == dataItems.StartAzimuthInDegree)
                 {
@@ -583,6 +583,56 @@ namespace RadarMonitor.ViewModel
                     _radarCartesianDatas[radarId][x, y] = grayValue;
                 }
             }
+        }
+
+        private double CalculateDistance(double lon1, double lat1, double lon2, double lat2)
+        {
+            lat1 = lat1 * (Math.PI / 180);
+            lon1 = lon1 * (Math.PI / 180);
+            lat2 = lat2 * (Math.PI / 180);
+            lon2 = lon2 * (Math.PI / 180);
+
+            double earthRadius = 6371.0; // 地球半径（以公里为单位）
+
+            double dlon = lon2 - lon1;
+            double dlat = lat2 - lat1;
+
+            double a = Math.Sin(dlat / 2) * Math.Sin(dlat / 2) +
+                       Math.Cos(lat1) * Math.Cos(lat2) *
+                       Math.Sin(dlon / 2) * Math.Sin(dlon / 2);
+
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            double distance = earthRadius * c;
+
+            return distance;
+        }
+
+        private static double CalculateAzimuth(double lon1, double lat1, double lon2, double lat2)
+        {
+            lat1 = lat1 * (Math.PI / 180);
+            lon1 = lon1 * (Math.PI / 180);
+            lat2 = lat2 * (Math.PI / 180);
+            lon2 = lon2 * (Math.PI / 180);
+
+            // 计算差值
+            double dlon = lon2 - lon1;
+
+            // 使用反正切函数计算方位角
+            double y = Math.Sin(dlon) * Math.Cos(lat2);
+            double x = Math.Cos(lat1) * Math.Sin(lat2) - Math.Sin(lat1) * Math.Cos(lat2) * Math.Cos(dlon);
+            double azimuth = Math.Atan2(y, x);
+
+            // 将弧度转换为度数
+            azimuth = azimuth * (180.0 / Math.PI);
+
+            // 将负角度转换为正角度
+            if (azimuth < 0)
+            {
+                azimuth += 360.0;
+            }
+
+            return azimuth;
         }
     }
 }
