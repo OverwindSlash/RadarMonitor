@@ -1,13 +1,12 @@
 ﻿using CAT240Parser;
+using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Mapping;
 using RadarMonitor.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Esri.ArcGISRuntime.Geometry;
 
 namespace RadarMonitor.ViewModel
 {
@@ -430,11 +429,11 @@ namespace RadarMonitor.ViewModel
 
         // 雷达数据及参数
         public List<int[,]> RadarCartesianDatas => _radarCartesianDatas;
-        public int[,] Radar1CartesianData => _radarCartesianDatas[0];
-        public int[,] Radar2CartesianData => _radarCartesianDatas[1];
-        public int[,] Radar3CartesianData => _radarCartesianDatas[2];
-        public int[,] Radar4CartesianData => _radarCartesianDatas[3];
-        public int[,] Radar5CartesianData => _radarCartesianDatas[4];
+        //public int[,] Radar1CartesianData => _radarCartesianDatas[0];
+        //public int[,] Radar2CartesianData => _radarCartesianDatas[1];
+        //public int[,] Radar3CartesianData => _radarCartesianDatas[2];
+        //public int[,] Radar4CartesianData => _radarCartesianDatas[3];
+        //public int[,] Radar5CartesianData => _radarCartesianDatas[4];
 
 
         // UDP Clients
@@ -448,6 +447,8 @@ namespace RadarMonitor.ViewModel
             Configuration = UserConfiguration.LoadConfiguration("Config/default.yaml");
 
             RadarSettings = Configuration.RadarSettings;
+
+            // TODO: 后续可以改善做到每个预置位按钮单独控制
             IsPresetLocationsLoaded = RadarSettings.Count > 0;
         }
 

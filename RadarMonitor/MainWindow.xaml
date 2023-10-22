@@ -45,8 +45,20 @@
             <Canvas Name="Radar3RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
             <Canvas Name="Radar4RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
             <Canvas Name="Radar5RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
-            <Canvas Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False">
-                <Image Name="EchoImageOverlay" IsHitTestVisible="False"></Image>
+            <Canvas Name="Radar1EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False">
+                <Image Name="Radar1EchoImageOverlay" IsHitTestVisible="False"></Image>
+            </Canvas>
+            <Canvas Name="Radar2EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False">
+                <Image Name="Radar2EchoImageOverlay" IsHitTestVisible="False"></Image>
+            </Canvas>
+            <Canvas Name="Radar3EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False">
+                <Image Name="Radar3EchoImageOverlay" IsHitTestVisible="False"></Image>
+            </Canvas>
+            <Canvas Name="Radar4EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False">
+                <Image Name="Radar4EchoImageOverlay" IsHitTestVisible="False"></Image>
+            </Canvas>
+            <Canvas Name="Radar5EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False">
+                <Image Name="Radar5EchoImageOverlay" IsHitTestVisible="False"></Image>
             </Canvas>
             <Canvas Name="ScaleOverlay" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="300" Height="50" Margin="20, 0, 0, 70" IsHitTestVisible="False"></Canvas>
         </Grid>
@@ -127,8 +139,10 @@
                               Click="DisplayEnc_OnClick"></CheckBox>
                     <TextBlock Name="TbRadar1" Text="Radar1" Margin="0, 4, 0, 2"></TextBlock>
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar1Connected}">
-                        <CheckBox Name="CbRadar1Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar1EchoDisplayed}"></CheckBox>
-                        <CheckBox Name="CbRadar1Rings" Content="Rings" IsChecked="{Binding Path=IsRadar1RingsDisplayed}"></CheckBox>
+                        <CheckBox Name="CbRadar1Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar1EchoDisplayed}"
+                                  Click="CbRadar1Echo_OnClick"></CheckBox>
+                        <CheckBox Name="CbRadar1Rings" Content="Rings" IsChecked="{Binding Path=IsRadar1RingsDisplayed}"
+                                  Click="CbRadar1Rings_OnClick"></CheckBox>
                     </StackPanel>
                     <TextBlock Name="TbRadar2" Text="Radar2" Margin="0, 4, 0, 2"></TextBlock>
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar2Connected}">
