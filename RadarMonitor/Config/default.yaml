@@ -33,41 +33,41 @@ radarSettings:
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: false
 -
-   radarName: radar3
-   radarLongitude: 121.496233
-   radarLatitude: 31.375250
-   radarOrientation: 27.0
+   radarName: 杨浦
+   radarLongitude: 121.539628
+   radarLatitude: 31.258811
+   radarOrientation: -85.0
    radarScale: 68750
-   radarMaxDistance: 60
+   radarMaxDistance: 30
    radarIpAddress: 127.0.0.1
    radarPort: 20103
-   isRadarEnabled: false
+   isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: false
 -
-   radarName: radar4
-   radarLongitude: 122.099197
-   radarLatitude: 31.416057
-   radarOrientation: 34.0
+   radarName: 吴淞
+   radarLongitude: 121.496233
+   radarLatitude: 31.376250
+   radarOrientation: -87
    radarScale: 160000
    radarMaxDistance: 60
    radarIpAddress: 127.0.0.1
    radarPort: 20104
-   isRadarEnabled: false
+   isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: false
 -
-   radarName: radar5
-   radarLongitude: 122.471336
-   radarLatitude: 30.780275
-   radarOrientation: -76.0
+   radarName: 闵行
+   radarLongitude: 121.463678
+   radarLatitude: 31.087561
+   radarOrientation: -91.0
    radarScale: 30000
    radarMaxDistance: 60
    radarIpAddress: 127.0.0.1
    radarPort: 20106
-   isRadarEnabled: false
+   isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: false
