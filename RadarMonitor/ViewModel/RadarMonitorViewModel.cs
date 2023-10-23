@@ -383,29 +383,55 @@ namespace RadarMonitor.ViewModel
             { null, null, null, null, null};
 
         #region Radar Status
+        
         public double Radar1StartAzimuth
         {
             get => _lastCat240DataItems[0] != null ? _lastCat240DataItems[0].StartAzimuthInDegree : 0.0;
+            set
+            {
+                _lastCat240DataItems[0].StartAzimuthInDegree = value;
+                OnPropertyChanged("Radar1StartAzimuth");
+            }
         }
 
         public double Radar2StartAzimuth
         {
-            get => _lastCat240DataItems[0] != null ? _lastCat240DataItems[1].StartAzimuthInDegree : 0.0;
+            get => _lastCat240DataItems[1] != null ? _lastCat240DataItems[1].StartAzimuthInDegree : 0.0;
+            set
+            {
+                _lastCat240DataItems[1].StartAzimuthInDegree = value;
+                OnPropertyChanged("Radar2StartAzimuth");
+            }
         }
 
         public double Radar3StartAzimuth
         {
-            get => _lastCat240DataItems[0] != null ? _lastCat240DataItems[2].StartAzimuthInDegree : 0.0;
+            get => _lastCat240DataItems[2] != null ? _lastCat240DataItems[2].StartAzimuthInDegree : 0.0;
+            set
+            {
+                _lastCat240DataItems[2].StartAzimuthInDegree = value;
+                OnPropertyChanged("Radar3StartAzimuth");
+            }
         }
 
         public double Radar4StartAzimuth
         {
-            get => _lastCat240DataItems[0] != null ? _lastCat240DataItems[3].StartAzimuthInDegree : 0.0;
+            get => _lastCat240DataItems[3] != null ? _lastCat240DataItems[3].StartAzimuthInDegree : 0.0;
+            set
+            {
+                _lastCat240DataItems[3].StartAzimuthInDegree = value;
+                OnPropertyChanged("Radar4StartAzimuth");
+            }
         }
 
         public double Radar5StartAzimuth
         {
-            get => _lastCat240DataItems[0] != null ? _lastCat240DataItems[4].StartAzimuthInDegree : 0.0;
+            get => _lastCat240DataItems[4] != null ? _lastCat240DataItems[4].StartAzimuthInDegree : 0.0;
+            set
+            {
+                _lastCat240DataItems[4].StartAzimuthInDegree = value;
+                OnPropertyChanged("Radar5StartAzimuth");
+            }
         }
         #endregion
 
@@ -573,6 +599,8 @@ namespace RadarMonitor.ViewModel
 
                 _lastCat240DataItems[radarId] = dataItems;
 
+                SetRadarAzimuth(radarId, dataItems.StartAzimuthInDegree);
+
                 PolarToCartesian(radarId, RadarSettings[radarId].RadarOrientation, dataItems);
                 //OnCat240PackageReceived?.Invoke(this, data);   // 调整成只变更数据，不触发显示
             });
@@ -596,6 +624,28 @@ namespace RadarMonitor.ViewModel
                     break;
                 case 4:
                     IsRadar5Connected = status;
+                    break;
+            }
+        }
+
+        private void SetRadarAzimuth(int radarId, double azimuthInDegree)
+        {
+            switch (radarId)
+            {
+                case 0:
+                    Radar1StartAzimuth = azimuthInDegree;
+                    break;
+                case 1:
+                    Radar2StartAzimuth = azimuthInDegree;
+                    break;
+                case 2:
+                    Radar3StartAzimuth = azimuthInDegree;
+                    break;
+                case 3:
+                    Radar4StartAzimuth = azimuthInDegree;
+                    break;
+                case 4:
+                    Radar5StartAzimuth = azimuthInDegree;
                     break;
             }
         }

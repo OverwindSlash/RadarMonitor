@@ -54,7 +54,7 @@ namespace RadarMonitor
         private List<byte[]> _radarEchoDatas = new();
 
         private readonly DispatcherTimer _timer = new();
-        private const int RefreshIntervalMs = 33;   // 60 FPS
+        private const int RefreshIntervalMs = 16;   // 60 FPS
 
         private Color _echoColor = DisplayConfigDialog.DefaultImageEchoColor;
         private bool _isFadingEnabled = true;
@@ -257,35 +257,39 @@ namespace RadarMonitor
         {
             var viewModel = GetViewModel();
 
-            for (int radarId = 0; radarId < RadarCount; radarId++)
+            Dispatcher.Invoke(() =>
             {
-                var radarSetting = viewModel.RadarSettings[radarId];
-                if (!radarSetting.IsConnected || !radarSetting.IsEchoDisplayed)
+                for (int radarId = 0; radarId < RadarCount; radarId++)
                 {
-                    continue;
-                }
-
-                // 重绘图片雷达回波
-                var radarEchoData = _radarEchoDatas[radarId];
-                var cartesianData = viewModel.RadarCartesianDatas[radarId];
-                for (int x = 0; x < cartesianData.GetLength(0) - 1; x++)
-                {
-                    for (int y = 0; y < cartesianData.GetLength(1) - 1; y++)
+                    var radarSetting = viewModel.RadarSettings[radarId];
+                    if (!radarSetting.IsConnected || !radarSetting.IsEchoDisplayed)
                     {
-                        int index = y * RadarEchoDataStride + x * 4;
+                        continue;
+                    }
 
-                        radarEchoData[index + 3] = (byte)cartesianData[x, y]; // Update Alpha
-
-                        if (_isFadingEnabled)
+                    // 重绘图片雷达回波
+                    var radarEchoData = _radarEchoDatas[radarId];
+                    var cartesianData = viewModel.RadarCartesianDatas[radarId];
+                    for (int x = 0; x < cartesianData.GetLength(0) - 1; x++)
+                    {
+                        for (int y = 0; y < cartesianData.GetLength(1) - 1; y++)
                         {
-                            cartesianData[x, y] = Math.Max(cartesianData[x, y] - _fadingStep, 0);
+                            int index = y * RadarEchoDataStride + x * 4;
+
+                            radarEchoData[index + 3] = (byte)cartesianData[x, y]; // Update Alpha
+
+                            if (_isFadingEnabled)
+                            {
+                                cartesianData[x, y] = Math.Max(cartesianData[x, y] - _fadingStep, 0);
+                            }
                         }
                     }
-                }
 
-                _radarBitmaps[radarId].WritePixels(new Int32Rect(0, 0, ImageSize, ImageSize), radarEchoData, RadarEchoDataStride, 0);
-                _echoImageOverlays[radarId].InvalidateVisual();
-            }
+                    _radarBitmaps[radarId].WritePixels(new Int32Rect(0, 0, ImageSize, ImageSize), radarEchoData,
+                        RadarEchoDataStride, 0);
+                    _echoImageOverlays[radarId].InvalidateVisual();
+                }
+            }, DispatcherPriority.Render);
         }
         
         #region Load ENC
@@ -445,7 +449,6 @@ namespace RadarMonitor
             {
                 return;
             }
-
 
             // 获取雷达静态信息
             var dialogViewModel = (RadarSettingsViewModel)radarDialog.DataContext;
