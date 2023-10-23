@@ -667,6 +667,118 @@ namespace RadarMonitor
             }
         }
 
+        private void CbRadar2Echo_OnClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox displayEchoCheckBox = (CheckBox)sender;
+
+            if (displayEchoCheckBox.IsChecked.Value)
+            {
+                Radar2EchoImageOverlay.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Radar2EchoImageOverlay.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void CbRadar2Rings_OnClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox displayRingsCheckBox = (CheckBox)sender;
+
+            if (displayRingsCheckBox.IsChecked.Value)
+            {
+                Radar2RingsOverlay.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Radar2RingsOverlay.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void CbRadar3Echo_OnClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox displayEchoCheckBox = (CheckBox)sender;
+
+            if (displayEchoCheckBox.IsChecked.Value)
+            {
+                Radar3EchoImageOverlay.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Radar3EchoImageOverlay.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void CbRadar3Rings_OnClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox displayRingsCheckBox = (CheckBox)sender;
+
+            if (displayRingsCheckBox.IsChecked.Value)
+            {
+                Radar3RingsOverlay.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Radar3RingsOverlay.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void CbRadar4Echo_OnClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox displayEchoCheckBox = (CheckBox)sender;
+
+            if (displayEchoCheckBox.IsChecked.Value)
+            {
+                Radar4EchoImageOverlay.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Radar4EchoImageOverlay.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void CbRadar4Rings_OnClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox displayRingsCheckBox = (CheckBox)sender;
+
+            if (displayRingsCheckBox.IsChecked.Value)
+            {
+                Radar4RingsOverlay.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Radar4RingsOverlay.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void CbRadar5Echo_OnClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox displayEchoCheckBox = (CheckBox)sender;
+
+            if (displayEchoCheckBox.IsChecked.Value)
+            {
+                Radar5EchoImageOverlay.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Radar5EchoImageOverlay.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void CbRadar5Rings_OnClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox displayRingsCheckBox = (CheckBox)sender;
+
+            if (displayRingsCheckBox.IsChecked.Value)
+            {
+                Radar5RingsOverlay.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Radar5RingsOverlay.Visibility = Visibility.Hidden;
+            }
+        }
+
         private void DisplayOpenGlEcho_OnClick(object sender, RoutedEventArgs e)
         {
             CheckBox displayOpenGlEchoCheckBox = (CheckBox)sender;
@@ -1156,5 +1268,7 @@ namespace RadarMonitor
                 GetAllFiles(d.FullName, fileList);
             }
         }
+
+        
     }
 }

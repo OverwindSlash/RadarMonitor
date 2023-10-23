@@ -146,23 +146,31 @@
                     </StackPanel>
                     <TextBlock Name="TbRadar2" Text="Radar2" Margin="0, 4, 0, 2"></TextBlock>
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar2Connected}">
-                        <CheckBox Name="CbRadar2Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar2EchoDisplayed}"></CheckBox>
-                        <CheckBox Name="CbRadar2Rings" Content="Rings" IsChecked="{Binding Path=IsRadar2RingsDisplayed}"></CheckBox>
+                        <CheckBox Name="CbRadar2Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar2EchoDisplayed}"
+                                  Click="CbRadar2Echo_OnClick"></CheckBox>
+                        <CheckBox Name="CbRadar2Rings" Content="Rings" IsChecked="{Binding Path=IsRadar2RingsDisplayed}"
+                                  Click="CbRadar2Rings_OnClick"></CheckBox>
                     </StackPanel>
                     <TextBlock Name="TbRadar3" Text="Radar3" Margin="0, 4, 0, 2"></TextBlock>
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar3Connected}">
-                        <CheckBox Name="CbRadar3Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar3EchoDisplayed}"></CheckBox>
-                        <CheckBox Name="CbRadar3Rings" Content="Rings" IsChecked="{Binding Path=IsRadar3RingsDisplayed}"></CheckBox>
+                        <CheckBox Name="CbRadar3Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar3EchoDisplayed}"
+                                  Click="CbRadar3Echo_OnClick"></CheckBox>
+                        <CheckBox Name="CbRadar3Rings" Content="Rings" IsChecked="{Binding Path=IsRadar3RingsDisplayed}"
+                                  Click="CbRadar3Rings_OnClick"></CheckBox>
                     </StackPanel>
                     <TextBlock Name="TbRadar4" Text="Radar4" Margin="0, 4, 0, 2"></TextBlock>
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar4Connected}">
-                        <CheckBox Name="CbRadar4Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar4EchoDisplayed}"></CheckBox>
-                        <CheckBox Name="CbRadar4Rings" Content="Rings" IsChecked="{Binding Path=IsRadar4RingsDisplayed}"></CheckBox>
+                        <CheckBox Name="CbRadar4Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar4EchoDisplayed}"
+                                  Click="CbRadar4Echo_OnClick"></CheckBox>
+                        <CheckBox Name="CbRadar4Rings" Content="Rings" IsChecked="{Binding Path=IsRadar4RingsDisplayed}"
+                                  Click="CbRadar4Rings_OnClick"></CheckBox>
                     </StackPanel>
                     <TextBlock Name="TbRadar5" Text="Radar5" Margin="0, 4, 0, 2"></TextBlock>
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar5Connected}">
-                        <CheckBox Name="CbRadar5Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar5EchoDisplayed}"></CheckBox>
-                        <CheckBox Name="CbRadar5Rings" Content="Rings" IsChecked="{Binding Path=IsRadar5RingsDisplayed}"></CheckBox>
+                        <CheckBox Name="CbRadar5Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar5EchoDisplayed}"
+                                  Click="CbRadar5Echo_OnClick"></CheckBox>
+                        <CheckBox Name="CbRadar5Rings" Content="Rings" IsChecked="{Binding Path=IsRadar5RingsDisplayed}"
+                                  Click="CbRadar5Rings_OnClick"></CheckBox>
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
