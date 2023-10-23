@@ -25,7 +25,7 @@ radarSettings:
    radarLatitude: 31.192678
    radarOrientation: -85.0
    radarScale: 20000
-   radarMaxDistance: 30
+   radarMaxDistance: 9
    radarIpAddress: 127.0.0.1
    radarPort: 20102
    isRadarEnabled: true
@@ -38,7 +38,7 @@ radarSettings:
    radarLatitude: 31.258811
    radarOrientation: -85.0
    radarScale: 68750
-   radarMaxDistance: 30
+   radarMaxDistance: 9
    radarIpAddress: 127.0.0.1
    radarPort: 20103
    isRadarEnabled: true
@@ -51,7 +51,7 @@ radarSettings:
    radarLatitude: 31.376250
    radarOrientation: -87
    radarScale: 160000
-   radarMaxDistance: 60
+   radarMaxDistance: 9
    radarIpAddress: 127.0.0.1
    radarPort: 20104
    isRadarEnabled: true
@@ -64,7 +64,7 @@ radarSettings:
    radarLatitude: 31.087561
    radarOrientation: -91.0
    radarScale: 30000
-   radarMaxDistance: 60
+   radarMaxDistance: 9
    radarIpAddress: 127.0.0.1
    radarPort: 20106
    isRadarEnabled: true
