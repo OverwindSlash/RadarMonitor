@@ -12,6 +12,7 @@ namespace RadarMonitor.ViewModel
 {
     public delegate void EncChangedEventHandler(object sender, string encType, string encUri);
     public delegate void RadarChangedEventHandler(object sender, int radarId, RadarSetting radarSetting);
+    public delegate void RadarConnectionStatusChangedHandler(object sender, int radarId, string ip, int port, RadarConnectionStatus status);
     public delegate void Cat240SpecChangedEventHandler(object sender, int radarId, Cat240Spec cat240Spec);
     public delegate void Cat240PackageReceivedEventHandler(object sender, int radarId, Cat240DataBlock data);
     public delegate void ViewPointChangedHandler(object sender, Viewpoint viewpoint);
@@ -38,6 +39,7 @@ namespace RadarMonitor.ViewModel
         // 事件
         public event EncChangedEventHandler OnEncChanged;
         public event RadarChangedEventHandler OnRadarChanged;
+        public event RadarConnectionStatusChangedHandler OnRadarConnectionStatusChanged;
         public event Cat240SpecChangedEventHandler OnCat240SpecChanged;
         public event Cat240PackageReceivedEventHandler OnCat240PackageReceived;
         public event ViewPointChangedHandler OnViewPointChanged;
@@ -477,7 +479,10 @@ namespace RadarMonitor.ViewModel
             var client = new MulticastClient(radarId, radarIp, radarPort);
             client.SetupMulticast(true);
             client.Multicast = $"239.255.0.{radarId}";
+            client.OnUdpConnected += OnUdpConnected;
             client.OnCat240Received += OnReceivedCat240DataBlock;
+            client.OnUdpDisconnected += OnUdpDisconnected;
+            client.OnUdpError += OnUdpError;
             client.Connect();
 
             _udpClients.Add(client);
@@ -511,16 +516,41 @@ namespace RadarMonitor.ViewModel
             }
         }
 
+        private void OnUdpConnected(object sender, int clientId, string ip, int port)
+        {
+            OnRadarConnectionStatusChanged?.Invoke(this, clientId, ip, port, RadarConnectionStatus.Connected);
+        }
+
+        private void OnUdpDisconnected(object sender, int clientId, string ip, int port)
+        {
+            SetRadarConnectionStatus(clientId, false);
+            OnRadarConnectionStatusChanged?.Invoke(this, clientId, ip, port, RadarConnectionStatus.Disconnected);
+        }
+
+        private void OnUdpError(object sender, int clientId, string ip, int port)
+        {
+            SetRadarConnectionStatus(clientId, false);
+            OnRadarConnectionStatusChanged?.Invoke(this, clientId, ip, port, RadarConnectionStatus.Error);
+        }
+
         public void OnReceivedCat240DataBlock(object sender, int radarId, Cat240DataBlock data)
         {
+            if (radarId > RadarSettings.Count - 1)
+            {
+                return;
+            }
+
             var dataItems = data.Items;
             
             ThreadPool.QueueUserWorkItem((obj) =>
             {
                 if (!RadarSettings[radarId].IsRadarEnabled)
                 {
+                    // 雷达若没启用，则略过数据包
                     return;
                 }
+
+                SetRadarConnectionStatus(radarId, true);
 
                 if (_lastCat240DataItems[radarId] != null && 
                     _lastCat240DataItems[radarId].StartAzimuthInDegree == dataItems.StartAzimuthInDegree)
@@ -532,27 +562,13 @@ namespace RadarMonitor.ViewModel
                 // 首个数据包 或 数据包发生了变化
                 if (dataItems.IsSpecChanged(_lastCat240DataItems[radarId]))
                 {
-                    switch (radarId)
-                    {
-                        case 0:
-                            IsRadar1Connected = true; break;
-                        case 1:
-                            IsRadar2Connected = true; break;
-                        case 2:
-                            IsRadar3Connected = true; break;
-                        case 3:
-                            IsRadar4Connected = true; break;
-                        case 4:
-                            IsRadar5Connected = true; break;
-                        default:
-                            return;
-                    }
-
-                    OnCat240SpecChanged?.Invoke(this, radarId, new Cat240Spec(dataItems));
-
                     _radarRadiusIncrements[radarId] = HalfCartesianSize / dataItems.VideoBlocks.Count;
                     _radarScaledSteps[radarId] = dataItems.VideoBlocks.Count / CartesianSize;
-                    RadarSettings[radarId].RadarMaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * HalfC * dataItems.ValidCellsInDataBlock);
+                    RadarSettings[radarId].RadarMaxDistance = 
+                        (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * HalfC * dataItems.ValidCellsInDataBlock);
+
+                    OnCat240SpecChanged?.Invoke(this, radarId, new Cat240Spec(dataItems));
+                    OnRadarConnectionStatusChanged?.Invoke(this, radarId, string.Empty, 0, RadarConnectionStatus.Normal);
                 }
 
                 _lastCat240DataItems[radarId] = dataItems;
@@ -560,6 +576,28 @@ namespace RadarMonitor.ViewModel
                 PolarToCartesian(radarId, RadarSettings[radarId].RadarOrientation, dataItems);
                 //OnCat240PackageReceived?.Invoke(this, data);   // 调整成只变更数据，不触发显示
             });
+        }
+
+        private void SetRadarConnectionStatus(int radarId, bool status)
+        {
+            switch (radarId)
+            {
+                case 0:
+                    IsRadar1Connected = status;
+                    break;
+                case 1:
+                    IsRadar2Connected = status;
+                    break;
+                case 2:
+                    IsRadar3Connected = status;
+                    break;
+                case 3:
+                    IsRadar4Connected = status;
+                    break;
+                case 4:
+                    IsRadar5Connected = status;
+                    break;
+            }
         }
 
         private void PolarToCartesian(int radarId, double radarOrientation, Cat240DataItems items)
@@ -585,7 +623,8 @@ namespace RadarMonitor.ViewModel
             }
         }
 
-        private double CalculateDistance(double lon1, double lat1, double lon2, double lat2)
+        #region Utilities
+        private static double CalculateDistance(double lon1, double lat1, double lon2, double lat2)
         {
             lat1 = lat1 * (Math.PI / 180);
             lon1 = lon1 * (Math.PI / 180);
@@ -634,5 +673,6 @@ namespace RadarMonitor.ViewModel
 
             return azimuth;
         }
+        #endregion
     }
 }

@@ -54,7 +54,7 @@ namespace RadarMonitor
         private List<byte[]> _radarEchoDatas = new();
 
         private readonly DispatcherTimer _timer = new();
-        private const int RefreshIntervalMs = 16;   // 60 FPS
+        private const int RefreshIntervalMs = 33;   // 60 FPS
 
         private Color _echoColor = DisplayConfigDialog.DefaultImageEchoColor;
         private bool _isFadingEnabled = true;
@@ -105,6 +105,7 @@ namespace RadarMonitor
             var viewModel = new RadarMonitorViewModel();
             viewModel.OnEncChanged += OnEncChanged;
             viewModel.OnRadarChanged += OnRadarChanged;
+            viewModel.OnRadarConnectionStatusChanged += OnRadarConnectionStatusChanged;
             viewModel.OnCat240SpecChanged += OnCat240SpecChanged;
             viewModel.OnCat240PackageReceived += OnCat240PackageReceived;
             DataContext = viewModel;
@@ -196,7 +197,7 @@ namespace RadarMonitor
                     radarEchoData[i + 0] = _echoColor.B;    // Blue
                     radarEchoData[i + 1] = _echoColor.G;    // Green
                     radarEchoData[i + 2] = _echoColor.R;    // Red
-                    radarEchoData[i + 3] = 0;                   // Alpha
+                    radarEchoData[i + 3] = 0;               // Alpha
                 }
                 _radarEchoDatas.Add(radarEchoData);
 
@@ -427,7 +428,7 @@ namespace RadarMonitor
         }
         #endregion
 
-        #region Connect Radar
+        #region Radar Handler
         private void ConnectRadar_OnClick(object sender, RoutedEventArgs e)
         {
             var viewModel = GetViewModel();
@@ -475,6 +476,42 @@ namespace RadarMonitor
             InitializeEchoData();
             // TODO: 优化提示消息
             TbStatusInfo.Text = $"Listening radar on {radarSetting.RadarIpAddress}:{radarSetting.RadarPort}.";
+        }
+
+        private void OnRadarConnectionStatusChanged(object sender, int radarId, string ip, int port, RadarConnectionStatus status)
+        {
+            string imgSrc = @"Assets\Disconnected.png";
+            switch (status)
+            {
+                case RadarConnectionStatus.Connected:
+                    imgSrc = @"Assets\Connected.png";
+                    break;
+                case RadarConnectionStatus.Normal:
+                    imgSrc = @"Assets\Normal.png";
+                    break;
+            }
+
+            Dispatcher.Invoke(() =>
+            {
+                switch (radarId)
+                {
+                    case 0:
+                        ImgRadar1Status.Source = new BitmapImage(new Uri(imgSrc, UriKind.Relative));
+                        break;
+                    case 1:
+                        ImgRadar2Status.Source = new BitmapImage(new Uri(imgSrc, UriKind.Relative));
+                        break;
+                    case 2:
+                        ImgRadar3Status.Source = new BitmapImage(new Uri(imgSrc, UriKind.Relative));
+                        break;
+                    case 3:
+                        ImgRadar4Status.Source = new BitmapImage(new Uri(imgSrc, UriKind.Relative));
+                        break;
+                    case 4:
+                        ImgRadar5Status.Source = new BitmapImage(new Uri(imgSrc, UriKind.Relative));
+                        break;
+                }
+            });
         }
 
         private void OnCat240SpecChanged(object sender, int radarId, Cat240Spec cat240spec)
@@ -645,6 +682,10 @@ namespace RadarMonitor
 
             if (displayEchoCheckBox.IsChecked.Value)
             {
+                var viewModel = GetViewModel();
+                var radarSetting = viewModel.RadarSettings[0];
+                TransformRadarEcho(0, radarSetting.RadarLongitude, radarSetting.RadarLatitude,
+                    radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
                 Radar1EchoImageOverlay.Visibility = Visibility.Visible;
             }
             else
@@ -659,6 +700,8 @@ namespace RadarMonitor
 
             if (displayRingsCheckBox.IsChecked.Value)
             {
+                var viewModel = GetViewModel();
+                DrawRings(0, viewModel.RadarSettings[0].RadarLongitude, viewModel.RadarSettings[0].RadarLatitude);
                 Radar1RingsOverlay.Visibility = Visibility.Visible;
             }
             else
@@ -673,6 +716,10 @@ namespace RadarMonitor
 
             if (displayEchoCheckBox.IsChecked.Value)
             {
+                var viewModel = GetViewModel();
+                var radarSetting = viewModel.RadarSettings[1];
+                TransformRadarEcho(1, radarSetting.RadarLongitude, radarSetting.RadarLatitude,
+                    radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
                 Radar2EchoImageOverlay.Visibility = Visibility.Visible;
             }
             else
@@ -687,6 +734,8 @@ namespace RadarMonitor
 
             if (displayRingsCheckBox.IsChecked.Value)
             {
+                var viewModel = GetViewModel();
+                DrawRings(1, viewModel.RadarSettings[1].RadarLongitude, viewModel.RadarSettings[1].RadarLatitude);
                 Radar2RingsOverlay.Visibility = Visibility.Visible;
             }
             else
@@ -701,6 +750,10 @@ namespace RadarMonitor
 
             if (displayEchoCheckBox.IsChecked.Value)
             {
+                var viewModel = GetViewModel();
+                var radarSetting = viewModel.RadarSettings[2];
+                TransformRadarEcho(2, radarSetting.RadarLongitude, radarSetting.RadarLatitude,
+                    radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
                 Radar3EchoImageOverlay.Visibility = Visibility.Visible;
             }
             else
@@ -715,6 +768,8 @@ namespace RadarMonitor
 
             if (displayRingsCheckBox.IsChecked.Value)
             {
+                var viewModel = GetViewModel();
+                DrawRings(2, viewModel.RadarSettings[2].RadarLongitude, viewModel.RadarSettings[2].RadarLatitude);
                 Radar3RingsOverlay.Visibility = Visibility.Visible;
             }
             else
@@ -729,6 +784,10 @@ namespace RadarMonitor
 
             if (displayEchoCheckBox.IsChecked.Value)
             {
+                var viewModel = GetViewModel();
+                var radarSetting = viewModel.RadarSettings[3];
+                TransformRadarEcho(3, radarSetting.RadarLongitude, radarSetting.RadarLatitude,
+                    radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
                 Radar4EchoImageOverlay.Visibility = Visibility.Visible;
             }
             else
@@ -743,6 +802,8 @@ namespace RadarMonitor
 
             if (displayRingsCheckBox.IsChecked.Value)
             {
+                var viewModel = GetViewModel();
+                DrawRings(3, viewModel.RadarSettings[3].RadarLongitude, viewModel.RadarSettings[3].RadarLatitude);
                 Radar4RingsOverlay.Visibility = Visibility.Visible;
             }
             else
@@ -757,7 +818,12 @@ namespace RadarMonitor
 
             if (displayEchoCheckBox.IsChecked.Value)
             {
+                var viewModel = GetViewModel();
+                var radarSetting = viewModel.RadarSettings[4];
+                TransformRadarEcho(4, radarSetting.RadarLongitude, radarSetting.RadarLatitude,
+                    radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
                 Radar5EchoImageOverlay.Visibility = Visibility.Visible;
+                
             }
             else
             {
@@ -771,6 +837,8 @@ namespace RadarMonitor
 
             if (displayRingsCheckBox.IsChecked.Value)
             {
+                var viewModel = GetViewModel();
+                DrawRings(4, viewModel.RadarSettings[4].RadarLongitude, viewModel.RadarSettings[4].RadarLatitude);
                 Radar5RingsOverlay.Visibility = Visibility.Visible;
             }
             else
@@ -1247,6 +1315,7 @@ namespace RadarMonitor
         }
         #endregion
 
+        #region Utilities
         private RadarMonitorViewModel GetViewModel()
         {
             return (RadarMonitorViewModel)DataContext;
@@ -1268,7 +1337,6 @@ namespace RadarMonitor
                 GetAllFiles(d.FullName, fileList);
             }
         }
-
-        
+        #endregion
     }
 }

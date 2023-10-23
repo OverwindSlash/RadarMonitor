@@ -180,21 +180,33 @@
                     <Label Name="CursorLatitude" ToolTip="Latitude" Content="Lat:"/>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Header="Radar Azimuth" Width="Auto">
+            <GroupBox Header="Radar Status" Width="Auto">
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Vertical">
+                        <Image Name="ImgRadar1Status" ToolTip="Radar1 Status" Height="{Binding ElementName=LblRadar1SA, Path=ActualHeight}" Width="10"
+                               HorizontalAlignment="Center" Source="Assets/Disconnected.png"></Image>
+                        <Image Name="ImgRadar2Status" ToolTip="Radar2 Status" Height="{Binding ElementName=LblRadar2SA, Path=ActualHeight}" Width="10"
+                               HorizontalAlignment="Center" Source="Assets/Disconnected.png"></Image>
+                        <Image Name="ImgRadar3Status" ToolTip="Radar3 Status" Height="{Binding ElementName=LblRadar3SA, Path=ActualHeight}" Width="10"
+                               HorizontalAlignment="Center" Source="Assets/Disconnected.png"></Image>
+                        <Image Name="ImgRadar4Status" ToolTip="Radar4 Status" Height="{Binding ElementName=LblRadar4SA, Path=ActualHeight}" Width="10"
+                               HorizontalAlignment="Center" Source="Assets/Disconnected.png"></Image>
+                        <Image Name="ImgRadar5Status" ToolTip="Radar5 Status" Height="{Binding ElementName=LblRadar5SA, Path=ActualHeight}" Width="10"
+                               HorizontalAlignment="Center" Source="Assets/Disconnected.png"></Image>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical">
                         <Label Name="LblRadar1SA" ToolTip="Radar1 Start Azimuth" Content="Radar1:"></Label>
                         <Label Name="LblRadar2SA" ToolTip="Radar2 Start Azimuth" Content="Radar2:"></Label>
                         <Label Name="LblRadar3SA" ToolTip="Radar3 Start Azimuth" Content="Radar3:"></Label>
                         <Label Name="LblRadar4SA" ToolTip="Radar4 Start Azimuth" Content="Radar4:"></Label>
                         <Label Name="LblRadar5SA" ToolTip="Radar5 Start Azimuth" Content="Radar5:"></Label>
-                        
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Orientation="Vertical">
+                    <StackPanel Grid.Column="2" Orientation="Vertical">
                         <TextBlock Name="TbRadar1SA" Height="{Binding ElementName=LblRadar1SA, Path=ActualHeight}" Margin="0, 5, 0, 0"
                                    Text="{Binding Radar1StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
                         <TextBlock Name="TbRadar2SA" Height="{Binding ElementName=LblRadar2SA, Path=ActualHeight}" 
