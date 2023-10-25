@@ -22,7 +22,7 @@ namespace Silk.WPF.OpenGL
         public float MapWidthOffCenter { get; set; } = 0f;
         public int UIHeight { get; set; } = 1000;
         public int UIWidth { get; set; } = 1600;
-        public double RadarMaxDistance { get; set; } = 60.0;
+        public float RadarMaxDistance { get; set; } = 60.0f;
 
 
         private uint lastId = 0;
@@ -57,6 +57,10 @@ namespace Silk.WPF.OpenGL
             get { return _orientation; }
             set
             {
+                if (value == _orientation)
+                {
+                    return;
+                }
                 _orientation = value;
                 IndexOffset = (int)(value / 360 * RadarConfig.SECTIONS);
             }

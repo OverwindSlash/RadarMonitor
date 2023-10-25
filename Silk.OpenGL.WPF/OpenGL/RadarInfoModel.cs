@@ -18,8 +18,13 @@ namespace Silk.WPF.OpenGL
         public float MapWidthOffCenter { get; set; } = 0f;
         public int UIHeight { get; set; } = 1000;
         public int UIWidth { get; set; } = 1600;
-        public double RadarMaxDistance { get; set; } = 60.0;
-        public double RadarOrientation { get; set; } = 0.0;
+        public float RadarMaxDistance { get; set; } = 60.0f;
         public int RealCells { get; set; } = 6000;
+
+
+        // config
+        public double Longitude { get; set; } = 0;
+        public double Latitude { get; set; } = 0;
+        public double RadarOrientation { get; set; } = 0.0f;
     }
 }

@@ -19,8 +19,8 @@ namespace RadarMonitor.ViewModel
     public delegate void EncChangedEventHandler(object sender, string encUri);
     public delegate void MainRadarChangedEventHandler(object sender, RadarSetting radarSettings);
     public delegate void Cat240SpecChangedEventHandler(object sender, Cat240Spec cat240Spec, int radarId);
-    public delegate void Cat240PackageReceivedEventHandler(object sender, Cat240DataBlock data, List<Tuple<int, int, int>> updatedPixels);
-    public delegate void Cat240PackageReceivedOpenGLEventHandler(object sender, RadarDataReceivedEventArgs e, int radarId);
+    //public delegate void Cat240PackageReceivedEventHandler(object sender, Cat240DataBlock data, List<Tuple<int, int, int>> updatedPixels);
+    public delegate void Cat240PackageReceivedOpenGLEventHandler(object sender, RadarDataReceivedEventArgs e);
     public delegate void ViewPointChangedHandler(object sender, ViewPoint viewPoint);
 
     public class RadarMonitorViewModel : INotifyPropertyChanged
@@ -59,7 +59,7 @@ namespace RadarMonitor.ViewModel
         private bool _isOpenGlEchoDisplayed;
 
         // 雷达动态属性
-        private Cat240DataItems _lastCat240DataItems = null;
+        //private Cat240DataItems _lastCat240DataItems = null;
         private double _lastStartAzimuth = 0;
         private double _startAzimuth;
         private double _endAzimuth;
@@ -79,12 +79,13 @@ namespace RadarMonitor.ViewModel
         public event EncChangedEventHandler OnEncChanged;
         public event MainRadarChangedEventHandler OnMainRadarChanged;
         public event Cat240SpecChangedEventHandler OnCat240SpecChanged;
-        public event Cat240PackageReceivedEventHandler OnCat240PackageReceived;
+        //public event Cat240PackageReceivedEventHandler OnCat240PackageReceived;
         public event Cat240PackageReceivedOpenGLEventHandler OnCat240PackageReceivedOpenGLEvent;
         public event ViewPointChangedHandler OnViewPointChanged;
 
         private MulticastClient _client;
 
+        private Dictionary<int, Cat240DataItems> _lastCat240DataItems = new Dictionary<int, Cat240DataItems>();
         private List<MulticastClient> _clients = new List<MulticastClient>();
         private Dictionary<int, RadarSetting> radarSettings= new Dictionary<int, RadarSetting>();
 
@@ -310,14 +311,6 @@ namespace RadarMonitor.ViewModel
             _client.OnCat240Received += OnReceivedCat240DataBlock;
             _client.Connect();
 
-            //_udpClient = new Cat240UdpClient(RadarPort);
-            //_udpClient.OnCat240Received += OnReceivedCat240DataBlock;
-            //ParameterizedThreadStart threadStart = new((obj) => {
-            //    _ = _udpClient.ConnectAsync();
-            //});
-
-            //Thread thread = new Thread(threadStart);
-            //thread.Start();
 
         }
 
@@ -364,12 +357,13 @@ namespace RadarMonitor.ViewModel
 
             // TODO: 疑问点
             // 同一雷达每个数据包基本不变的信息
-            if (dataItems.IsSpecChanged(_lastCat240DataItems))
+            if (dataItems.IsSpecChanged(_lastCat240DataItems.GetValueOrDefault(radarId)))
             {
                 OnCat240SpecChanged?.Invoke(this, new Cat240Spec(dataItems),radarId);
+                _lastCat240DataItems[radarId] = dataItems;
             }
 
-            _lastCat240DataItems = dataItems;
+
             _lastStartAzimuth = StartAzimuth;
 
             //var updatedPixels = PolarToCartesian(data);
@@ -385,8 +379,7 @@ namespace RadarMonitor.ViewModel
                 DataArr.Add(color);
             }
 
-            //OnCat240PackageReceived?.Invoke(this, data, updatedPixels);
-            OnCat240PackageReceivedOpenGLEvent?.Invoke(this, new RadarDataReceivedEventArgs(data.Items.StartAzimuth, DataArr),radarId);
+            OnCat240PackageReceivedOpenGLEvent?.Invoke(this, new RadarDataReceivedEventArgs(radarId, data.Items.StartAzimuth, DataArr));
         }
 
         private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)

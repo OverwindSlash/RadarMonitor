@@ -68,7 +68,7 @@ namespace CAT240Parser
                 //double lastAzimuth = 0.0;
 
                 Cat240DataBlock dataBlock = new Cat240DataBlock(buffer, size);
-            //Trace.TraceInformation($"{Id}: {dataBlock.Items.StartAzimuth}");
+                //Trace.TraceInformation($"{Id}: {dataBlock.Items.StartAzimuth}");
 
 
                 //if (dataBlock.Items.StartAzimuth != lastAzimuth)

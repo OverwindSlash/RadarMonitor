@@ -19,8 +19,9 @@ public class RadarDataReceivedEventArgs
     public int Azimuth { get; set; }
     public List<float> DataArray { get; set; } = new List<float>();
 
-    public RadarDataReceivedEventArgs(int azimuth, List<float> data)
+    public RadarDataReceivedEventArgs(int radarId, int azimuth, List<float> data)
     {
+        RadarID = radarId;
         this.Azimuth = azimuth;
         this.DataArray = data;
     }
@@ -46,15 +47,6 @@ public partial class ExampleScene : UserControl
     private const float CameraZoom = 45f;
     private float heightScale = 0.5f / MathF.Tan(CameraZoom / 2 / 180 * MathF.PI);
     //private float l = 2* 10 * CELLS / 1000f;
-
-    // properties to be modified by radar monitor viewmodel
-    //public float MapHeight { get; set; } = 90f;
-    //public float MapWidth { get; set; } = 160f;
-    //public float MapHeightOffCenter { get; set; } = 0f;
-    //public float MapWidthOffCenter { get; set; } = 0f;
-    //public int UIHeight { get; set; } = 1000;
-    //public int UIWidth { get; set; } = 1600;
-    //public double RadarMaxDistance { get; set; } = 60.0;
 
     private bool _isDisplay;
 
@@ -301,7 +293,7 @@ public partial class ExampleScene : UserControl
             radar.MapWidthOffCenter = radarInfo.MapWidthOffCenter;
             radar.MapHeightOffCenter = radarInfo.MapHeightOffCenter;
             radar.RadarOrientation = radarInfo.RadarOrientation;
-        radar.RadarMaxDistance = radarInfo.RadarMaxDistance;
+            radar.RadarMaxDistance = radarInfo.RadarMaxDistance;
         }
         else
         {
