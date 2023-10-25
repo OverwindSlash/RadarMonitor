@@ -214,7 +214,7 @@ public partial class ExampleScene : UserControl
             //var model = Matrix4x4.Identity;
             CameraPosition.Z = (float)(radar.MapHeight / 2.0f / radar.RadarMaxDistance * heightScale);
             //Trace.WriteLine($"W:{MapWidth}, H:{MapHeight}, MD:{RadarMaxDistance}, UIW:{UIWidth}, UIH:{UIHeight}, MCW:{MapWidthOffCenter}, MCH:{MapHeightOffCenter} , Scale:{heightScale}");
-            CameraPosition.X = -(float)(radar.MapWidthOffCenter * (model.Key + 1) / 2.0f / radar.RadarMaxDistance / heightScale * 1.03f);
+            CameraPosition.X = -(float)(radar.MapWidthOffCenter / 2.0f / radar.RadarMaxDistance / heightScale * 1.03f);
             CameraPosition.Y = -(float)(radar.MapHeightOffCenter / 2.0f / radar.RadarMaxDistance / heightScale * 1.03f);
 
             var view = Matrix4x4.CreateLookAt(CameraPosition, CameraPosition + CameraFront, CameraUp);
@@ -301,7 +301,7 @@ public partial class ExampleScene : UserControl
             radar.MapWidthOffCenter = radarInfo.MapWidthOffCenter;
             radar.MapHeightOffCenter = radarInfo.MapHeightOffCenter;
             radar.RadarOrientation = radarInfo.RadarOrientation;
-            radar.RadarMaxDistance = radarInfo.RadarMaxDistance;
+        radar.RadarMaxDistance = radarInfo.RadarMaxDistance;
         }
         else
         {

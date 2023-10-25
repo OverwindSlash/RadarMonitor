@@ -411,15 +411,15 @@ namespace RadarMonitor
                 {
                     var viewModel = (RadarMonitorViewModel)DataContext;
 
+                    RadarInfoModel radarInfo = _radarInfos[radarId];
+                    radarInfo.RealCells = viewModel.CellCount;
+                    radarInfo.RadarOrientation = viewModel.RadarOrientation;
+                    radarInfo.RadarMaxDistance = viewModel.MaxDistance;
+
                     TransformOpenGlRadarEcho(radarId, viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
                         cat240spec.MaxDistance);
 
-                    // TODO: 疑问点
-                    //OpenGlEchoOverlay.RealCells = viewModel.CellCount;
-                    //OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
-                    //OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
 
-                    
                 });
             }
             catch (Exception e)
