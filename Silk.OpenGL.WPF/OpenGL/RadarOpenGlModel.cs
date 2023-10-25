@@ -1,0 +1,81 @@
+﻿using Silk.NET.Direct3D9;
+using Silk.NET.OpenGL;
+using Silk.WPF.OpenGL.Scene;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Silk.WPF.OpenGL
+{
+    public class RadarOpenGlModel
+    {
+        private float[] DataArray = new float[RadarConfig.SECTIONS * (RadarConfig.CELLS + 1)];
+
+        public List<RadarDataReceivedEventArgs> DataList = new List<RadarDataReceivedEventArgs>();
+        public object Lock = new object();
+
+        public float MapHeight { get; set; } = 90f;
+        public float MapWidth { get; set; } = 160f;
+        public float MapHeightOffCenter { get; set; } = 0f;
+        public float MapWidthOffCenter { get; set; } = 0f;
+        public int UIHeight { get; set; } = 1000;
+        public int UIWidth { get; set; } = 1600;
+        public double RadarMaxDistance { get; set; } = 60.0;
+
+
+        private uint lastId = 0;
+
+        private int _realCells = RadarConfig.CELLS;
+
+        public int RealCells
+        {
+            get { return _realCells; }
+            set
+            {
+                if (value <= 0)
+                {
+                    return;
+                }
+                if (value != _realCells)
+                {
+                    DataArray = new float[RadarConfig.SECTIONS * (value + 1)];
+                    TextureData = new OpenGLSharp.Texture(RenderContext.Gl, DataArray, (uint)(value + 1), RadarConfig.SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit.Texture0);
+                    lastId = 0;
+
+                }
+                _realCells = value;
+            }
+        }
+
+
+        public int IndexOffset { get; private set; } = 0;
+        private double _orientation = 0;
+        public double RadarOrientation
+        {
+            get { return _orientation; }
+            set
+            {
+                _orientation = value;
+                IndexOffset = (int)(value / 360 * RadarConfig.SECTIONS);
+            }
+        }
+
+        public int RadarID { get; set; } 
+        public RadarOpenGlModel(int radarID)
+        {
+            RadarID = radarID;
+            TextureUnit = (TextureUnit)(TextureUnit.Texture0 + radarID);
+            gl = RenderContext.Gl;
+            TextureData = new OpenGLSharp.Texture(gl, DataArray, (uint)(_realCells + 1), RadarConfig.SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit);
+
+        }
+
+        #region opengl
+        private GL gl;
+        public TextureUnit TextureUnit = TextureUnit.Texture0;
+        public OpenGLSharp.Texture TextureData;
+        #endregion
+    }
+}

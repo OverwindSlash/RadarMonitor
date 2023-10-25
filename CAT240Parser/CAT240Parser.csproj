@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Cat240UdpClient.cs" />
+    <Compile Remove="SimpleUdpClient.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NetCoreServer" Version="6.7.0" />
   </ItemGroup>
 

@@ -5,7 +5,7 @@ using UdpClient = NetCoreServer.UdpClient;
 
 namespace CAT240Parser
 {
-    public delegate void Cat240ReceivedEventHandler(object sender, Cat240DataBlock data);
+    public delegate void Cat240ReceivedEventHandler(object sender, Cat240DataBlock data, int radarId);
 
     public class MulticastClient : UdpClient
     {
@@ -13,12 +13,14 @@ namespace CAT240Parser
 
         // 定义事件
         public event Cat240ReceivedEventHandler OnCat240Received;
+        private int _radarId;
 
-
-        public MulticastClient(string address, int port) : base(address, port) {
+        public MulticastClient(string address, int port, int radarId) : base(address, port)
+        {
             int coreCount = Environment.ProcessorCount;
             ThreadPool.SetMinThreads(1, 1);
             ThreadPool.SetMaxThreads(coreCount, coreCount);
+            _radarId = radarId;
         }
 
         public void DisconnectAndStop()
@@ -57,17 +59,23 @@ namespace CAT240Parser
 
         protected override void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
         {
+
+            //byte[] data=new byte[8192]; 
+            //buffer.CopyTo(data,0);
+            
             ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
             {
-                double lastAzimuth = 0.0;
+                //double lastAzimuth = 0.0;
 
                 Cat240DataBlock dataBlock = new Cat240DataBlock(buffer, size);
+            //Trace.TraceInformation($"{Id}: {dataBlock.Items.StartAzimuth}");
 
-                if (dataBlock.Items.StartAzimuth != lastAzimuth)
-                {
-                    OnCat240Received?.Invoke(this, dataBlock);
-                    lastAzimuth = dataBlock.Items.StartAzimuth;
-                }
+
+                //if (dataBlock.Items.StartAzimuth != lastAzimuth)
+                //{
+                    OnCat240Received?.Invoke(this, dataBlock, _radarId);
+                //    lastAzimuth = dataBlock.Items.StartAzimuth;
+                //}
             }));
 
             ReceiveAsync();

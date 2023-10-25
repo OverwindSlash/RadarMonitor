@@ -13,7 +13,8 @@ namespace RadarMonitor
     /// </summary>
     public partial class RadarDialog : Window
     {
-        private List<RadarSettings> _settings;
+        private List<RadarSetting> _settings;
+        
 
         public RadarDialog()
         {
@@ -33,22 +34,25 @@ namespace RadarMonitor
                 .Build();
 
             //yml contains a string containing your YAML
-            _settings = deserializer.Deserialize<List<RadarSettings>>(contents);
+            _settings = deserializer.Deserialize<List<RadarSetting>>(contents);
         }
 
         private void BtnLoadPreset1_Click(object sender, RoutedEventArgs e)
         {
             DataContext = new RadarSettingsViewModel(_settings[0]);
+
         }
 
         private void BtnLoadPreset2_Click(object sender, RoutedEventArgs e)
         {
             DataContext = new RadarSettingsViewModel(_settings[1]);
+
         }
 
         private void BtnLoadPreset3_Click(object sender, RoutedEventArgs e)
         {
             DataContext = new RadarSettingsViewModel(_settings[2]);
+
         }
 
         private void BtnLoadPreset4_Click(object sender, RoutedEventArgs e)
@@ -59,6 +63,7 @@ namespace RadarMonitor
         private void BtnLoadPreset5_Click(object sender, RoutedEventArgs e)
         {
             DataContext = new RadarSettingsViewModel(_settings[4]);
+
         }
 
         private void BtnOK_Click(object sender, RoutedEventArgs e)

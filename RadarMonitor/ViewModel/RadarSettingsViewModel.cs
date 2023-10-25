@@ -131,6 +131,8 @@ namespace RadarMonitor.ViewModel
             }
         }
 
+        public int CurrentId { get; set; }
+
         public RadarSettingsViewModel()
         {
             _longitude = "118.82300101666256";
@@ -144,7 +146,7 @@ namespace RadarMonitor.ViewModel
             _port = 30101;
         }
 
-        public RadarSettingsViewModel(RadarSettings current)
+        public RadarSettingsViewModel(RadarSetting current)
         {
             Longitude = current.Longitude.ToString();
             Latitude = current.Latitude.ToString();
@@ -156,6 +158,7 @@ namespace RadarMonitor.ViewModel
             IpPart4 = int.Parse(current.Ip.Split('.')[3]);
 
             Port = current.Port;
+            CurrentId = current.Id;
         }
 
         private bool IsLongitudeValid(string input)
@@ -207,14 +210,14 @@ namespace RadarMonitor.ViewModel
             return result;
         }
 
-        public RadarSettings ToRadarSettings()
+        public RadarSetting ToRadarSettings()
         {
             if (!IsValidated())
             {
                 return null;
             }
 
-            return new RadarSettings()
+            return new RadarSetting()
             {
                 Longitude = double.Parse(_longitude),
                 Latitude = double.Parse(_latitude),

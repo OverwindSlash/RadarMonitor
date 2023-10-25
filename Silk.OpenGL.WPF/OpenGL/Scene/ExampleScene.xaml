@@ -8,6 +8,18 @@
              d:DesignHeight="450"
              d:DesignWidth="800">
     <Grid >
-        <opengl:OpenGLControl x:Name="GLControl" Opacity="0.7" Background="Transparent"/>
+        <opengl:OpenGLControl x:Name="GLControl" Opacity="0.5" />
+        <Image x:Name="ImageView"  RenderTransformOrigin="0.5,0.5" Opacity="0.99">
+            <Image.RenderTransform >
+                <ScaleTransform ScaleY="-1"/>
+
+            </Image.RenderTransform>
+        </Image>
+        <TextBlock HorizontalAlignment="Left"
+           VerticalAlignment="Top"
+           Margin="10,5,0,0"
+           FontSize="30"
+           Foreground="Green"
+           Text="{Binding ElementName=GLControl, Path=Fps}" />
     </Grid>
 </UserControl>

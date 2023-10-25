@@ -6,16 +6,21 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Sockets;
+using System.Net;
 using System.Runtime.CompilerServices;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using System.Threading;
+using Silk.WPF.OpenGL;
 
 namespace RadarMonitor.ViewModel
 {
     public delegate void EncChangedEventHandler(object sender, string encUri);
-    public delegate void MainRadarChangedEventHandler(object sender, RadarSettings radarSettings);
-    public delegate void Cat240SpecChangedEventHandler(object sender, Cat240Spec cat240Spec);
+    public delegate void MainRadarChangedEventHandler(object sender, RadarSetting radarSettings);
+    public delegate void Cat240SpecChangedEventHandler(object sender, Cat240Spec cat240Spec, int radarId);
     public delegate void Cat240PackageReceivedEventHandler(object sender, Cat240DataBlock data, List<Tuple<int, int, int>> updatedPixels);
+    public delegate void Cat240PackageReceivedOpenGLEventHandler(object sender, RadarDataReceivedEventArgs e, int radarId);
     public delegate void ViewPointChangedHandler(object sender, ViewPoint viewPoint);
 
     public class RadarMonitorViewModel : INotifyPropertyChanged
@@ -48,7 +53,7 @@ namespace RadarMonitor.ViewModel
 
         // 雷达静态属性
         private bool _isRadarConnected;
-        private RadarSettings _radarSettings;
+        private RadarSetting _radarSetting;
         private bool _isRingsDisplayed;
         private bool _isEchoDisplayed;
         private bool _isOpenGlEchoDisplayed;
@@ -75,9 +80,13 @@ namespace RadarMonitor.ViewModel
         public event MainRadarChangedEventHandler OnMainRadarChanged;
         public event Cat240SpecChangedEventHandler OnCat240SpecChanged;
         public event Cat240PackageReceivedEventHandler OnCat240PackageReceived;
+        public event Cat240PackageReceivedOpenGLEventHandler OnCat240PackageReceivedOpenGLEvent;
         public event ViewPointChangedHandler OnViewPointChanged;
 
         private MulticastClient _client;
+
+        private List<MulticastClient> _clients = new List<MulticastClient>();
+        private Dictionary<int, RadarSetting> radarSettings= new Dictionary<int, RadarSetting>();
 
         #region Properties
         public bool IsEncLoaded
@@ -119,23 +128,23 @@ namespace RadarMonitor.ViewModel
             }
         }
 
-        public RadarSettings MainRadarSettings
+        public RadarSetting MainRadarSettings
         {
-            get => _radarSettings;
+            get => _radarSetting;
             set
             {
-                if (_radarSettings != value)
+                if (_radarSetting != value)
                 {
-                    SetField(ref _radarSettings, value, "MainRadarSettings");
-                    OnMainRadarChanged?.Invoke(this, _radarSettings);
+                    SetField(ref _radarSetting, value, "MainRadarSettings");
+                    OnMainRadarChanged?.Invoke(this, _radarSetting);
                 }
             }
         }
-        public double RadarLongitude => _radarSettings.Longitude;
-        public double RadarLatitude => _radarSettings.Latitude;
-        public double RadarOrientation => _radarSettings.Orientation;
-        public string RadarIpAddress => _radarSettings.Ip;
-        public int RadarPort => _radarSettings.Port;
+        public double RadarLongitude => _radarSetting.Longitude;
+        public double RadarLatitude => _radarSetting.Latitude;
+        public double RadarOrientation => _radarSetting.Orientation;
+        public string RadarIpAddress => _radarSetting.Ip;
+        public int RadarPort => _radarSetting.Port;
 
         public bool IsRingsDisplayed
         {
@@ -251,7 +260,7 @@ namespace RadarMonitor.ViewModel
             try
             {
                 LoadPresetLocations();
-                _radarSettings = new RadarSettings();
+                _radarSetting = new RadarSetting();
             }
             catch (Exception e)
             {
@@ -291,15 +300,25 @@ namespace RadarMonitor.ViewModel
             }
         }
 
-        public void CaptureCat240NetworkPackage()
+        public void CaptureCat240NetworkPackage(int radarId)
         {
             StopCaptureCat240NetworkPackage();
 
-            _client = new MulticastClient(RadarIpAddress, RadarPort);
+            _client = new MulticastClient(RadarIpAddress, RadarPort, radarId);
             _client.SetupMulticast(true);
-            _client.Multicast = "239.255.0.1";
+            _client.Multicast = $"239.255.0.1";
             _client.OnCat240Received += OnReceivedCat240DataBlock;
             _client.Connect();
+
+            //_udpClient = new Cat240UdpClient(RadarPort);
+            //_udpClient.OnCat240Received += OnReceivedCat240DataBlock;
+            //ParameterizedThreadStart threadStart = new((obj) => {
+            //    _ = _udpClient.ConnectAsync();
+            //});
+
+            //Thread thread = new Thread(threadStart);
+            //thread.Start();
+
         }
 
         public void StopCaptureCat240NetworkPackage()
@@ -321,7 +340,7 @@ namespace RadarMonitor.ViewModel
             }
         }
 
-        public void OnReceivedCat240DataBlock(object sender, Cat240DataBlock data)
+        public void OnReceivedCat240DataBlock(object sender, Cat240DataBlock data, int radarId)
         {
             var dataItems = data.Items;
 
@@ -345,16 +364,29 @@ namespace RadarMonitor.ViewModel
 
             // TODO: 疑问点
             // 同一雷达每个数据包基本不变的信息
-            //if (dataItems.IsSpecChanged(_lastCat240DataItems))
+            if (dataItems.IsSpecChanged(_lastCat240DataItems))
             {
-                OnCat240SpecChanged?.Invoke(this, new Cat240Spec(dataItems));
+                OnCat240SpecChanged?.Invoke(this, new Cat240Spec(dataItems),radarId);
             }
 
             _lastCat240DataItems = dataItems;
             _lastStartAzimuth = StartAzimuth;
 
-            var updatedPixels = PolarToCartesian(data);
-            OnCat240PackageReceived?.Invoke(this, data, updatedPixels);
+            //var updatedPixels = PolarToCartesian(data);
+
+            List<float> DataArr = new List<float>((int)CellCount + 1);
+            var t = DateTime.Now;
+            var ts = t.Hour * 60 * 60 * 1000 + t.Minute * 60 * 1000 + t.Second * 1000 + t.Millisecond;
+            DataArr.Add(ts);
+
+            for (int i = 0; i < data.Items.ValidCellsInDataBlock; i++)
+            {
+                var color = (float)data.Items.GetCellData(i) / 255;
+                DataArr.Add(color);
+            }
+
+            //OnCat240PackageReceived?.Invoke(this, data, updatedPixels);
+            OnCat240PackageReceivedOpenGLEvent?.Invoke(this, new RadarDataReceivedEventArgs(data.Items.StartAzimuth, DataArr),radarId);
         }
 
         private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)

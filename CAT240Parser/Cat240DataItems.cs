@@ -187,37 +187,47 @@ namespace CAT240Parser
                 return true;
             }
 
-            if (this.CellDuration != other.CellDuration)
-            {
-                return true;
-            }
+            //if (this.CellDuration != other.CellDuration)
+            //{
+            //    return true;
+            //}
 
-            if (this.VideoCellDurationUnit != other.VideoCellDurationUnit)
-            {
-                return true;
-            }
+            //if (this.VideoCellDurationUnit != other.VideoCellDurationUnit)
+            //{
+            //    return true;
+            //}
 
-            if (this.IsDataCompressed != other.IsDataCompressed)
-            {
-                return true;
-            }
+            //if (this.IsDataCompressed != other.IsDataCompressed)
+            //{
+            //    return true;
+            //}
 
-            if (this.VideoResolution != other.VideoResolution)
-            {
-                return true;
-            }
+            //if (this.VideoResolution != other.VideoResolution)
+            //{
+            //    return true;
+            //}
 
-            if (this.ValidBytesInDataBlock != other.ValidBytesInDataBlock)
-            {
-                return true;
-            }
+            //if (this.ValidBytesInDataBlock != other.ValidBytesInDataBlock)
+            //{
+            //    return true;
+            //}
 
-            if (this.ValidCellsInDataBlock != other.ValidCellsInDataBlock)
-            {
-                return true;
-            }
+            //if (this.ValidCellsInDataBlock != other.ValidCellsInDataBlock)
+            //{
+            //    return true;
+            //}
 
-            if (this.VideoBlockLength != other.VideoBlockLength)
+            //if (this.VideoBlockLength != other.VideoBlockLength)
+            //{
+            //    return true;
+            //}
+            if (this.CellDuration != other.CellDuration
+                || this.VideoCellDurationUnit != other.VideoCellDurationUnit
+                || this.IsDataCompressed != other.IsDataCompressed
+                || this.VideoResolution != other.VideoResolution
+                || this.ValidBytesInDataBlock != other.ValidBytesInDataBlock
+                || this.ValidCellsInDataBlock != other.ValidCellsInDataBlock
+                || this.VideoBlockLength != other.VideoBlockLength)
             {
                 return true;
             }

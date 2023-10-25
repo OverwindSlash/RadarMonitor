@@ -5,6 +5,7 @@ using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.UI.Controls;
 using RadarMonitor.Model;
 using RadarMonitor.ViewModel;
+using Silk.WPF.OpenGL;
 using Silk.WPF.OpenGL.Scene;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using YamlDotNet.Serialization;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using CheckBox = System.Windows.Controls.CheckBox;
@@ -55,6 +57,8 @@ namespace RadarMonitor
 
         private bool _encDisplayFlag = false;
 
+        private Dictionary<int, RadarInfoModel> _radarInfos = new Dictionary<int, RadarInfoModel>();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -65,18 +69,19 @@ namespace RadarMonitor
             viewModel.OnMainRadarChanged += OnMainRadarChanged;
             viewModel.OnCat240SpecChanged += OnCat240SpecChanged;
             viewModel.OnCat240PackageReceived += OnCat240PackageReceived;
+            viewModel.OnCat240PackageReceivedOpenGLEvent += OnCat240PackageReceivedOpenGL;
             DataContext = viewModel;
 
             InitializeMapView();
 
             // 初始化图片回波显示后台一维数组
             _scanlineColor = DisplayConfigDialog.DefaultImageEchoColor;
-            InitializeEchoData();
+            //InitializeEchoData();
             
             // 初始化刷新计时器
-            _timer.Interval = TimeSpan.FromMilliseconds(RefreshIntervalMs);
-            _timer.Tick += RefreshImageEcho;
-            _timer.Start();
+            //_timer.Interval = TimeSpan.FromMilliseconds(RefreshIntervalMs);
+            //_timer.Tick += RefreshImageEcho;
+            //_timer.Start();
         }
 
         private void InitializeMapView()
@@ -86,7 +91,7 @@ namespace RadarMonitor
 
             #region Enc configuration
             // 海图显示配置：不显示 海床，深度点，地理名称等
-            EncEnvironmentSettings.Default.DisplaySettings.MarinerSettings.ColorScheme = EncColorScheme.Night;
+            EncEnvironmentSettings.Default.DisplaySettings.MarinerSettings.ColorScheme = EncColorScheme.Day;
 
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.AllIsolatedDangers = _encDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ArchipelagicSeaLanes = _encDisplayFlag;
@@ -364,20 +369,23 @@ namespace RadarMonitor
                 viewModel.IsRingsDisplayed = true;
 
                 // 默认显示图片雷达回波
-                bool showImageEchoFirst = true;
+                bool showImageEchoFirst = false;
                 viewModel.IsEchoDisplayed = showImageEchoFirst;
                 viewModel.IsOpenGlEchoDisplayed = !showImageEchoFirst;
                 OpenGlEchoOverlay.IsDisplay = viewModel.IsOpenGlEchoDisplayed;
                 OpenGlEchoOverlay.Visibility = viewModel.IsOpenGlEchoDisplayed ? Visibility.Visible : Visibility.Hidden;
 
+
                 // 抓取 CAT240 网络包
-                InitializeEchoData();
-                viewModel.CaptureCat240NetworkPackage();
+                //InitializeEchoData();
+                viewModel.CaptureCat240NetworkPackage(settings.CurrentId);
 
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
-                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 0);
-                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 0);
 
+                // CreateUpdateRadar
+                
+                TransformOpenGlRadarEcho(settings.CurrentId, viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, 0);
+                
                 //// TODO: 如何改善
                 //Task.Factory.StartNew(() =>
                 //{
@@ -389,28 +397,29 @@ namespace RadarMonitor
             }
         }
 
-        private void OnMainRadarChanged(object sender, RadarSettings radarSettings)
+        private void OnMainRadarChanged(object sender, RadarSetting radarSettings)
         {
             TbStatusInfo.Text = $"Listening radar on {radarSettings.Ip}:{radarSettings.Port}.";
-            InitializeEchoData();
+            //InitializeEchoData();
         }
 
-        private void OnCat240SpecChanged(object sender, Cat240Spec cat240spec)
+        private void OnCat240SpecChanged(object sender, Cat240Spec cat240spec, int radarId)
         {
             try
             {
                 Dispatcher.Invoke(() =>
                 {
                     var viewModel = (RadarMonitorViewModel)DataContext;
-                    TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
-                        cat240spec.MaxDistance);
-                    TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
+
+                    TransformOpenGlRadarEcho(radarId, viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
                         cat240spec.MaxDistance);
 
                     // TODO: 疑问点
-                    OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
-                    OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
-                    OpenGlEchoOverlay.RealCells = viewModel.CellCount;
+                    //OpenGlEchoOverlay.RealCells = viewModel.CellCount;
+                    //OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
+                    //OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
+
+                    
                 });
             }
             catch (Exception e)
@@ -428,26 +437,26 @@ namespace RadarMonitor
                     var viewModel = (RadarMonitorViewModel)DataContext;
 
                     // GDI 回波图像绘制
-                    if (viewModel.IsEchoDisplayed)
-                    {
-                        foreach (var pixel in updatedPixels)
-                        {
-                            int x = pixel.Item1;
-                            int y = pixel.Item2;
-                            int index = y * _echoDataStride + x * 4;
+                    //if (viewModel.IsEchoDisplayed)
+                    //{
+                    //    foreach (var pixel in updatedPixels)
+                    //    {
+                    //        int x = pixel.Item1;
+                    //        int y = pixel.Item2;
+                    //        int index = y * _echoDataStride + x * 4;
 
-                            _echoData[index + 3] = (byte)pixel.Item3;   // Update Alpha
-                        }
-                    }
+                    //        _echoData[index + 3] = (byte)pixel.Item3;   // Update Alpha
+                    //    }
+                    //}
 
                     // OpenGL 回波图像绘制
                     if (viewModel.IsOpenGlEchoDisplayed)
                     {
                         // TODO: 疑问点
-                        OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
-                        OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
-                        OpenGlEchoOverlay.RealCells = viewModel.CellCount;
-                        ExampleScene.OnReceivedCat240DataBlock(sender, data);
+                        //OpenGlEchoOverlay.RealCells = viewModel.CellCount;
+                        //OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
+                        //OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
+                        //OpenGlEchoOverlay.OnReceivedDataBlock(sender, data);
                     }
                 });
             }
@@ -457,6 +466,34 @@ namespace RadarMonitor
             }
         }
         #endregion
+
+        private void OnCat240PackageReceivedOpenGL(object sender, RadarDataReceivedEventArgs e, int radarId)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    var viewModel = (RadarMonitorViewModel)DataContext;
+
+
+                    // OpenGL 回波图像绘制
+                    if (viewModel.IsOpenGlEchoDisplayed)
+                    {
+                        // TODO: 疑问点
+                        //OpenGlEchoOverlay.RealCells = viewModel.CellCount;
+                        //OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
+                        //OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
+                        //OpenGlEchoOverlay.OnReceivedDataBlock(sender, data);
+                        OpenGlEchoOverlay.OnReceivedRadarData(sender, e);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                // TODO: 有没有更好的优雅结束的方法
+            }
+        }
+        
 
 
         private void ConfigDisplay_OnClick(object sender, RoutedEventArgs e)
@@ -485,6 +522,7 @@ namespace RadarMonitor
 
                 _isFadingEnabled = config.IsFadingEnabled;
                 _fadingInterval = config.FadingInterval;
+                OpenGlEchoOverlay.FadeDuration = config.FadingInterval;
             }
         }
 
@@ -502,8 +540,11 @@ namespace RadarMonitor
             if (viewModel.IsEchoDisplayed || viewModel.IsOpenGlEchoDisplayed)
             {
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
-                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
-                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
+                //TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
+                foreach (var radar in _radarInfos)
+                {
+                    TransformOpenGlRadarEcho(radar.Value.RadarID,viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
+                }
             }
         }
 
@@ -521,9 +562,12 @@ namespace RadarMonitor
             if (viewModel.IsEchoDisplayed || viewModel.IsOpenGlEchoDisplayed)
             {
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
-                TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
-                TransformOpenGlRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
+                //TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
+                foreach (var radar in _radarInfos)
+                {
+                    TransformOpenGlRadarEcho(radar.Value.RadarID, viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale,
                     viewModel.MaxDistance);
+                }
             }
         }
 
@@ -941,7 +985,7 @@ namespace RadarMonitor
             Canvas.SetTop(EchoImageOverlay, point.Y - size / 2.0);
         }
 
-        private void TransformOpenGlRadarEcho(double longitude, double latitude, double scale, double maxDistance)
+        private void TransformOpenGlRadarEcho(int radarId, double longitude, double latitude, double scale, double maxDistance)
         {
             if ((longitude == 0) || (latitude == 0) || (scale == 0))
             {
@@ -966,15 +1010,36 @@ namespace RadarMonitor
             float mapWidthOffCenter = (float)(xOffset * kmWith1Lon);
             float mapHeightOffCenter = (float)(yOffset * kmWith1Lon);
 
-            OpenGlEchoOverlay.UIWidth = uiWidth;
-            OpenGlEchoOverlay.UIHeight = uiHeight;
-            OpenGlEchoOverlay.MapWidth = mapWidth;
-            OpenGlEchoOverlay.MapHeight = mapHeight;
-            OpenGlEchoOverlay.MapWidthOffCenter = mapWidthOffCenter;
-            OpenGlEchoOverlay.MapHeightOffCenter = mapHeightOffCenter;
+            //OpenGlEchoOverlay.UIWidth = uiWidth;
+            //OpenGlEchoOverlay.UIHeight = uiHeight;
+            //OpenGlEchoOverlay.MapWidth = mapWidth;
+            //OpenGlEchoOverlay.MapHeight = mapHeight;
+            //OpenGlEchoOverlay.MapWidthOffCenter = mapWidthOffCenter;
+            //OpenGlEchoOverlay.MapHeightOffCenter = mapHeightOffCenter;
 
-            var viewModel = (RadarMonitorViewModel)DataContext;
-            OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
+
+            // CreateUpdateRadar: all radars need to be modified
+            RadarInfoModel radarInfo;
+            if (_radarInfos.ContainsKey(radarId))
+            {
+                radarInfo = _radarInfos[radarId];
+            }
+            else
+            {
+                radarInfo = new RadarInfoModel(radarId);
+                _radarInfos.Add(radarId, radarInfo);
+                //var viewModel = (RadarMonitorViewModel)DataContext;
+                //OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
+                
+            }
+            radarInfo.UIWidth = uiWidth;
+            radarInfo.UIHeight = uiHeight;
+            radarInfo.MapWidth = mapWidth;
+            radarInfo.MapHeight = mapHeight;
+            radarInfo.MapWidthOffCenter = mapWidthOffCenter;
+            radarInfo.MapHeightOffCenter = mapHeightOffCenter;
+
+            OpenGlEchoOverlay.CreateUpdateRadar(radarInfo);
         }
         #endregion
 
