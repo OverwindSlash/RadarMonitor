@@ -254,10 +254,10 @@ public partial class ExampleScene : UserControl
             return;
         }
 
-        foreach (var radar in _radarModels)
-        {
-            //var radar = _radarModels[e.RadarID];
-            int idx = (RadarConfig.SECTIONS - 1 - (int)(e.Azimuth / 65536.0f * (float)RadarConfig.SECTIONS) - radar.Value.IndexOffset);
+        //foreach (var radar in _radarModels)
+        //{
+        var radar = _radarModels[e.RadarID];
+        int idx = (RadarConfig.SECTIONS - 1 - (int)(e.Azimuth / 65536.0f * (float)RadarConfig.SECTIONS) - radar.IndexOffset);
             if (idx < 0)
             {
                 idx = idx + RadarConfig.SECTIONS;
@@ -268,16 +268,16 @@ public partial class ExampleScene : UserControl
             }
             e.SectionId = idx;
 
-            if (radar.Value != null)
+            if (radar != null)
             {
 
-                lock (radar.Value.Lock)
+                lock (radar.Lock)
                 {
-                    radar.Value.DataList.Add(e);
+                    radar.DataList.Add(e);
 
                 }
             }
-        }
+        //}
 
     }
     public void CreateUpdateRadar(RadarInfoModel radarInfo)

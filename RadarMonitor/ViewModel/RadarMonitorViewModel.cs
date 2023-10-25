@@ -83,11 +83,11 @@ namespace RadarMonitor.ViewModel
         public event Cat240PackageReceivedOpenGLEventHandler OnCat240PackageReceivedOpenGLEvent;
         public event ViewPointChangedHandler OnViewPointChanged;
 
-        private MulticastClient _client;
+        //private MulticastClient _client;
 
         private Dictionary<int, Cat240DataItems> _lastCat240DataItems = new Dictionary<int, Cat240DataItems>();
-        private List<MulticastClient> _clients = new List<MulticastClient>();
-        private Dictionary<int, RadarSetting> radarSettings= new Dictionary<int, RadarSetting>();
+        private Dictionary<int, MulticastClient> _clients = new Dictionary<int, MulticastClient>();
+        //private Dictionary<int, RadarSetting> radarSettings= new Dictionary<int, RadarSetting>();
 
         #region Properties
         public bool IsEncLoaded
@@ -303,34 +303,45 @@ namespace RadarMonitor.ViewModel
 
         public void CaptureCat240NetworkPackage(int radarId)
         {
-            StopCaptureCat240NetworkPackage();
-
-            _client = new MulticastClient(RadarIpAddress, RadarPort, radarId);
-            _client.SetupMulticast(true);
-            _client.Multicast = $"239.255.0.1";
-            _client.OnCat240Received += OnReceivedCat240DataBlock;
-            _client.Connect();
+            if (_clients.ContainsKey(radarId))
+            {
+                StopCaptureCat240NetworkPackage(radarId);
+            }
+            else
+            {
+                var client = new MulticastClient(RadarIpAddress, RadarPort, radarId);
+                client.SetupMulticast(true);
+                client.Multicast = $"239.255.0.{radarId}";
+                client.OnCat240Received += OnReceivedCat240DataBlock;
+                client.Connect();
+                _clients[radarId] = client;
+            }
 
 
         }
 
-        public void StopCaptureCat240NetworkPackage()
+        public void StopCaptureCat240NetworkPackage(int radarId)
         {
-            if (_client != null)
+            var client= _clients[radarId];
+            if (client != null)
             {
-                _client.Disconnect();
-                _client.Dispose();
+                client.Disconnect();
+                client.Dispose();
 
-                _cartesianData = new int[CartesianSzie, CartesianSzie];
             }
         }
 
         public void DisposeCat240Parser()
         {
-            if (_client != null)
+            foreach (var item in _clients)
             {
-                _client.DisconnectAndStop();
+                var client = item.Value;
+                if (client != null)
+                {
+                    client.DisconnectAndStop();
+                }
             }
+           
         }
 
         public void OnReceivedCat240DataBlock(object sender, Cat240DataBlock data, int radarId)
@@ -360,7 +371,10 @@ namespace RadarMonitor.ViewModel
             if (dataItems.IsSpecChanged(_lastCat240DataItems.GetValueOrDefault(radarId)))
             {
                 OnCat240SpecChanged?.Invoke(this, new Cat240Spec(dataItems),radarId);
-                _lastCat240DataItems[radarId] = dataItems;
+                lock (this)
+                {
+                    _lastCat240DataItems[radarId] = dataItems;
+                }
             }
 
 
@@ -440,53 +454,5 @@ namespace RadarMonitor.ViewModel
                 }
             }
         }
-
-
-
-        // private List<Tuple<int, int, int>> PolarToCartesian(Cat240DataBlock data)
-        // {
-        //     Cat240DataItems items = data.Items;
-        //
-        //     List<Tuple<int, int, int>> updatedPixels = new List<Tuple<int, int, int>>();
-        //
-        //     double angleOffset = 0.1;
-        //
-        //     double angleInRadians = (items.StartAzimuthInDegree + RadarOrientation) * Math.PI / 180.0;
-        //     double angleInRadiansMinusOffset = (items.StartAzimuthInDegree - angleOffset + RadarOrientation) * Math.PI / 180.0;
-        //     double angleInRadiansPlusOffset = (items.StartAzimuthInDegree + angleOffset + RadarOrientation) * Math.PI / 180.0;
-        //
-        //     //UpdatePixelsByAzimuth(angleInRadiansMinusOffset, items, updatedPixels);
-        //     UpdatePixelsByAzimuth(angleInRadians, items, updatedPixels);
-        //     //UpdatePixelsByAzimuth(angleInRadiansPlusOffset, items, updatedPixels);
-        //
-        //     return updatedPixels;
-        // }
-        //
-        // private void UpdatePixelsByAzimuth(double angleInRadians, Cat240DataItems items, List<Tuple<int, int, int>> updatedPixels)
-        // {
-        //     var cosAzi = Math.Cos(angleInRadians);
-        //     var sinAzi = Math.Sin(angleInRadians);
-        //
-        //     double radiusIncrement = CartesianSzie / 2.0 / items.VideoBlocks.Count;
-        //
-        //     double cosAziStep = radiusIncrement * cosAzi;
-        //     double sinAziStep = radiusIncrement * sinAzi;
-        //
-        //     double halfSize = CartesianSzie / 2.0;
-        //
-        //     int index = 0;
-        //     for (int i = 0; i < items.VideoBlocks.Count; i++)
-        //     {
-        //         int x = (int)(halfSize + i * cosAziStep);
-        //         int y = (int)(halfSize + i * sinAziStep);
-        //
-        //         if (x >= 0 && x < CartesianSzie && y >= 0 && y < CartesianSzie)
-        //         {
-        //             int grayValue = (int)items.GetCellData(i);
-        //             _cartesianData[x, y] = grayValue;
-        //             updatedPixels.Add(new Tuple<int, int, int>(x, y, grayValue));
-        //         }
-        //     }
-        // }
     }
 }

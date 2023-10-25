@@ -11,7 +11,7 @@ namespace Silk.WPF.OpenGL
 {
     public class RadarOpenGlModel
     {
-        private float[] DataArray = new float[RadarConfig.SECTIONS * (RadarConfig.CELLS + 1)];
+        private float[] DataArray;
 
         public List<RadarDataReceivedEventArgs> DataList = new List<RadarDataReceivedEventArgs>();
         public object Lock = new object();
@@ -72,6 +72,7 @@ namespace Silk.WPF.OpenGL
             RadarID = radarID;
             TextureUnit = (TextureUnit)(TextureUnit.Texture0 + radarID);
             gl = RenderContext.Gl;
+            DataArray = new float[RadarConfig.SECTIONS * (RadarConfig.CELLS + 1)];
             TextureData = new OpenGLSharp.Texture(gl, DataArray, (uint)(_realCells + 1), RadarConfig.SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit);
 
         }
