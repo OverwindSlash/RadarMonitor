@@ -19,7 +19,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using YamlDotNet.Serialization;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using CheckBox = System.Windows.Controls.CheckBox;
@@ -43,13 +42,6 @@ namespace RadarMonitor
         private double _dpiY;
         private double _dpcX;
         private double _dpcY;
-
-        private WriteableBitmap _bitmap;
-        private byte[] _echoData;
-        private int _echoDataStride;
-
-        //private DispatcherTimer _timer = new DispatcherTimer();
-        private const int RefreshIntervalMs = 30;
 
         private Color _scanlineColor;
         private bool _isFadingEnabled = true;
@@ -136,52 +128,7 @@ namespace RadarMonitor
             viewModel.IsEncLoaded = false;
             viewModel.IsEncDisplayed = false;
         }
-
-        private void InitializeEchoData()
-        {
-            _echoData = new byte[RadarMonitorViewModel.CartesianSzie * RadarMonitorViewModel.CartesianSzie * 4];
-            _echoDataStride = RadarMonitorViewModel.CartesianSzie * 4;
-
-            for (int i = 0; i < _echoData.Length; i += 4)
-            {
-                _echoData[i + 0] = _scanlineColor.B;    // Blue
-                _echoData[i + 1] = _scanlineColor.G;    // Green
-                _echoData[i + 2] = _scanlineColor.R;    // Red
-                _echoData[i + 3] = 0;                   // Alpha
-            }
-
-            _bitmap = new WriteableBitmap(ImageSize, ImageSize, 96, 96, PixelFormats.Bgra32, null);
-            EchoImageOverlay.Source = _bitmap;
-        }
-
-        private void RefreshImageEcho(object? sender, EventArgs e)
-        {
-            var viewModel = (RadarMonitorViewModel)DataContext;
-            if (!viewModel.IsEchoDisplayed)
-            {
-                return;
-            }
-            
-            // 重绘图片雷达回波
-            _bitmap.WritePixels(new Int32Rect(0, 0, ImageSize, ImageSize), _echoData, _echoDataStride, 0);
-            EchoOverlay.InvalidateVisual();
-
-            // Fading
-            if (_isFadingEnabled)
-            {
-                byte fadingStep = (byte)(255 / _fadingInterval / (1000 / RefreshIntervalMs));
-                for (int i = 0; i < _echoData.Length; i += 4)
-                {
-                    byte alpha = _echoData[i + 3];
-                    if (alpha == 0)
-                    {
-                        continue;
-                    }
-
-                    _echoData[i + 3] = (byte)Math.Max((alpha - fadingStep), 0);
-                }
-            }
-        }
+       
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
@@ -375,31 +322,21 @@ namespace RadarMonitor
                 OpenGlEchoOverlay.Visibility = viewModel.IsOpenGlEchoDisplayed ? Visibility.Visible : Visibility.Hidden;
 
 
-                // 抓取 CAT240 网络包
-                //InitializeEchoData();
-                viewModel.CaptureCat240NetworkPackage(settings.CurrentId);
-
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
 
                 // CreateUpdateRadar
                 CreateUpdateRadarInfoBase(settings.CurrentId, settings);
                 TransformOpenGlRadarEcho(settings.CurrentId, viewModel.CurrentEncScale);
-                
-                //// TODO: 如何改善
-                //Task.Factory.StartNew(() =>
-                //{
-                //    // Refresh UI
-                //    viewModel.IsEchoDisplayed = !viewModel.IsEchoDisplayed;
-                //    viewModel.IsEchoDisplayed = !viewModel.IsEchoDisplayed;
 
-                //});
+                // 抓取 CAT240 网络包
+                viewModel.CaptureCat240NetworkPackage(settings.CurrentId);
+
             }
         }
 
         private void OnMainRadarChanged(object sender, RadarSetting radarSettings)
         {
             TbStatusInfo.Text = $"Listening radar on {radarSettings.Ip}:{radarSettings.Port}.";
-            //InitializeEchoData();
         }
 
         private void OnCat240SpecChanged(object sender, Cat240Spec cat240spec, int radarId)
@@ -435,13 +372,8 @@ namespace RadarMonitor
                     var viewModel = (RadarMonitorViewModel)DataContext;
 
                     // OpenGL 回波图像绘制
-                    if (viewModel.IsOpenGlEchoDisplayed)
+                    //if (viewModel.IsOpenGlEchoDisplayed)
                     {
-                        // TODO: 疑问点
-                        //OpenGlEchoOverlay.RealCells = viewModel.CellCount;
-                        //OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
-                        //OpenGlEchoOverlay.RadarMaxDistance = viewModel.MaxDistance;
-                        //OpenGlEchoOverlay.OnReceivedDataBlock(sender, data);
 
                         OpenGlEchoOverlay.OnReceivedRadarData(sender, e);
                     }
@@ -573,19 +505,6 @@ namespace RadarMonitor
             }
         }
 
-        private void DisplayEcho_OnClick(object sender, RoutedEventArgs e)
-        {
-            CheckBox displayEchoCheckBox = (CheckBox)sender;
-
-            if (displayEchoCheckBox.IsChecked.Value)
-            {
-                EchoImageOverlay.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                EchoImageOverlay.Visibility = Visibility.Hidden;
-            }
-        }
 
         private void DisplayRings_OnClick(object sender, RoutedEventArgs e)
         {
@@ -919,29 +838,6 @@ namespace RadarMonitor
             }
         }
 
-        private void TransformRadarEcho(double longitude, double latitude, double scale, double maxDistance)
-        {
-            if ((longitude == 0) || (latitude == 0) || (scale == 0))
-            {
-                return;
-            }
-
-            double kmWith1Cm = (scale / 100000.0);
-            double kmWith1px = kmWith1Cm / _dpcX;
-
-            EchoOverlay.Children.Clear();
-            EchoOverlay.Children.Add(EchoImageOverlay);
-
-            var size = 2* maxDistance / kmWith1px;
-
-            EchoImageOverlay.Width = size;
-            EchoImageOverlay.Height = size;
-
-            var point = BaseMapView.LocationToScreen(new MapPoint(longitude, latitude, SpatialReferences.Wgs84));
-
-            Canvas.SetLeft(EchoImageOverlay, point.X - size / 2.0);
-            Canvas.SetTop(EchoImageOverlay, point.Y - size / 2.0);
-        }
 
         private void TransformOpenGlRadarEcho(int radarId, double scale)
         {
@@ -1007,8 +903,10 @@ namespace RadarMonitor
         private void BtnPresetLocation1_OnClick(object sender, RoutedEventArgs e)
         {
             var viewModel = (RadarMonitorViewModel)DataContext;
-
-            GotoViewPoint(viewModel.GetPresetLocation(0));
+            var position = viewModel.GetPresetLocation(0);
+            GotoViewPoint(position);
+            //viewModel.RadarLatitude= position.Latitude;
+            //viewModel.RadarLongitude= position.Longitude;
         }
 
         private void BtnPresetLocation2_OnClick(object sender, RoutedEventArgs e)

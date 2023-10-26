@@ -307,16 +307,13 @@ namespace RadarMonitor.ViewModel
             {
                 StopCaptureCat240NetworkPackage(radarId);
             }
-            else
-            {
-                var client = new MulticastClient(RadarIpAddress, RadarPort, radarId);
-                client.SetupMulticast(true);
-                client.Multicast = $"239.255.0.{radarId}";
-                client.OnCat240Received += OnReceivedCat240DataBlock;
-                client.Connect();
-                _clients[radarId] = client;
-            }
 
+            var client = new MulticastClient(RadarIpAddress, RadarPort, radarId);
+            _clients[radarId] = client;
+            client.SetupMulticast(true);
+            client.Multicast = $"239.255.0.{radarId}";
+            client.OnCat240Received += OnReceivedCat240DataBlock;
+            client.Connect();
 
         }
 
@@ -348,23 +345,23 @@ namespace RadarMonitor.ViewModel
         {
             var dataItems = data.Items;
 
-            // 避免切换雷达数据源时，因为没能及时处理数据而重发导致的问题
-            if (_lastStartAzimuth == dataItems.StartAzimuthInDegree)
-            {
-                return;
-            }
+            //// 避免切换雷达数据源时，因为没能及时处理数据而重发导致的问题
+            //if (_lastStartAzimuth == dataItems.StartAzimuthInDegree)
+            //{
+            //    return;
+            //}
 
-            // 同一雷达每个数据包都会变的信息
-            StartAzimuth = dataItems.StartAzimuthInDegree;
-            EndAzimuth = dataItems.EndAzimuthInDegree;
-            StartRange = (int)dataItems.StartRange;
+            //// 同一雷达每个数据包都会变的信息
+            //StartAzimuth = dataItems.StartAzimuthInDegree;
+            //EndAzimuth = dataItems.EndAzimuthInDegree;
+            //StartRange = (int)dataItems.StartRange;
 
-            CellCompression = dataItems.IsDataCompressed;
-            CellDuration = (int)dataItems.CellDuration;
-            CellResolution = dataItems.VideoResolution;
-            CellCount = (int)dataItems.ValidCellsInDataBlock;
-            VideoBlockCount = (int)dataItems.ValidCellsInDataBlock;
-            MaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * 300000 / 2 * dataItems.ValidCellsInDataBlock);
+            //CellCompression = dataItems.IsDataCompressed;
+            //CellDuration = (int)dataItems.CellDuration;
+            //CellResolution = dataItems.VideoResolution;
+            //CellCount = (int)dataItems.ValidCellsInDataBlock;
+            //VideoBlockCount = (int)dataItems.ValidCellsInDataBlock;
+            //MaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * 300000 / 2 * dataItems.ValidCellsInDataBlock);
 
             // TODO: 疑问点
             // 同一雷达每个数据包基本不变的信息
@@ -378,9 +375,7 @@ namespace RadarMonitor.ViewModel
             }
 
 
-            _lastStartAzimuth = StartAzimuth;
-
-            //var updatedPixels = PolarToCartesian(data);
+            //_lastStartAzimuth = StartAzimuth;
 
             List<float> DataArr = new List<float>((int)CellCount + 1);
             var t = DateTime.Now;

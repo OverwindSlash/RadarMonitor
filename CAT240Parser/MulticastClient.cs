@@ -62,7 +62,7 @@ namespace CAT240Parser
 
             //byte[] data=new byte[8192]; 
             //buffer.CopyTo(data,0);
-            
+
             ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
             {
                 //double lastAzimuth = 0.0;
@@ -73,7 +73,9 @@ namespace CAT240Parser
 
                 //if (dataBlock.Items.StartAzimuth != lastAzimuth)
                 //{
-                    OnCat240Received?.Invoke(this, dataBlock, _radarId);
+                //Trace.TraceInformation($"{_radarId}");
+
+                OnCat240Received?.Invoke(this, dataBlock, _radarId);
                 //    lastAzimuth = dataBlock.Items.StartAzimuth;
                 //}
             }));

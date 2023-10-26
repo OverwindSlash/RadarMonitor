@@ -42,9 +42,9 @@
             <sampleGL:ExampleScene Name="OpenGlEchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False" Visibility="Hidden"/>
            
             <Canvas Name="RingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
-            <Canvas Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False">
+            <!--<Canvas Name="EchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False">
                 <Image Name="EchoImageOverlay" IsHitTestVisible="False"></Image>
-            </Canvas>
+            </Canvas>-->
             <Canvas Name="ScaleOverlay" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="300" Height="50" Margin="20, 0, 0, 70" IsHitTestVisible="False"></Canvas>
         </Grid>
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Width="120" DockPanel.Dock="Right" Margin="3, 3, 6, 3" ZIndex="1" Background="White">
@@ -122,8 +122,8 @@
                 <StackPanel Orientation="Vertical">
                     <CheckBox Name="DisplayOpenGlEcho" Content="OpenGL Echo" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsOpenGlEchoDisplayed}" 
                               Click="DisplayOpenGlEcho_OnClick"></CheckBox>
-                    <CheckBox Name="DisplayEcho" Content="Image Echo" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsEchoDisplayed}" 
-                              Click="DisplayEcho_OnClick"></CheckBox>
+                    <!--<CheckBox Name="DisplayEcho" Content="Image Echo" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsEchoDisplayed}" 
+                              Click="DisplayEcho_OnClick"></CheckBox>-->
                     <CheckBox Name="DisplayRings" Content="Distance Rings" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsRingsDisplayed}" 
                               Click="DisplayRings_OnClick"></CheckBox>
                     <CheckBox Name="DisplayEnc" Content="Enc" IsEnabled="{Binding Path=IsEncLoaded}" IsChecked="{Binding Path=IsEncDisplayed}" 

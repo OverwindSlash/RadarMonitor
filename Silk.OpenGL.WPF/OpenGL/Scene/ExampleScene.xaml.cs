@@ -245,10 +245,10 @@ public partial class ExampleScene : UserControl
 
     public void OnReceivedRadarData(object sender, RadarDataReceivedEventArgs e)
     {
-        if (!isInitialized)
-        {
-            return;
-        }
+        //if (!isInitialized)
+        //{
+        //    return;
+        //}
         if (radarChanging)
         {
             return;
@@ -256,6 +256,7 @@ public partial class ExampleScene : UserControl
 
         //foreach (var radar in _radarModels)
         //{
+
         var radar = _radarModels[e.RadarID];
         int idx = (RadarConfig.SECTIONS - 1 - (int)(e.Azimuth / 65536.0f * (float)RadarConfig.SECTIONS) - radar.IndexOffset);
             if (idx < 0)
