@@ -13,8 +13,8 @@ namespace Silk.WPF.OpenGL
     {
         private float[] DataArray;
 
-        public List<RadarDataReceivedEventArgs> DataList = new List<RadarDataReceivedEventArgs>();
-        public object Lock = new object();
+        private List<RadarDataReceivedEventArgs> DataList = new List<RadarDataReceivedEventArgs>();
+        private object Lock = new object();
 
         public float MapHeight { get; set; } = 90f;
         public float MapWidth { get; set; } = 160f;
@@ -79,8 +79,57 @@ namespace Silk.WPF.OpenGL
 
         #region opengl
         private GL gl;
-        public TextureUnit TextureUnit = TextureUnit.Texture0;
-        public OpenGLSharp.Texture TextureData;
+        private TextureUnit TextureUnit = TextureUnit.Texture0;
+        private OpenGLSharp.Texture TextureData;
+
+        public void UpdateData(RadarDataReceivedEventArgs e)
+        {
+            int idx = (RadarConfig.SECTIONS - 1 - (int)(e.Azimuth / 65536.0f * (float)RadarConfig.SECTIONS) - IndexOffset);
+            if (idx < 0)
+            {
+                idx = idx + RadarConfig.SECTIONS;
+            }
+            else if (idx > RadarConfig.SECTIONS - 1)
+            {
+                idx -= RadarConfig.SECTIONS;
+            }
+            e.SectionId = idx;
+
+            //Array.Copy( e.DataArray.ToArray(), 0,  DataArray, idx* (RealCells+1),  e.DataArray.Count);
+            lock (Lock)
+            {
+                DataList.Add(e);
+            }
+        }
+
+        public void BindTexture()
+        {
+            TextureData.Bind(TextureUnit);
+        }
+        public unsafe void UpdateTexture()
+        {
+            lock (Lock)
+            {
+                if (DataList.Count > 0)
+                {
+                    foreach (var item in DataList)
+                    {
+                        fixed (void* d = &item.DataArray.ToArray()[0])
+                        {
+                            gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, item.SectionId, (uint)(RealCells + 1), 1, PixelFormat.Red, PixelType.Float, d);
+
+                        }
+                    }
+                    DataList.Clear();
+                }
+            }
+
+
+            //fixed (void* d = &radar.DataArray.ToArray()[0])
+            //{
+            //    gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, (uint)(radar?.RealCells + 1), RadarConfig.SECTIONS, PixelFormat.Red, PixelType.Float, d);
+            //}
+        }
         #endregion
     }
 }

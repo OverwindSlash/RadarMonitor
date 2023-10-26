@@ -138,7 +138,7 @@ public partial class ExampleScene : UserControl
         this.ImageView.Source = _bitmap;
     }
 
-    //private const int fps = 25;
+    //private const int fps = 1;
     //private int unit = 1000 / fps;
     //private int durationMS = 0;
     private unsafe void OnRender(TimeSpan delta)
@@ -165,29 +165,8 @@ public partial class ExampleScene : UserControl
         foreach (var model in _radarModels)
         {
             var radar = model.Value;
-            radar.TextureData.Bind(radar.TextureUnit);
-
-            lock (radar.Lock)
-            {
-                if (radar.DataList.Count>0)
-                {
-                    foreach (var item in radar.DataList)
-                    {
-                        fixed (void* d = &item.DataArray.ToArray()[0])
-                        {
-                            gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, item.SectionId, (uint)(radar?.RealCells + 1), 1, PixelFormat.Red, PixelType.Float, d);
-
-                        }
-                    }
-                    radar.DataList.Clear();
-                }
-            }
-
-            //fixed (void* d = &DataArray.ToArray()[0])
-            //{
-            //    gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, (uint)(_realCells + 1), SECTIONS, PixelFormat.Red, PixelType.Float, d);
-            //}
-
+            radar.BindTexture();
+            radar.UpdateTexture();
 
             Vao.Bind();
             Shader.Use();
@@ -254,31 +233,12 @@ public partial class ExampleScene : UserControl
             return;
         }
 
-        //foreach (var radar in _radarModels)
-        //{
-
         var radar = _radarModels[e.RadarID];
-        int idx = (RadarConfig.SECTIONS - 1 - (int)(e.Azimuth / 65536.0f * (float)RadarConfig.SECTIONS) - radar.IndexOffset);
-            if (idx < 0)
-            {
-                idx = idx + RadarConfig.SECTIONS;
-            }
-            else if (idx > RadarConfig.SECTIONS - 1)
-            {
-                idx -= RadarConfig.SECTIONS;
-            }
-            e.SectionId = idx;
 
-            if (radar != null)
-            {
-
-                lock (radar.Lock)
-                {
-                    radar.DataList.Add(e);
-
-                }
-            }
-        //}
+        if (radar != null)
+        {
+            radar.UpdateData(e);
+        }
 
     }
     public void CreateUpdateRadar(RadarInfoModel radarInfo)
