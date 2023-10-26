@@ -351,17 +351,17 @@ namespace RadarMonitor.ViewModel
             //    return;
             //}
 
-            //// 同一雷达每个数据包都会变的信息
-            //StartAzimuth = dataItems.StartAzimuthInDegree;
-            //EndAzimuth = dataItems.EndAzimuthInDegree;
-            //StartRange = (int)dataItems.StartRange;
+            // 同一雷达每个数据包都会变的信息
+            StartAzimuth = dataItems.StartAzimuthInDegree;
+            EndAzimuth = dataItems.EndAzimuthInDegree;
+            StartRange = (int)dataItems.StartRange;
 
-            //CellCompression = dataItems.IsDataCompressed;
-            //CellDuration = (int)dataItems.CellDuration;
-            //CellResolution = dataItems.VideoResolution;
-            //CellCount = (int)dataItems.ValidCellsInDataBlock;
-            //VideoBlockCount = (int)dataItems.ValidCellsInDataBlock;
-            //MaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * 300000 / 2 * dataItems.ValidCellsInDataBlock);
+            CellCompression = dataItems.IsDataCompressed;
+            CellDuration = (int)dataItems.CellDuration;
+            CellResolution = dataItems.VideoResolution;
+            CellCount = (int)dataItems.ValidCellsInDataBlock;
+            VideoBlockCount = (int)dataItems.ValidCellsInDataBlock;
+            MaxDistance = (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * 300000 / 2 * dataItems.ValidCellsInDataBlock);
 
             // TODO: 疑问点
             // 同一雷达每个数据包基本不变的信息

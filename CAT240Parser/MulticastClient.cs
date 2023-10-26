@@ -21,11 +21,13 @@ namespace CAT240Parser
             ThreadPool.SetMinThreads(1, 1);
             ThreadPool.SetMaxThreads(coreCount, coreCount);
             _radarId = radarId;
+            
         }
 
         public void DisconnectAndStop()
         {
             _stop = true;
+            //LeaveMulticastGroup(Multicast);
             Disconnect();
             while (IsConnected)
                 Thread.Yield();
@@ -45,7 +47,7 @@ namespace CAT240Parser
         protected override void OnDisconnected()
         {
             Trace.WriteLine($"Multicast UDP client disconnected a session with Id {Id}");
-
+            
             // Wait for a while...
             Thread.Sleep(1000);
 
@@ -59,9 +61,6 @@ namespace CAT240Parser
 
         protected override void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
         {
-
-            //byte[] data=new byte[8192]; 
-            //buffer.CopyTo(data,0);
 
             ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
             {
@@ -78,9 +77,9 @@ namespace CAT240Parser
                 OnCat240Received?.Invoke(this, dataBlock, _radarId);
                 //    lastAzimuth = dataBlock.Items.StartAzimuth;
                 //}
+                ReceiveAsync();
             }));
 
-            ReceiveAsync();
         }
 
         protected override void OnError(SocketError error)
