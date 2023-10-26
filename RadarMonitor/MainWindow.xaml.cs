@@ -324,6 +324,7 @@ namespace RadarMonitor
 
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
 
+
                 // CreateUpdateRadar
                 CreateUpdateRadarInfoBase(settings.CurrentId, settings);
                 TransformOpenGlRadarEcho(settings.CurrentId, viewModel.CurrentEncScale);
@@ -351,7 +352,7 @@ namespace RadarMonitor
                     radarInfo.RealCells = (int)cat240spec.ValidCellsInDataBlock;
                     radarInfo.RadarMaxDistance = cat240spec.MaxDistance;
 
-                    //TransformOpenGlRadarEcho(radarId, viewModel.CurrentEncScale);
+                    TransformOpenGlRadarEcho(radarId, viewModel.CurrentEncScale);
 
                 });
             }
@@ -373,10 +374,10 @@ namespace RadarMonitor
 
                     // OpenGL 回波图像绘制
                     //if (viewModel.IsOpenGlEchoDisplayed)
-                    {
+                    //{
 
                         OpenGlEchoOverlay.OnReceivedRadarData(sender, e);
-                    }
+                    //}
                 });
             }
             catch (Exception ex)
