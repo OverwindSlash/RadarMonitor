@@ -62,6 +62,7 @@ namespace RadarMonitor
         private byte _fadingStep;
 
         private readonly bool _encDetailDisplayFlag = false;
+        private Int32Rect _redrawRect;
 
 
         public MainWindow()
@@ -176,6 +177,8 @@ namespace RadarMonitor
             _radarBitmaps.Clear();
             _radarEchoDatas.Clear();
 
+            _redrawRect = new Int32Rect(0, 0, ImageSize, ImageSize);
+
             for (int radarId = 0; radarId < RadarCount; radarId++)
             {
                 // 准备雷达回波数据二维数组
@@ -244,7 +247,6 @@ namespace RadarMonitor
         private void RefreshImageEcho(object? sender, EventArgs e)
         {
             var viewModel = GetViewModel();
-            var redrawRect = new Int32Rect(0, 0, ImageSize, ImageSize);
 
             Task.Run(() =>
             {
@@ -273,7 +275,7 @@ namespace RadarMonitor
 
                         Dispatcher.Invoke(() =>
                         {
-                            _radarBitmaps[radarId].WritePixels(redrawRect, radarEchoData, RadarEchoDataStride, 0);
+                            _radarBitmaps[radarId].WritePixels(_redrawRect, radarEchoData, RadarEchoDataStride, 0);
                             //_echoImageOverlays[radarId].InvalidateVisual();
                         });
                     }
