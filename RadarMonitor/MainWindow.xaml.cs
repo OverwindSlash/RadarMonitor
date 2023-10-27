@@ -29,6 +29,7 @@ using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Point = System.Windows.Point;
 using Window = System.Windows.Window;
 using System.Linq;
+using System.Threading;
 
 namespace RadarMonitor
 {
@@ -243,12 +244,11 @@ namespace RadarMonitor
         private void RefreshImageEcho(object? sender, EventArgs e)
         {
             var viewModel = GetViewModel();
-
             var redrawRect = new Int32Rect(0, 0, ImageSize, ImageSize);
 
-            for (int radarId = 0; radarId < RadarCount; radarId++)
+            Task.Run(() =>
             {
-                Dispatcher.Invoke(() =>
+                for (int radarId = 0; radarId < RadarCount; radarId++)
                 {
                     var radarSetting = viewModel.RadarSettings[radarId];
                     if (radarSetting.IsConnected && radarSetting.IsEchoDisplayed)
@@ -271,11 +271,52 @@ namespace RadarMonitor
                             }
                         }
 
-                        _radarBitmaps[radarId].WritePixels(redrawRect, radarEchoData, RadarEchoDataStride, 0);
-                        _echoImageOverlays[radarId].InvalidateVisual();
+                        Dispatcher.Invoke(() =>
+                        {
+                            _radarBitmaps[radarId].WritePixels(redrawRect, radarEchoData, RadarEchoDataStride, 0);
+                            //_echoImageOverlays[radarId].InvalidateVisual();
+                        });
                     }
-                }, DispatcherPriority.Render);
-            }
+                }
+
+                Dispatcher.Invoke(() =>
+                {
+                    RadarEchoOverlay.InvalidateVisual();
+                });
+            }).ConfigureAwait(true); // 使用ConfigureAwait(true)确保在UI线程上继续执行
+
+            // Dispatcher.Invoke(() =>
+            // {
+            //     for (int radarId = 0; radarId < RadarCount; radarId++)
+            //     {
+            //         var radarSetting = viewModel.RadarSettings[radarId];
+            //         if (radarSetting.IsConnected && radarSetting.IsEchoDisplayed)
+            //         {
+            //             // 重绘图片雷达回波
+            //             var radarEchoData = _radarEchoDatas[radarId];
+            //             var cartesianData = viewModel.RadarCartesianDatas[radarId];
+            //             for (int x = 0; x < cartesianData.GetLength(0) - 1; x++)
+            //             {
+            //                 for (int y = 0; y < cartesianData.GetLength(1) - 1; y++)
+            //                 {
+            //                     int index = y * RadarEchoDataStride + x * 4;
+            //
+            //                     radarEchoData[index + 3] = (byte)cartesianData[x, y]; // Update Alpha
+            //
+            //                     if (_isFadingEnabled)
+            //                     {
+            //                         cartesianData[x, y] = Math.Max(cartesianData[x, y] - _fadingStep, 0);
+            //                     }
+            //                 }
+            //             }
+            //
+            //             _radarBitmaps[radarId].WritePixels(redrawRect, radarEchoData, RadarEchoDataStride, 0);
+            //             //_echoImageOverlays[radarId].InvalidateVisual();
+            //         }
+            //     }
+            // }, DispatcherPriority.Render);
+
+            //RadarEchoOverlay.InvalidateVisual();
         }
 
         #region Load ENC
@@ -714,7 +755,7 @@ namespace RadarMonitor
             RedrawRadarRings(viewModel);
         }
 
-        
+
 
         private void CbRadar2Echo_OnClick(object sender, RoutedEventArgs e)
         {
