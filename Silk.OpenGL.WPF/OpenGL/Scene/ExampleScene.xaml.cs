@@ -71,7 +71,7 @@ public partial class ExampleScene : UserControl
         }
     }
 
-    private int fade_duration = 5;
+    private int fade_duration = 10;
 
     public int FadeDuration
     {
@@ -255,6 +255,8 @@ public partial class ExampleScene : UserControl
             radar.MapHeightOffCenter = radarInfo.MapHeightOffCenter;
             radar.RadarOrientation = radarInfo.RadarOrientation;
             radar.RadarMaxDistance = radarInfo.RadarMaxDistance;
+            radar.RealCells = radarInfo.RealCells;
+
         }
         else
         {

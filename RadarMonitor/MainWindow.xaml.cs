@@ -398,19 +398,6 @@ namespace RadarMonitor
                 var config = (DisplayConfigViewModel)configDialog.DataContext;
 
                 _scanlineColor = config.ScanlineColor;
-                // Change Color
-                //for (int i = 0; i < _echoData.Length; i += 4)
-                //{
-                //    byte alpha = _echoData[i + 3];
-                //    if (alpha == 0)
-                //    {
-                //        continue;
-                //    }
-
-                //    _echoData[i + 0] = _scanlineColor.B;
-                //    _echoData[i + 1] = _scanlineColor.G;
-                //    _echoData[i + 2] = _scanlineColor.R;
-                //}
 
                 _isFadingEnabled = config.IsFadingEnabled;
                 _fadingInterval = config.FadingInterval;
@@ -418,8 +405,17 @@ namespace RadarMonitor
             }
         }
 
+        //static private int viewPointChangedFlag = 0;
+        //const int viewPointChangedInterval = 5;
+
         private void BaseMapView_OnViewpointChanged(object? sender, EventArgs e)
         {
+            //viewPointChangedFlag++;
+            //if (viewPointChangedFlag % viewPointChangedInterval != 0)
+            //{
+            //    return;
+            //}
+
             MapView mapView = (MapView)sender;
             var viewModel = (RadarMonitorViewModel)DataContext;
             viewModel.CurrentEncScale = mapView.MapScale;
@@ -432,7 +428,6 @@ namespace RadarMonitor
             if (viewModel.IsEchoDisplayed || viewModel.IsOpenGlEchoDisplayed)
             {
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
-                //TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
                 foreach (var radar in _radarInfos)
                 {
                     TransformOpenGlRadarEcho(radar.Value.RadarID, viewModel.CurrentEncScale);
@@ -454,10 +449,10 @@ namespace RadarMonitor
             if (viewModel.IsEchoDisplayed || viewModel.IsOpenGlEchoDisplayed)
             {
                 DrawRings(viewModel.RadarLongitude, viewModel.RadarLatitude);
-                //TransformRadarEcho(viewModel.RadarLongitude, viewModel.RadarLatitude, viewModel.CurrentEncScale, viewModel.MaxDistance);
                 foreach (var radar in _radarInfos)
                 {
                     TransformOpenGlRadarEcho(radar.Value.RadarID, viewModel.CurrentEncScale);
+
                 }
             }
         }
@@ -906,36 +901,43 @@ namespace RadarMonitor
             var viewModel = (RadarMonitorViewModel)DataContext;
             var position = viewModel.GetPresetLocation(0);
             GotoViewPoint(position);
-            //viewModel.RadarLatitude= position.Latitude;
-            //viewModel.RadarLongitude= position.Longitude;
+            DrawRings(position.Longitude, position.Latitude);
         }
 
         private void BtnPresetLocation2_OnClick(object sender, RoutedEventArgs e)
         {
             var viewModel = (RadarMonitorViewModel)DataContext;
 
-            GotoViewPoint(viewModel.GetPresetLocation(1));
+            var position = viewModel.GetPresetLocation(1);
+            GotoViewPoint(position);
+            DrawRings(position.Longitude, position.Latitude);
         }
 
         private void BtnPresetLocation3_OnClick(object sender, RoutedEventArgs e)
         {
             var viewModel = (RadarMonitorViewModel)DataContext;
 
-            GotoViewPoint(viewModel.GetPresetLocation(2));
+            var position = viewModel.GetPresetLocation(2);
+            GotoViewPoint(position);
+            DrawRings(position.Longitude, position.Latitude);
         }
 
         private void BtnPresetLocation4_OnClick(object sender, RoutedEventArgs e)
         {
             var viewModel = (RadarMonitorViewModel)DataContext;
 
-            GotoViewPoint(viewModel.GetPresetLocation(3));
+            var position = viewModel.GetPresetLocation(3);
+            GotoViewPoint(position);
+            DrawRings(position.Longitude, position.Latitude);
         }
 
         private void BtnPresetLocation5_OnClick(object sender, RoutedEventArgs e)
         {
             var viewModel = (RadarMonitorViewModel)DataContext;
 
-            GotoViewPoint(viewModel.GetPresetLocation(4));
+            var position = viewModel.GetPresetLocation(4);
+            GotoViewPoint(position);
+            DrawRings(position.Longitude, position.Latitude);
         }
         #endregion
 
