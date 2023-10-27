@@ -44,8 +44,6 @@ namespace RadarMonitor
 
         private const int RadarCount = 5;
 
-        private readonly List<Canvas> _ringsOverlays = new();
-        private readonly List<Canvas> _echoOverlays = new();
         private readonly List<Image> _echoImageOverlays = new();
 
         private const int ImageSize = RadarMonitorViewModel.CartesianSize;
@@ -55,7 +53,7 @@ namespace RadarMonitor
         private List<byte[]> _radarEchoDatas = new();
 
         private readonly DispatcherTimer _timer = new();
-        private const int RefreshIntervalMs = 16;   // 60 FPS
+        private const int RefreshIntervalMs = 33;   // 30 FPS
 
         private Color _echoColor = DisplayConfigDialog.DefaultImageEchoColor;
         private bool _isFadingEnabled = true;
@@ -164,23 +162,11 @@ namespace RadarMonitor
 
         private void InitializeMapOverlays()
         {
-            _ringsOverlays.Add(Radar1RingsOverlay);
-            _ringsOverlays.Add(Radar2RingsOverlay);
-            _ringsOverlays.Add(Radar3RingsOverlay);
-            _ringsOverlays.Add(Radar4RingsOverlay);
-            _ringsOverlays.Add(Radar5RingsOverlay);
-
-            _echoOverlays.Add(Radar1EchoOverlay);
-            _echoOverlays.Add(Radar2EchoOverlay);
-            _echoOverlays.Add(Radar3EchoOverlay);
-            _echoOverlays.Add(Radar4EchoOverlay);
-            _echoOverlays.Add(Radar5EchoOverlay);
-
-            _echoImageOverlays.Add(Radar1EchoImageOverlay);
-            _echoImageOverlays.Add(Radar2EchoImageOverlay);
-            _echoImageOverlays.Add(Radar3EchoImageOverlay);
-            _echoImageOverlays.Add(Radar4EchoImageOverlay);
-            _echoImageOverlays.Add(Radar5EchoImageOverlay);
+            _echoImageOverlays.Add(Radar1EchoImage);
+            _echoImageOverlays.Add(Radar2EchoImage);
+            _echoImageOverlays.Add(Radar3EchoImage);
+            _echoImageOverlays.Add(Radar4EchoImage);
+            _echoImageOverlays.Add(Radar5EchoImage);
         }
 
         // TODO: 多雷达支持
@@ -262,35 +248,33 @@ namespace RadarMonitor
 
             for (int radarId = 0; radarId < RadarCount; radarId++)
             {
-                Parallel.Invoke(() =>
+                Dispatcher.Invoke(() =>
                 {
                     var radarSetting = viewModel.RadarSettings[radarId];
-                    if (!radarSetting.IsConnected || !radarSetting.IsEchoDisplayed)
+                    if (radarSetting.IsConnected && radarSetting.IsEchoDisplayed)
                     {
-                        return;
-                    }
-
-                    // 重绘图片雷达回波
-                    var radarEchoData = _radarEchoDatas[radarId];
-                    var cartesianData = viewModel.RadarCartesianDatas[radarId];
-                    for (int x = 0; x < cartesianData.GetLength(0) - 1; x++)
-                    {
-                        for (int y = 0; y < cartesianData.GetLength(1) - 1; y++)
+                        // 重绘图片雷达回波
+                        var radarEchoData = _radarEchoDatas[radarId];
+                        var cartesianData = viewModel.RadarCartesianDatas[radarId];
+                        for (int x = 0; x < cartesianData.GetLength(0) - 1; x++)
                         {
-                            int index = y * RadarEchoDataStride + x * 4;
-
-                            radarEchoData[index + 3] = (byte)cartesianData[x, y]; // Update Alpha
-
-                            if (_isFadingEnabled)
+                            for (int y = 0; y < cartesianData.GetLength(1) - 1; y++)
                             {
-                                cartesianData[x, y] = Math.Max(cartesianData[x, y] - _fadingStep, 0);
+                                int index = y * RadarEchoDataStride + x * 4;
+
+                                radarEchoData[index + 3] = (byte)cartesianData[x, y]; // Update Alpha
+
+                                if (_isFadingEnabled)
+                                {
+                                    cartesianData[x, y] = Math.Max(cartesianData[x, y] - _fadingStep, 0);
+                                }
                             }
                         }
-                    }
 
-                    _radarBitmaps[radarId].WritePixels(redrawRect, radarEchoData, RadarEchoDataStride, 0);
-                    _echoImageOverlays[radarId].InvalidateVisual();
-                });
+                        _radarBitmaps[radarId].WritePixels(redrawRect, radarEchoData, RadarEchoDataStride, 0);
+                        _echoImageOverlays[radarId].InvalidateVisual();
+                    }
+                }, DispatcherPriority.Render);
             }
         }
 
@@ -529,6 +513,7 @@ namespace RadarMonitor
                     var radarSetting = viewModel.RadarSettings[radarId];
 
                     RelocateAndScaleRadarEcho(radarId, radarSetting, viewModel.EncScale);
+                    RedrawRadarRings(viewModel);
 
                     // TODO: 疑问点
                     // OpenGlEchoOverlay.RadarOrientation = viewModel.RadarOrientation;
@@ -585,6 +570,23 @@ namespace RadarMonitor
             }
 
             RefreshRadarEcho(viewModel);
+            RedrawRadarRings(viewModel);
+        }
+
+        private void RedrawRadarRings(RadarMonitorViewModel viewModel)
+        {
+            RadarRingsOverlay.Children.Clear();
+
+            int radarId = 0;
+            foreach (var radarSetting in viewModel.RadarSettings)
+            {
+                if (radarSetting.IsConnected && radarSetting.IsRingsDisplayed)
+                {
+                    DrawRings(radarId, radarSetting.RadarLongitude, radarSetting.RadarLatitude);
+                }
+
+                radarId++;
+            }
         }
 
         private void RefreshRadarEcho(RadarMonitorViewModel viewModel)
@@ -601,11 +603,6 @@ namespace RadarMonitor
             if (!radarSetting.IsConnected)
             {
                 return;
-            }
-
-            if (radarSetting.IsRingsDisplayed)
-            {
-                DrawRings(radarId, radarSetting.RadarLongitude, radarSetting.RadarLatitude);
             }
 
             if (radarSetting.IsEchoDisplayed)
@@ -633,6 +630,7 @@ namespace RadarMonitor
             }
 
             RefreshRadarEcho(viewModel);
+            RedrawRadarRings(viewModel);
         }
 
         private void ConfigDisplay_OnClick(object sender, RoutedEventArgs e)
@@ -691,11 +689,11 @@ namespace RadarMonitor
                 var radarSetting = viewModel.RadarSettings[0];
                 TransformRadarEcho(0, radarSetting.RadarLongitude, radarSetting.RadarLatitude,
                     radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
-                Radar1EchoImageOverlay.Visibility = Visibility.Visible;
+                Radar1EchoImage.Visibility = Visibility.Visible;
             }
             else
             {
-                Radar1EchoImageOverlay.Visibility = Visibility.Hidden;
+                Radar1EchoImage.Visibility = Visibility.Hidden;
             }
         }
 
@@ -703,17 +701,20 @@ namespace RadarMonitor
         {
             CheckBox displayRingsCheckBox = (CheckBox)sender;
 
+            var viewModel = GetViewModel();
             if (displayRingsCheckBox.IsChecked.Value)
             {
-                var viewModel = GetViewModel();
-                DrawRings(0, viewModel.RadarSettings[0].RadarLongitude, viewModel.RadarSettings[0].RadarLatitude);
-                Radar1RingsOverlay.Visibility = Visibility.Visible;
+                viewModel.RadarSettings[0].IsRingsDisplayed = true;
             }
             else
             {
-                Radar1RingsOverlay.Visibility = Visibility.Hidden;
+                viewModel.RadarSettings[0].IsRingsDisplayed = false;
             }
+
+            RedrawRadarRings(viewModel);
         }
+
+        
 
         private void CbRadar2Echo_OnClick(object sender, RoutedEventArgs e)
         {
@@ -725,11 +726,11 @@ namespace RadarMonitor
                 var radarSetting = viewModel.RadarSettings[1];
                 TransformRadarEcho(1, radarSetting.RadarLongitude, radarSetting.RadarLatitude,
                     radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
-                Radar2EchoImageOverlay.Visibility = Visibility.Visible;
+                Radar2EchoImage.Visibility = Visibility.Visible;
             }
             else
             {
-                Radar2EchoImageOverlay.Visibility = Visibility.Hidden;
+                Radar2EchoImage.Visibility = Visibility.Hidden;
             }
         }
 
@@ -737,16 +738,17 @@ namespace RadarMonitor
         {
             CheckBox displayRingsCheckBox = (CheckBox)sender;
 
+            var viewModel = GetViewModel();
             if (displayRingsCheckBox.IsChecked.Value)
             {
-                var viewModel = GetViewModel();
-                DrawRings(1, viewModel.RadarSettings[1].RadarLongitude, viewModel.RadarSettings[1].RadarLatitude);
-                Radar2RingsOverlay.Visibility = Visibility.Visible;
+                viewModel.RadarSettings[1].IsRingsDisplayed = true;
             }
             else
             {
-                Radar2RingsOverlay.Visibility = Visibility.Hidden;
+                viewModel.RadarSettings[1].IsRingsDisplayed = false;
             }
+
+            RedrawRadarRings(viewModel);
         }
 
         private void CbRadar3Echo_OnClick(object sender, RoutedEventArgs e)
@@ -759,11 +761,11 @@ namespace RadarMonitor
                 var radarSetting = viewModel.RadarSettings[2];
                 TransformRadarEcho(2, radarSetting.RadarLongitude, radarSetting.RadarLatitude,
                     radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
-                Radar3EchoImageOverlay.Visibility = Visibility.Visible;
+                Radar3EchoImage.Visibility = Visibility.Visible;
             }
             else
             {
-                Radar3EchoImageOverlay.Visibility = Visibility.Hidden;
+                Radar3EchoImage.Visibility = Visibility.Hidden;
             }
         }
 
@@ -771,16 +773,17 @@ namespace RadarMonitor
         {
             CheckBox displayRingsCheckBox = (CheckBox)sender;
 
+            var viewModel = GetViewModel();
             if (displayRingsCheckBox.IsChecked.Value)
             {
-                var viewModel = GetViewModel();
-                DrawRings(2, viewModel.RadarSettings[2].RadarLongitude, viewModel.RadarSettings[2].RadarLatitude);
-                Radar3RingsOverlay.Visibility = Visibility.Visible;
+                viewModel.RadarSettings[2].IsRingsDisplayed = true;
             }
             else
             {
-                Radar3RingsOverlay.Visibility = Visibility.Hidden;
+                viewModel.RadarSettings[2].IsRingsDisplayed = false;
             }
+
+            RedrawRadarRings(viewModel);
         }
 
         private void CbRadar4Echo_OnClick(object sender, RoutedEventArgs e)
@@ -793,11 +796,11 @@ namespace RadarMonitor
                 var radarSetting = viewModel.RadarSettings[3];
                 TransformRadarEcho(3, radarSetting.RadarLongitude, radarSetting.RadarLatitude,
                     radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
-                Radar4EchoImageOverlay.Visibility = Visibility.Visible;
+                Radar4EchoImage.Visibility = Visibility.Visible;
             }
             else
             {
-                Radar4EchoImageOverlay.Visibility = Visibility.Hidden;
+                Radar4EchoImage.Visibility = Visibility.Hidden;
             }
         }
 
@@ -805,16 +808,17 @@ namespace RadarMonitor
         {
             CheckBox displayRingsCheckBox = (CheckBox)sender;
 
+            var viewModel = GetViewModel();
             if (displayRingsCheckBox.IsChecked.Value)
             {
-                var viewModel = GetViewModel();
-                DrawRings(3, viewModel.RadarSettings[3].RadarLongitude, viewModel.RadarSettings[3].RadarLatitude);
-                Radar4RingsOverlay.Visibility = Visibility.Visible;
+                viewModel.RadarSettings[3].IsRingsDisplayed = true;
             }
             else
             {
-                Radar4RingsOverlay.Visibility = Visibility.Hidden;
+                viewModel.RadarSettings[3].IsRingsDisplayed = false;
             }
+
+            RedrawRadarRings(viewModel);
         }
 
         private void CbRadar5Echo_OnClick(object sender, RoutedEventArgs e)
@@ -827,12 +831,12 @@ namespace RadarMonitor
                 var radarSetting = viewModel.RadarSettings[4];
                 TransformRadarEcho(4, radarSetting.RadarLongitude, radarSetting.RadarLatitude,
                     radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
-                Radar5EchoImageOverlay.Visibility = Visibility.Visible;
+                Radar5EchoImage.Visibility = Visibility.Visible;
 
             }
             else
             {
-                Radar5EchoImageOverlay.Visibility = Visibility.Hidden;
+                Radar5EchoImage.Visibility = Visibility.Hidden;
             }
         }
 
@@ -840,16 +844,17 @@ namespace RadarMonitor
         {
             CheckBox displayRingsCheckBox = (CheckBox)sender;
 
+            var viewModel = GetViewModel();
             if (displayRingsCheckBox.IsChecked.Value)
             {
-                var viewModel = GetViewModel();
-                DrawRings(4, viewModel.RadarSettings[4].RadarLongitude, viewModel.RadarSettings[4].RadarLatitude);
-                Radar5RingsOverlay.Visibility = Visibility.Visible;
+                viewModel.RadarSettings[4].IsRingsDisplayed = true;
             }
             else
             {
-                Radar5RingsOverlay.Visibility = Visibility.Hidden;
+                viewModel.RadarSettings[4].IsRingsDisplayed = false;
             }
+
+            RedrawRadarRings(viewModel);
         }
 
         private void DisplayOpenGlEcho_OnClick(object sender, RoutedEventArgs e)
@@ -1056,9 +1061,10 @@ namespace RadarMonitor
 
         private void DrawRings(int radarId, double longitude, double latitude)
         {
-            Canvas ringsOverlay = _ringsOverlays[radarId];
+            //Canvas ringsOverlay = _ringsOverlays[radarId];
+            Canvas ringsOverlay = RadarRingsOverlay;
 
-            ringsOverlay.Children.Clear();
+            //ringsOverlay.Children.Clear();
 
             Brush ringBrush = new SolidColorBrush(Colors.Chartreuse);   // 距离环的颜色
             DoubleCollection dashArray = new DoubleCollection(new double[] { 2, 4 });
@@ -1136,9 +1142,9 @@ namespace RadarMonitor
 
             var imageOverlay = _echoImageOverlays[radarId];
 
-            var echoOverlay = _echoOverlays[radarId];
-            echoOverlay.Children.Clear();
-            echoOverlay.Children.Add(imageOverlay);
+            var echoOverlay = RadarEchoOverlay;
+            //echoOverlay.Children.Clear();
+            //echoOverlay.Children.Add(imageOverlay);
 
             var size = 2 * radarMaxDistance / kmWith1px;
 
