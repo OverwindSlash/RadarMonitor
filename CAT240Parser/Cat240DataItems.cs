@@ -82,7 +82,7 @@ namespace CAT240Parser
             // End azimuth, 2 bytes, 单位：360/2^16
             EndAzimuth = BitOperation.Get2BytesBigEndian(buffer, offset);
             offset += 2;
-            EndAzimuthInDegree = EndAzimuth * AzimuthUnit;
+            //EndAzimuthInDegree = EndAzimuth * AzimuthUnit;
 
             // Start range, 4 bytes
             StartRange = BitOperation.Get4BytesBigEndian(buffer, offset);
@@ -99,7 +99,28 @@ namespace CAT240Parser
                 IsDataCompressed = (compress_flag == 0b10000000);
 
                 byte resolution_flag = buffer[offset++];
-                VideoResolution = (byte)Math.Pow(2.0, resolution_flag - 1);
+                //VideoResolution = (byte)Math.Pow(2.0, resolution_flag - 1);
+                switch (resolution_flag)
+                {
+                    case 1:
+                        VideoResolution = 1;
+                        break;
+                    case 2:
+                        VideoResolution = 2;
+                        break;
+                    case 3:
+                        VideoResolution = 4;
+                        break;
+                    case 4:
+                        VideoResolution = 8;
+                        break;
+                    case 5:
+                        VideoResolution = 16;
+                        break;
+                    case 6:
+                        VideoResolution = 32;
+                        break;
+                }
             }
 
             // Valid video bytes and cells
@@ -138,7 +159,11 @@ namespace CAT240Parser
                 ArraySegment<byte> segment = new ArraySegment<byte>(buffer, offset, VideoBlockLength);
                 offset += VideoBlockLength;
 
-                VideoBlocks.AddRange(segment.ToList());
+                //VideoBlocks.AddRange(segment.ToList());
+                for (int j = 0; j < VideoBlockLength; j++)
+                {
+                    VideoBlocks.Add(segment.Array[segment.Offset + j]);
+                }
             }
 
             // Time of day, 3 bytes, 单位 1/128 s

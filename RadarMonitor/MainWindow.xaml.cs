@@ -276,15 +276,15 @@ namespace RadarMonitor
                         Dispatcher.Invoke(() =>
                         {
                             _radarBitmaps[radarId].WritePixels(_redrawRect, radarEchoData, RadarEchoDataStride, 0);
-                            //_echoImageOverlays[radarId].InvalidateVisual();
+                            _echoImageOverlays[radarId].InvalidateVisual();
                         });
                     }
                 }
 
-                Dispatcher.Invoke(() =>
-                {
-                    RadarEchoOverlay.InvalidateVisual();
-                });
+                // Dispatcher.Invoke(() =>
+                // {
+                //     RadarEchoOverlay.InvalidateVisual();
+                // });
             }).ConfigureAwait(true); // 使用ConfigureAwait(true)确保在UI线程上继续执行
 
             // Dispatcher.Invoke(() =>
