@@ -86,6 +86,12 @@ namespace CAT240Parser
                     _dataBlockIds.Clear();
                 }
 
+                // TODO: 后续看是否需要这样的性能优化
+                if (_dataBlockCount % 2 == 0)
+                {
+                    return;
+                }
+                
                 if (_dataBlockIds.ContainsKey(dataBlock.Items.MessageIndex))
                 {
                     return;

@@ -660,7 +660,8 @@ namespace RadarMonitor.ViewModel
             double cosAziStep = _radarRadiusIncrements[radarId] * cosAzi;
             double sinAziStep = _radarRadiusIncrements[radarId] * sinAzi;
 
-            for (int i = 0; i < items.VideoBlocks.Count; i += _radarScaledSteps[radarId])
+            // TODO: 后续看是否需要这样的性能优化
+            for (int i = 0; i < items.VideoBlocks.Count; i += _radarScaledSteps[radarId] * 2)
             {
                 int x = (int)(HalfCartesianSize + i * cosAziStep);
                 int y = (int)(HalfCartesianSize + i * sinAziStep);

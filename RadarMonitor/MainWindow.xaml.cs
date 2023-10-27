@@ -28,6 +28,7 @@ using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Point = System.Windows.Point;
 using Window = System.Windows.Window;
+using System.Linq;
 
 namespace RadarMonitor
 {
@@ -80,7 +81,7 @@ namespace RadarMonitor
 
             // 初始化图片回波显示后台一维数组
             InitializeEchoData();
-            
+
             // 初始化刷新计时器
             InitializeRedrawTimer();
 
@@ -209,7 +210,7 @@ namespace RadarMonitor
 
             _fadingStep = (byte)Math.Max(1, 255 / _fadingInterval / (1000 / RefreshIntervalMs));
         }
-        
+
         private void InitializeRedrawTimer()
         {
             _timer.Interval = TimeSpan.FromMilliseconds(RefreshIntervalMs);
@@ -257,14 +258,16 @@ namespace RadarMonitor
         {
             var viewModel = GetViewModel();
 
-            Dispatcher.Invoke(() =>
+            var redrawRect = new Int32Rect(0, 0, ImageSize, ImageSize);
+
+            for (int radarId = 0; radarId < RadarCount; radarId++)
             {
-                for (int radarId = 0; radarId < RadarCount; radarId++)
+                Parallel.Invoke(() =>
                 {
                     var radarSetting = viewModel.RadarSettings[radarId];
                     if (!radarSetting.IsConnected || !radarSetting.IsEchoDisplayed)
                     {
-                        continue;
+                        return;
                     }
 
                     // 重绘图片雷达回波
@@ -285,13 +288,12 @@ namespace RadarMonitor
                         }
                     }
 
-                    _radarBitmaps[radarId].WritePixels(new Int32Rect(0, 0, ImageSize, ImageSize), radarEchoData,
-                        RadarEchoDataStride, 0);
+                    _radarBitmaps[radarId].WritePixels(redrawRect, radarEchoData, RadarEchoDataStride, 0);
                     _echoImageOverlays[radarId].InvalidateVisual();
-                }
-            }, DispatcherPriority.Render);
+                });
+            }
         }
-        
+
         #region Load ENC
         private async void LoadEnc_OnClick(object sender, RoutedEventArgs e)
         {
@@ -573,7 +575,7 @@ namespace RadarMonitor
             {
                 return;
             }
-            
+
             var viewModel = GetViewModel();
             viewModel.RecordEncViewPoint(viewpoint);
 
@@ -826,7 +828,7 @@ namespace RadarMonitor
                 TransformRadarEcho(4, radarSetting.RadarLongitude, radarSetting.RadarLatitude,
                     radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, viewModel.EncScale);
                 Radar5EchoImageOverlay.Visibility = Visibility.Visible;
-                
+
             }
             else
             {
@@ -1068,7 +1070,7 @@ namespace RadarMonitor
             double radarY = point.Y;
 
             double maxDistance = Math.Max(ringsOverlay.ActualWidth, ringsOverlay.ActualHeight) / 2;
-            
+
             // 绘制雷达点
             double radarPointRadius = 1.0;
             Ellipse center = new Ellipse
