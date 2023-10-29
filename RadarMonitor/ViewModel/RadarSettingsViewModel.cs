@@ -98,6 +98,8 @@ namespace RadarMonitor.ViewModel
                 _currentEditRadarSetting.RadarLongitude = value;
                 OnPropertyChanged("Longitude");
                 OnPropertyChanged("IsRadarSettingValid");
+
+                IsLongitudeValid = LongitudeValidationRule.IsValidLongitude(value.ToString());
             }
         }
 
@@ -118,6 +120,8 @@ namespace RadarMonitor.ViewModel
                 _currentEditRadarSetting.RadarLatitude = value;
                 OnPropertyChanged("Latitude");
                 OnPropertyChanged("IsRadarSettingValid");
+
+                IsLatitudeValid = LatitudeValidationRule.IsValidLatitude(value.ToString());
             }
         }
 
@@ -138,6 +142,8 @@ namespace RadarMonitor.ViewModel
                 _currentEditRadarSetting.RadarOrientation = value;
                 OnPropertyChanged("Orientation");
                 OnPropertyChanged("IsRadarSettingValid");
+
+                IsOrientationValid = OrientationValidationRule.IsValidOrientation(value.ToString());
             }
         }
 
@@ -158,6 +164,8 @@ namespace RadarMonitor.ViewModel
                 _currentEditRadarSetting.RadarMaxDistance = value;
                 OnPropertyChanged("MaxDistance");
                 OnPropertyChanged("IsRadarSettingValid");
+
+                IsMaxDistanceValid = MaxDistanceValidationRule.IsValidMaxDistance(value.ToString());
             }
         }
 
@@ -179,6 +187,8 @@ namespace RadarMonitor.ViewModel
                 _currentEditRadarSetting.RadarIpAddress = ip;
                 OnPropertyChanged("IpPart1");
                 OnPropertyChanged("IsRadarSettingValid");
+
+                IsIpPart1Valid = IpPart1ValidationRule.IsValidIpPart(value);
             }
         }
 
@@ -200,6 +210,8 @@ namespace RadarMonitor.ViewModel
                 _currentEditRadarSetting.RadarIpAddress = ip;
                 OnPropertyChanged("IpPart2");
                 OnPropertyChanged("IsRadarSettingValid");
+
+                IsIpPart2Valid = IpPart1ValidationRule.IsValidIpPart(value);
             }
         }
 
@@ -221,6 +233,8 @@ namespace RadarMonitor.ViewModel
                 _currentEditRadarSetting.RadarIpAddress = ip;
                 OnPropertyChanged("IpPart3");
                 OnPropertyChanged("IsRadarSettingValid");
+
+                IsIpPart3Valid = IpPart1ValidationRule.IsValidIpPart(value);
             }
         }
 
@@ -242,6 +256,8 @@ namespace RadarMonitor.ViewModel
                 _currentEditRadarSetting.RadarIpAddress = ip;
                 OnPropertyChanged("IpPart4");
                 OnPropertyChanged("IsRadarSettingValid");
+
+                IsIpPart4Valid = IpPart1ValidationRule.IsValidIpPart(value);
             }
         }
 
@@ -262,6 +278,8 @@ namespace RadarMonitor.ViewModel
                 _currentEditRadarSetting.RadarPort = value;
                 OnPropertyChanged("Port");
                 OnPropertyChanged("IsRadarSettingValid");
+
+                IsIpPortValid = IpPortValidationRule.IsValidIpPort(value.ToString());
             }
         }
 
@@ -297,24 +315,31 @@ namespace RadarMonitor.ViewModel
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            string input = value as string;
-
             var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
 
-            if (!double.TryParse(input, out double longitude))
+            if (!IsValidLongitude(value as string))
             {
                 viewModel.IsLongitudeValid = false;
-                return new ValidationResult(false, "Longitude must be a number.");
-            }
-
-            if (longitude < -180.0 || longitude > 180.0)
-            {
-                viewModel.IsLongitudeValid = false;
-                return new ValidationResult(false, "Longitude must between -180.0 and 180.0.");
+                return new ValidationResult(false, "Longitude must be a number between -180.0 and 180.0.");
             }
 
             viewModel.IsLongitudeValid = true;
             return ValidationResult.ValidResult;
+        }
+
+        public static bool IsValidLongitude(string input)
+        {
+            if (!double.TryParse(input, out double longitude))
+            {
+                return false;
+            }
+
+            if (longitude < -180.0 || longitude > 180.0)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 
@@ -322,24 +347,31 @@ namespace RadarMonitor.ViewModel
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            string input = value as string;
-
             var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
 
-            if (!double.TryParse(input, out double latitude))
+            if (!IsValidLatitude(value as string))
             {
                 viewModel.IsLatitudeValid = false;
-                return new ValidationResult(false, "Latitude must be a number.");
-            }
-
-            if (latitude < -90.0 || latitude > 90.0)
-            {
-                viewModel.IsLatitudeValid = false;
-                return new ValidationResult(false, "Latitude must between -90.0 and 90.0.");
+                return new ValidationResult(false, "Latitude must be a number between -90.0 and 90.0.");
             }
 
             viewModel.IsLatitudeValid = true;
             return ValidationResult.ValidResult;
+        }
+
+        public static bool IsValidLatitude(string input)
+        {
+            if (!double.TryParse(input, out double latitude))
+            {
+                return false;
+            }
+
+            if (latitude < -90.0 || latitude > 90.0)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 
@@ -347,24 +379,31 @@ namespace RadarMonitor.ViewModel
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            string input = value as string;
-
             var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
 
-            if (!double.TryParse(input, out double orientation))
+            if (!IsValidOrientation(value as string))
             {
                 viewModel.IsOrientationValid = false;
-                return new ValidationResult(false, "Orientation must be a number.");
-            }
-
-            if (orientation < -180.0 || orientation > 180.0)
-            {
-                viewModel.IsOrientationValid = false;
-                return new ValidationResult(false, "Longitude must between -180.0 and 180.0.");
+                return new ValidationResult(false, "Orientation must be a number between -180.0 and 180.0.");
             }
 
             viewModel.IsOrientationValid = true;
             return ValidationResult.ValidResult;
+        }
+
+        public static bool IsValidOrientation(string input)
+        {
+            if (!double.TryParse(input, out double orientation))
+            {
+                return false;
+            }
+
+            if (orientation < -180.0 || orientation > 180.0)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 
@@ -372,24 +411,31 @@ namespace RadarMonitor.ViewModel
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            string input = value as string;
-
             var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
 
-            if (!double.TryParse(input, out double distance))
+            if (!IsValidMaxDistance(value as string))
             {
                 viewModel.IsMaxDistanceValid = false;
-                return new ValidationResult(false, "Max distance must be a number.");
-            }
-
-            if (distance < 0.0 || distance > 200.0)
-            {
-                viewModel.IsMaxDistanceValid = false;
-                return new ValidationResult(false, "Max distance must between 0 and 200.0.");
+                return new ValidationResult(false, "Max distance must bigger than 0.");
             }
 
             viewModel.IsMaxDistanceValid = true;
             return ValidationResult.ValidResult;
+        }
+
+        public static bool IsValidMaxDistance(string input)
+        {
+            if (!double.TryParse(input, out double distance))
+            {
+                return false;
+            }
+
+            if (distance < 0)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 
@@ -397,17 +443,9 @@ namespace RadarMonitor.ViewModel
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            string input = value as string;
-
             var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
 
-            if (!int.TryParse(input, out int ipPart))
-            {
-                viewModel.IsIpPart1Valid = false;
-                return new ValidationResult(false, "Ip must be a number.");
-            }
-
-            if (ipPart < 0 || ipPart > 255)
+            if (!IsValidIpPart(value as string))
             {
                 viewModel.IsIpPart1Valid = false;
                 return new ValidationResult(false, "Ip must between 0 and 255.");
@@ -416,23 +454,30 @@ namespace RadarMonitor.ViewModel
             viewModel.IsIpPart1Valid = true;
             return ValidationResult.ValidResult;
         }
+
+        public static bool IsValidIpPart(string input)
+        {
+            if (!int.TryParse(input, out int ipPart))
+            {
+                return false;
+            }
+
+            if (ipPart < 0 || ipPart > 255)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 
     public class IpPart2ValidationRule : ValidationRule
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            string input = value as string;
-
             var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
 
-            if (!int.TryParse(input, out int ipPart))
-            {
-                viewModel.IsIpPart2Valid = false;
-                return new ValidationResult(false, "Ip must be a number.");
-            }
-
-            if (ipPart < 0 || ipPart > 255)
+            if (!IpPart1ValidationRule.IsValidIpPart(value as string))
             {
                 viewModel.IsIpPart2Valid = false;
                 return new ValidationResult(false, "Ip must between 0 and 255.");
@@ -447,17 +492,9 @@ namespace RadarMonitor.ViewModel
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            string input = value as string;
-
             var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
 
-            if (!int.TryParse(input, out int ipPart))
-            {
-                viewModel.IsIpPart3Valid = false;
-                return new ValidationResult(false, "Ip must be a number.");
-            }
-
-            if (ipPart < 0 || ipPart > 255)
+            if (!IpPart1ValidationRule.IsValidIpPart(value as string))
             {
                 viewModel.IsIpPart3Valid = false;
                 return new ValidationResult(false, "Ip must between 0 and 255.");
@@ -472,17 +509,9 @@ namespace RadarMonitor.ViewModel
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            string input = value as string;
-
             var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
 
-            if (!int.TryParse(input, out int ipPart))
-            {
-                viewModel.IsIpPart4Valid = false;
-                return new ValidationResult(false, "Ip must be a number.");
-            }
-
-            if (ipPart < 0 || ipPart > 255)
+            if (!IpPart1ValidationRule.IsValidIpPart(value as string))
             {
                 viewModel.IsIpPart4Valid = false;
                 return new ValidationResult(false, "Ip must between 0 and 255.");
@@ -497,19 +526,31 @@ namespace RadarMonitor.ViewModel
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            string input = value as string;
+            var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
 
-            if (!int.TryParse(input, out int port))
+            if (!IsValidIpPort(value as string))
             {
-                return new ValidationResult(false, "Port must be a number.");
-            }
-
-            if (port < 0 || port > 65535)
-            {
+                viewModel.IsIpPortValid = false;
                 return new ValidationResult(false, "Port must between 0 and 65535.");
             }
 
+            viewModel.IsIpPortValid = true;
             return ValidationResult.ValidResult;
+        }
+
+        public static bool IsValidIpPort(string input)
+        {
+            if (!int.TryParse(input, out int ipPart))
+            {
+                return false;
+            }
+
+            if (ipPart < 0 || ipPart > 65535)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
