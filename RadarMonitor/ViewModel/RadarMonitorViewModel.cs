@@ -343,6 +343,10 @@ namespace RadarMonitor.ViewModel
 
         public void OnReceivedCat240DataBlock(object sender, Cat240DataBlock data, int radarId)
         {
+            if (!IsOpenGlEchoDisplayed)
+            {
+                return;
+            }
             var dataItems = data.Items;
 
             //// 避免切换雷达数据源时，因为没能及时处理数据而重发导致的问题
@@ -382,9 +386,10 @@ namespace RadarMonitor.ViewModel
             var ts = t.Hour * 60 * 60 * 1000 + t.Minute * 60 * 1000 + t.Second * 1000 + t.Millisecond;
             DataArr.Add(ts);
 
+            var buffer = data.Items.VideoBlocks.ToArray();
             for (int i = 0; i < data.Items.ValidCellsInDataBlock; i++)
             {
-                var color = (float)data.Items.GetCellData(i) / 255;
+                var color = (float)data.Items.GetCellData(buffer, i) / 255;
                 DataArr.Add(color);
             }
 

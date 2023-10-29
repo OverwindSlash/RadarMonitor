@@ -50,7 +50,7 @@ namespace RadarMonitor
         private bool _encDisplayFlag = false;
 
         private Dictionary<int, RadarInfoModel> _radarInfos = new Dictionary<int, RadarInfoModel>();
-
+        private double currentEncScale = 0.0;
         public MainWindow()
         {
             InitializeComponent();
@@ -68,7 +68,7 @@ namespace RadarMonitor
             // 初始化图片回波显示后台一维数组
             _scanlineColor = DisplayConfigDialog.DefaultImageEchoColor;
             //InitializeEchoData();
-            
+
             // 初始化刷新计时器
             //_timer.Interval = TimeSpan.FromMilliseconds(RefreshIntervalMs);
             //_timer.Tick += RefreshImageEcho;
@@ -128,7 +128,7 @@ namespace RadarMonitor
             viewModel.IsEncLoaded = false;
             viewModel.IsEncDisplayed = false;
         }
-       
+
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
@@ -148,7 +148,7 @@ namespace RadarMonitor
             var viewModel = (RadarMonitorViewModel)DataContext;
             viewModel.DisposeCat240Parser();
         }
-        
+
         #region Load ENC
         private async void LoadEnc_OnClick(object sender, RoutedEventArgs e)
         {
@@ -344,17 +344,17 @@ namespace RadarMonitor
         {
             try
             {
-                Dispatcher.Invoke(() =>
-                {
-                    var viewModel = (RadarMonitorViewModel)DataContext;
+                //Dispatcher.Invoke(() =>
+                //{
+                    //var viewModel = (RadarMonitorViewModel)DataContext;
 
                     RadarInfoModel radarInfo = _radarInfos[radarId];
                     radarInfo.RealCells = (int)cat240spec.ValidCellsInDataBlock;
                     radarInfo.RadarMaxDistance = cat240spec.MaxDistance;
 
-                    TransformOpenGlRadarEcho(radarId, viewModel.CurrentEncScale);
+                    TransformOpenGlRadarEcho(radarId, currentEncScale);
 
-                });
+                //});
             }
             catch (Exception e)
             {
@@ -368,24 +368,14 @@ namespace RadarMonitor
         {
             try
             {
-                Dispatcher.Invoke(() =>
-                {
-                    var viewModel = (RadarMonitorViewModel)DataContext;
-
-                    // OpenGL 回波图像绘制
-                    //if (viewModel.IsOpenGlEchoDisplayed)
-                    //{
-
-                        OpenGlEchoOverlay.OnReceivedRadarData(sender, e);
-                    //}
-                });
+                OpenGlEchoOverlay.OnReceivedRadarData(sender, e);
             }
             catch (Exception ex)
             {
                 // TODO: 有没有更好的优雅结束的方法
             }
         }
-        
+
 
 
         private void ConfigDisplay_OnClick(object sender, RoutedEventArgs e)
@@ -419,6 +409,7 @@ namespace RadarMonitor
             MapView mapView = (MapView)sender;
             var viewModel = (RadarMonitorViewModel)DataContext;
             viewModel.CurrentEncScale = mapView.MapScale;
+            currentEncScale = mapView.MapScale;
 
             if (viewModel.IsEncLoaded)
             {
@@ -440,7 +431,7 @@ namespace RadarMonitor
             MapView mapView = (MapView)sender;
             var viewModel = (RadarMonitorViewModel)DataContext;
             viewModel.CurrentEncScale = mapView.MapScale;
-
+            currentEncScale= mapView.MapScale; 
             if (viewModel.IsEncLoaded)
             {
                 DrawScaleLine();
@@ -479,7 +470,7 @@ namespace RadarMonitor
                 var distance = CalculateDistance(viewModel.RadarLongitude, viewModel.RadarLatitude, location.X, location.Y);
                 CursorDistance.Content = "D2R:   " + distance.ToString("F2") + " KM";
 
-                var azimuth = CalculateAzimuth(viewModel.RadarLongitude, viewModel.RadarLatitude,location.X, location.Y);
+                var azimuth = CalculateAzimuth(viewModel.RadarLongitude, viewModel.RadarLatitude, location.X, location.Y);
                 CursorAzimuth.Content = "A2R:   " + azimuth.ToString("F2") + "°";
             }
         }
@@ -780,7 +771,7 @@ namespace RadarMonitor
             double radarY = point.Y;
 
             double maxDistance = Math.Max(RingsOverlay.ActualWidth, RingsOverlay.ActualHeight) / 2;
-            
+
             // 绘制雷达点
             double radarPointRadius = 1.0;
             Ellipse center = new Ellipse
@@ -863,7 +854,7 @@ namespace RadarMonitor
             float mapHeightOffCenter = (float)(yOffset * kmWith1Lon);
 
             // CreateUpdateRadar: all radars need to be modified
-           
+
             radarInfo.UIWidth = uiWidth;
             radarInfo.UIHeight = uiHeight;
             radarInfo.MapWidth = mapWidth;
@@ -888,8 +879,8 @@ namespace RadarMonitor
 
             }
 
-            radarInfo.Latitude= double.Parse(setting.Latitude);
-            radarInfo.Longitude= double.Parse(setting.Longitude);
+            radarInfo.Latitude = double.Parse(setting.Latitude);
+            radarInfo.Longitude = double.Parse(setting.Longitude);
             radarInfo.RadarOrientation = setting.Orientation;
 
         }

@@ -71,7 +71,7 @@ public partial class ExampleScene : UserControl
         }
     }
 
-    private int fade_duration = 10;
+    private int fade_duration = 7;
 
     public int FadeDuration
     {
@@ -171,7 +171,7 @@ public partial class ExampleScene : UserControl
             Vao.Bind();
             Shader.Use();
 
-            Shader.SetUniform("uTexture0", model.Key);
+            Shader.SetUniform("uTexture0", model.Key +1 );
             Shader.SetUniform("uSection", RadarConfig.SECTIONS);
             Shader.SetUniform("uCell", (int)radar?.RealCells);
 

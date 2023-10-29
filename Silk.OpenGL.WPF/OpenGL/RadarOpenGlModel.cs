@@ -70,7 +70,7 @@ namespace Silk.WPF.OpenGL
         public RadarOpenGlModel(int radarID)
         {
             RadarID = radarID;
-            TextureUnit = (TextureUnit)(TextureUnit.Texture0 + radarID);
+            TextureUnit = (TextureUnit)(TextureUnit.Texture0 + radarID+1);
             gl = RenderContext.Gl;
             DataArray = new float[RadarConfig.SECTIONS * (RadarConfig.CELLS + 1)];
             TextureData = new OpenGLSharp.Texture(gl, DataArray, (uint)(_realCells + 1), RadarConfig.SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit);

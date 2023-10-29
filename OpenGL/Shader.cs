@@ -46,6 +46,16 @@ namespace OpenGLSharp
             _gl.Uniform1(location, value);
         }
 
+        public void SetUniform(string name, int[] value, uint count)
+        {
+            int location = _gl.GetUniformLocation(_handle, name);
+            if (location == -1)
+            {
+                throw new Exception($"{name} uniform not found on shader.");
+            }
+            _gl.Uniform1(location, count, value);
+        }
+
         public unsafe void SetUniform(string name, Matrix4x4 value)
         {
             //A new overload has been created for setting a uniform so we can use the transform in our shader.
