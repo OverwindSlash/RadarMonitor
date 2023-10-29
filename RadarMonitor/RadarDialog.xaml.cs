@@ -55,7 +55,7 @@ namespace RadarMonitor
         {
             var viewModel = (RadarSettingsViewModel)DataContext;
 
-            if (viewModel.IsValidated())
+            if (viewModel.ValidateRadarSetting())
             {
                 DialogResult = true;
                 Close();

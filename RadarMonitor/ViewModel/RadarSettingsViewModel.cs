@@ -1,7 +1,10 @@
 ﻿using RadarMonitor.Model;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace RadarMonitor.ViewModel
 {
@@ -22,17 +25,20 @@ namespace RadarMonitor.ViewModel
             OnPropertyChanged(propertyName);
             return true;
         }
-
-        protected bool SetField<T>(T field, T value, [CallerMemberName] string? propertyName = null)
-        {
-            field = value;
-            OnPropertyChanged(propertyName);
-            return true;
-        }
         #endregion
 
         private List<RadarSetting> _radarSettings;
         private RadarSetting _currentEditRadarSetting;
+
+        private bool _isLongitudeValid;
+        private bool _isLatitudeValid;
+        private bool _isOrientationValid;
+        private bool _isMaxDistanceValid;
+        private bool _isIpPart1Valid;
+        private bool _isIpPart2Valid;
+        private bool _isIpPart3Valid;
+        private bool _isIpPart4Valid;
+        private bool _isIpPortValid;
 
         #region Radar Properties
         public List<RadarSetting> RadarSettings
@@ -69,7 +75,8 @@ namespace RadarMonitor.ViewModel
             get => _currentEditRadarSetting.RadarName;
             set
             {
-                SetField(_currentEditRadarSetting.RadarName, value, "Name");
+                _currentEditRadarSetting.RadarName = value;
+                OnPropertyChanged("Name");
             }
         }
 
@@ -78,7 +85,8 @@ namespace RadarMonitor.ViewModel
             get => _currentEditRadarSetting.IsRadarEnabled;
             set
             {
-                SetField(_currentEditRadarSetting.IsRadarEnabled, value, "Enabled");
+                _currentEditRadarSetting.IsRadarEnabled = value;
+                OnPropertyChanged("Enabled");
             }
         }
 
@@ -87,7 +95,18 @@ namespace RadarMonitor.ViewModel
             get => _currentEditRadarSetting.RadarLongitude;
             set
             {
-                SetField(_currentEditRadarSetting.RadarLongitude, value, "Longitude");
+                _currentEditRadarSetting.RadarLongitude = value;
+                OnPropertyChanged("Longitude");
+                OnPropertyChanged("IsRadarSettingValid");
+            }
+        }
+
+        public bool IsLongitudeValid
+        {
+            get => _isLongitudeValid;
+            set
+            {
+                SetField(ref _isLongitudeValid, value, "IsLongitudeValid");
             }
         }
 
@@ -96,7 +115,18 @@ namespace RadarMonitor.ViewModel
             get => _currentEditRadarSetting.RadarLatitude;
             set
             {
-                SetField(_currentEditRadarSetting.RadarLatitude, value, "Latitude");
+                _currentEditRadarSetting.RadarLatitude = value;
+                OnPropertyChanged("Latitude");
+                OnPropertyChanged("IsRadarSettingValid");
+            }
+        }
+
+        public bool IsLatitudeValid
+        {
+            get => _isLatitudeValid;
+            set
+            {
+                SetField(ref _isLatitudeValid, value, "IsLatitudeValid");
             }
         }
 
@@ -105,16 +135,38 @@ namespace RadarMonitor.ViewModel
             get => _currentEditRadarSetting.RadarOrientation;
             set
             {
-                SetField(_currentEditRadarSetting.RadarOrientation, value, "Orientation");
+                _currentEditRadarSetting.RadarOrientation = value;
+                OnPropertyChanged("Orientation");
+                OnPropertyChanged("IsRadarSettingValid");
             }
         }
 
-        public double MaxDistance
+        public bool IsOrientationValid
+        {
+            get => _isOrientationValid;
+            set
+            {
+                SetField(ref _isOrientationValid, value, "IsOrientationValid");
+            }
+        }
+
+        public int MaxDistance
         {
             get => _currentEditRadarSetting.RadarMaxDistance;
             set
             {
-                SetField(_currentEditRadarSetting.RadarMaxDistance, value, "MaxDistance");
+                _currentEditRadarSetting.RadarMaxDistance = value;
+                OnPropertyChanged("MaxDistance");
+                OnPropertyChanged("IsRadarSettingValid");
+            }
+        }
+
+        public bool IsMaxDistanceValid
+        {
+            get => _isMaxDistanceValid;
+            set
+            {
+                SetField(ref _isMaxDistanceValid, value, "IsMaxDistanceValid");
             }
         }
 
@@ -124,7 +176,18 @@ namespace RadarMonitor.ViewModel
             set
             {
                 string ip = $"{value}.{IpPart2}.{IpPart3}.{IpPart4}";
-                SetField(_currentEditRadarSetting.RadarIpAddress, ip, "IpPart1");
+                _currentEditRadarSetting.RadarIpAddress = ip;
+                OnPropertyChanged("IpPart1");
+                OnPropertyChanged("IsRadarSettingValid");
+            }
+        }
+
+        public bool IsIpPart1Valid
+        {
+            get => _isIpPart1Valid;
+            set
+            {
+                SetField(ref _isIpPart1Valid, value, "IsIpPart1Valid");
             }
         }
 
@@ -134,7 +197,18 @@ namespace RadarMonitor.ViewModel
             set
             {
                 string ip = $"{IpPart1}.{value}.{IpPart3}.{IpPart4}";
-                SetField(_currentEditRadarSetting.RadarIpAddress, ip, "IpPart2");
+                _currentEditRadarSetting.RadarIpAddress = ip;
+                OnPropertyChanged("IpPart2");
+                OnPropertyChanged("IsRadarSettingValid");
+            }
+        }
+
+        public bool IsIpPart2Valid
+        {
+            get => _isIpPart2Valid;
+            set
+            {
+                SetField(ref _isIpPart2Valid, value, "IsIpPart2Valid");
             }
         }
 
@@ -144,7 +218,18 @@ namespace RadarMonitor.ViewModel
             set
             {
                 string ip = $"{IpPart1}.{IpPart2}.{value}.{IpPart4}";
-                SetField(_currentEditRadarSetting.RadarIpAddress, ip, "IpPart3");
+                _currentEditRadarSetting.RadarIpAddress = ip;
+                OnPropertyChanged("IpPart3");
+                OnPropertyChanged("IsRadarSettingValid");
+            }
+        }
+
+        public bool IsIpPart3Valid
+        {
+            get => _isIpPart3Valid;
+            set
+            {
+                SetField(ref _isIpPart3Valid, value, "IsIpPart3Valid");
             }
         }
 
@@ -154,7 +239,18 @@ namespace RadarMonitor.ViewModel
             set
             {
                 string ip = $"{IpPart1}.{IpPart2}.{IpPart3}.{value}";
-                SetField(_currentEditRadarSetting.RadarIpAddress, ip, "IpPart4");
+                _currentEditRadarSetting.RadarIpAddress = ip;
+                OnPropertyChanged("IpPart4");
+                OnPropertyChanged("IsRadarSettingValid");
+            }
+        }
+
+        public bool IsIpPart4Valid
+        {
+            get => _isIpPart4Valid;
+            set
+            {
+                SetField(ref _isIpPart4Valid, value, "IsIpPart4Valid");
             }
         }
 
@@ -163,11 +259,26 @@ namespace RadarMonitor.ViewModel
             get => _currentEditRadarSetting.RadarPort;
             set
             {
-                SetField(_currentEditRadarSetting.RadarPort, value, "Port");
+                _currentEditRadarSetting.RadarPort = value;
+                OnPropertyChanged("Port");
+                OnPropertyChanged("IsRadarSettingValid");
             }
         }
-        #endregion
 
+        public bool IsIpPortValid
+        {
+            get => _isIpPortValid;
+            set
+            {
+                SetField(ref _isIpPortValid, value, "IsIpPortValid");
+            }
+        }
+
+        public bool IsRadarSettingValid
+        {
+            get => ValidateRadarSetting();
+        }
+        #endregion
 
         public RadarSettingsViewModel(List<RadarSetting> radarSettings)
         {
@@ -175,53 +286,230 @@ namespace RadarMonitor.ViewModel
             CurrentEditRadarSetting = RadarSettings[0];
         }
 
-        private bool IsLongitudeValid(string input)
+        public bool ValidateRadarSetting()
         {
-            if (double.TryParse(input, out double longitude))
+            return _isLongitudeValid && _isLatitudeValid && _isOrientationValid && _isOrientationValid && 
+                   _isIpPart1Valid && _isIpPart2Valid && _isIpPart3Valid && _isIpPart4Valid && _isIpPortValid;
+        }
+    }
+
+    public class LongitudeValidationRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+        {
+            string input = value as string;
+
+            var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
+
+            if (!double.TryParse(input, out double longitude))
             {
-                return (longitude >= -180.0 && longitude <= 180.0);
+                viewModel.IsLongitudeValid = false;
+                return new ValidationResult(false, "Longitude must be a number.");
             }
-            return false;
-        }
 
-        private bool IsLatitudeValid(string input)
-        {
-            if (double.TryParse(input, out double latitude))
+            if (longitude < -180.0 || longitude > 180.0)
             {
-                return (latitude >= -90.0 && latitude <= 90.0);
+                viewModel.IsLongitudeValid = false;
+                return new ValidationResult(false, "Longitude must between -180.0 and 180.0.");
             }
-            return false;
+
+            viewModel.IsLongitudeValid = true;
+            return ValidationResult.ValidResult;
         }
+    }
 
-        private bool IsValidOrientation(double input)
+    public class LatitudeValidationRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            return (input >= -180.0 && input <= 180.0);
+            string input = value as string;
+
+            var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
+
+            if (!double.TryParse(input, out double latitude))
+            {
+                viewModel.IsLatitudeValid = false;
+                return new ValidationResult(false, "Latitude must be a number.");
+            }
+
+            if (latitude < -90.0 || latitude > 90.0)
+            {
+                viewModel.IsLatitudeValid = false;
+                return new ValidationResult(false, "Latitude must between -90.0 and 90.0.");
+            }
+
+            viewModel.IsLatitudeValid = true;
+            return ValidationResult.ValidResult;
         }
+    }
 
-        private bool IsValidIpAddressPart(int input)
+    public class OrientationValidationRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            return (input >= 0 && input <= 255);
+            string input = value as string;
+
+            var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
+
+            if (!double.TryParse(input, out double orientation))
+            {
+                viewModel.IsOrientationValid = false;
+                return new ValidationResult(false, "Orientation must be a number.");
+            }
+
+            if (orientation < -180.0 || orientation > 180.0)
+            {
+                viewModel.IsOrientationValid = false;
+                return new ValidationResult(false, "Longitude must between -180.0 and 180.0.");
+            }
+
+            viewModel.IsOrientationValid = true;
+            return ValidationResult.ValidResult;
         }
+    }
 
-        private bool IsValidPort(int input)
+    public class MaxDistanceValidationRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            return (input >= 0 && input <= 65535);
+            string input = value as string;
+
+            var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
+
+            if (!double.TryParse(input, out double distance))
+            {
+                viewModel.IsMaxDistanceValid = false;
+                return new ValidationResult(false, "Max distance must be a number.");
+            }
+
+            if (distance < 0.0 || distance > 200.0)
+            {
+                viewModel.IsMaxDistanceValid = false;
+                return new ValidationResult(false, "Max distance must between 0 and 200.0.");
+            }
+
+            viewModel.IsMaxDistanceValid = true;
+            return ValidationResult.ValidResult;
         }
+    }
 
-        public bool IsValidated()
+    public class IpPart1ValidationRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            bool result = true;
+            string input = value as string;
 
-            // result &= IsLongitudeValid(Longitude);
-            // result &= IsLatitudeValid(Latitude);
-            // result &= IsValidOrientation(Orientation);
-            // result &= IsValidIpAddressPart(IpPart1);
-            // result &= IsValidIpAddressPart(IpPart2);
-            // result &= IsValidIpAddressPart(IpPart3);
-            // result &= IsValidIpAddressPart(IpPart4);
-            // result &= IsValidPort(Port);
+            var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
 
-            return result;
+            if (!int.TryParse(input, out int ipPart))
+            {
+                viewModel.IsIpPart1Valid = false;
+                return new ValidationResult(false, "Ip must be a number.");
+            }
+
+            if (ipPart < 0 || ipPart > 255)
+            {
+                viewModel.IsIpPart1Valid = false;
+                return new ValidationResult(false, "Ip must between 0 and 255.");
+            }
+
+            viewModel.IsIpPart1Valid = true;
+            return ValidationResult.ValidResult;
+        }
+    }
+
+    public class IpPart2ValidationRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+        {
+            string input = value as string;
+
+            var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
+
+            if (!int.TryParse(input, out int ipPart))
+            {
+                viewModel.IsIpPart2Valid = false;
+                return new ValidationResult(false, "Ip must be a number.");
+            }
+
+            if (ipPart < 0 || ipPart > 255)
+            {
+                viewModel.IsIpPart2Valid = false;
+                return new ValidationResult(false, "Ip must between 0 and 255.");
+            }
+
+            viewModel.IsIpPart2Valid = true;
+            return ValidationResult.ValidResult;
+        }
+    }
+
+    public class IpPart3ValidationRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+        {
+            string input = value as string;
+
+            var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
+
+            if (!int.TryParse(input, out int ipPart))
+            {
+                viewModel.IsIpPart3Valid = false;
+                return new ValidationResult(false, "Ip must be a number.");
+            }
+
+            if (ipPart < 0 || ipPart > 255)
+            {
+                viewModel.IsIpPart3Valid = false;
+                return new ValidationResult(false, "Ip must between 0 and 255.");
+            }
+
+            viewModel.IsIpPart3Valid = true;
+            return ValidationResult.ValidResult;
+        }
+    }
+
+    public class IpPart4ValidationRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+        {
+            string input = value as string;
+
+            var viewModel = ((MainWindow)Application.Current.MainWindow).DialogViewModel;
+
+            if (!int.TryParse(input, out int ipPart))
+            {
+                viewModel.IsIpPart4Valid = false;
+                return new ValidationResult(false, "Ip must be a number.");
+            }
+
+            if (ipPart < 0 || ipPart > 255)
+            {
+                viewModel.IsIpPart4Valid = false;
+                return new ValidationResult(false, "Ip must between 0 and 255.");
+            }
+
+            viewModel.IsIpPart4Valid = true;
+            return ValidationResult.ValidResult;
+        }
+    }
+
+    public class IpPortValidationRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+        {
+            string input = value as string;
+
+            if (!int.TryParse(input, out int port))
+            {
+                return new ValidationResult(false, "Port must be a number.");
+            }
+
+            if (port < 0 || port > 65535)
+            {
+                return new ValidationResult(false, "Port must between 0 and 65535.");
+            }
+
+            return ValidationResult.ValidResult;
         }
     }
 }

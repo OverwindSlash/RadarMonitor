@@ -18,7 +18,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Esri.ArcGISRuntime;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using CheckBox = System.Windows.Controls.CheckBox;
@@ -64,6 +63,7 @@ namespace RadarMonitor
         private readonly bool _encDetailDisplayFlag = false;
         private Int32Rect _redrawRect;
 
+        public RadarSettingsViewModel DialogViewModel { get; set; }
 
         public MainWindow()
         {
@@ -280,45 +280,7 @@ namespace RadarMonitor
                         });
                     }
                 }
-
-                // Dispatcher.Invoke(() =>
-                // {
-                //     RadarEchoOverlay.InvalidateVisual();
-                // });
             }).ConfigureAwait(true); // 使用ConfigureAwait(true)确保在UI线程上继续执行
-
-            // Dispatcher.Invoke(() =>
-            // {
-            //     for (int radarId = 0; radarId < RadarCount; radarId++)
-            //     {
-            //         var radarSetting = viewModel.RadarSettings[radarId];
-            //         if (radarSetting.IsConnected && radarSetting.IsEchoDisplayed)
-            //         {
-            //             // 重绘图片雷达回波
-            //             var radarEchoData = _radarEchoDatas[radarId];
-            //             var cartesianData = viewModel.RadarCartesianDatas[radarId];
-            //             for (int x = 0; x < cartesianData.GetLength(0) - 1; x++)
-            //             {
-            //                 for (int y = 0; y < cartesianData.GetLength(1) - 1; y++)
-            //                 {
-            //                     int index = y * RadarEchoDataStride + x * 4;
-            //
-            //                     radarEchoData[index + 3] = (byte)cartesianData[x, y]; // Update Alpha
-            //
-            //                     if (_isFadingEnabled)
-            //                     {
-            //                         cartesianData[x, y] = Math.Max(cartesianData[x, y] - _fadingStep, 0);
-            //                     }
-            //                 }
-            //             }
-            //
-            //             _radarBitmaps[radarId].WritePixels(redrawRect, radarEchoData, RadarEchoDataStride, 0);
-            //             //_echoImageOverlays[radarId].InvalidateVisual();
-            //         }
-            //     }
-            // }, DispatcherPriority.Render);
-
-            //RadarEchoOverlay.InvalidateVisual();
         }
 
         #region Load ENC
@@ -473,6 +435,7 @@ namespace RadarMonitor
 
             // 指定雷达参数对话框
             var radarDialog = new RadarDialog(viewModel.Configuration.RadarSettings);
+            DialogViewModel = (RadarSettingsViewModel)radarDialog.DataContext;
             bool? dialogResult = radarDialog.ShowDialog();
             if (dialogResult != true)
             {
@@ -686,19 +649,18 @@ namespace RadarMonitor
                 var config = (DisplayConfigViewModel)configDialog.DataContext;
 
                 _echoColor = config.ScanlineColor;
-                // Change Color
-                //for (int i = 0; i < _radar1EchoData.Length; i += 4)
-                //{
-                //    byte alpha = _radar1EchoData[i + 3];
-                //    if (alpha == 0)
-                //    {
-                //        continue;
-                //    }
 
-                //    _radar1EchoData[i + 0] = _echoColor.B;
-                //    _radar1EchoData[i + 1] = _echoColor.G;
-                //    _radar1EchoData[i + 2] = _echoColor.R;
-                //}
+                // Change Color
+                for (int radarId = 0; radarId < RadarCount; radarId++)
+                {
+                    var radarEchoData = _radarEchoDatas[radarId];
+                    for (int i = 0; i < radarEchoData.Length; i += 4)
+                    {
+                        radarEchoData[i + 0] = _echoColor.B;    // Blue
+                        radarEchoData[i + 1] = _echoColor.G;    // Green
+                        radarEchoData[i + 2] = _echoColor.R;    // Red
+                    }
+                }
 
                 _isFadingEnabled = config.IsFadingEnabled;
                 _fadingInterval = config.FadingInterval;
