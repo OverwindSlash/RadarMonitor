@@ -11,7 +11,7 @@ namespace Silk.WPF.OpenGL
 {
     public class RadarOpenGlModel
     {
-        private float[] DataArray;
+        private float[] DataArray = null;
 
         private List<RadarDataReceivedEventArgs> DataList = new List<RadarDataReceivedEventArgs>();
         private object Lock = new object();
@@ -40,8 +40,8 @@ namespace Silk.WPF.OpenGL
                 }
                 if (value != _realCells)
                 {
-                    DataArray = new float[RadarConfig.SECTIONS * (value + 1)];
-                    TextureData = new OpenGLSharp.Texture(RenderContext.Gl, DataArray, (uint)(value + 1), RadarConfig.SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit.Texture0);
+                    DataArray = new float[RadarConfig.SECTIONS * (value + RadarConfig.HEAD)];
+                    TextureData = new OpenGLSharp.Texture(gl, DataArray, (uint)(value + RadarConfig.HEAD), RadarConfig.SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit);
                     lastId = 0;
 
                 }
@@ -72,8 +72,8 @@ namespace Silk.WPF.OpenGL
             RadarID = radarID;
             TextureUnit = (TextureUnit)(TextureUnit.Texture0 + radarID+1);
             gl = RenderContext.Gl;
-            DataArray = new float[RadarConfig.SECTIONS * (RadarConfig.CELLS + 1)];
-            TextureData = new OpenGLSharp.Texture(gl, DataArray, (uint)(_realCells + 1), RadarConfig.SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit);
+            DataArray = new float[RadarConfig.SECTIONS * (RadarConfig.CELLS + RadarConfig.HEAD)];
+            TextureData = new OpenGLSharp.Texture(gl, DataArray, (uint)(_realCells + RadarConfig.HEAD), RadarConfig.SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit);
 
         }
 
@@ -116,7 +116,7 @@ namespace Silk.WPF.OpenGL
                     {
                         fixed (void* d = &item.DataArray.ToArray()[0])
                         {
-                            gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, item.SectionId, (uint)(RealCells + 1), 1, PixelFormat.Red, PixelType.Float, d);
+                            gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, item.SectionId, (uint)(RealCells + RadarConfig.HEAD), 1, PixelFormat.Red, PixelType.Float, d);
 
                         }
                     }

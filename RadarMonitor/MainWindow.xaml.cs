@@ -344,8 +344,8 @@ namespace RadarMonitor
         {
             try
             {
-                //Dispatcher.Invoke(() =>
-                //{
+                Dispatcher.Invoke(() =>
+                {
                     //var viewModel = (RadarMonitorViewModel)DataContext;
 
                     RadarInfoModel radarInfo = _radarInfos[radarId];
@@ -354,7 +354,7 @@ namespace RadarMonitor
 
                     TransformOpenGlRadarEcho(radarId, currentEncScale);
 
-                //});
+                });
             }
             catch (Exception e)
             {
