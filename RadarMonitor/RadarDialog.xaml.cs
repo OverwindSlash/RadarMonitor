@@ -1,10 +1,7 @@
 ﻿using RadarMonitor.Model;
 using RadarMonitor.ViewModel;
 using System.Collections.Generic;
-using System.IO;
 using System.Windows;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace RadarMonitor
 {
@@ -14,63 +11,51 @@ namespace RadarMonitor
     public partial class RadarDialog : Window
     {
         private List<RadarSetting> _settings;
-        
 
-        public RadarDialog()
+        public RadarDialog(List<RadarSetting> radarSettings)
         {
             InitializeComponent();
 
-            LoadPresets();
+            _settings = radarSettings;
 
-            DataContext = new RadarSettingsViewModel();
-        }
-
-        private void LoadPresets()
-        {
-            string contents = File.ReadAllText("Presets/preset-radars.yaml");
-
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build();
-
-            //yml contains a string containing your YAML
-            _settings = deserializer.Deserialize<List<RadarSetting>>(contents);
+            DataContext = new RadarSettingsViewModel(_settings);
         }
 
         private void BtnLoadPreset1_Click(object sender, RoutedEventArgs e)
         {
-            DataContext = new RadarSettingsViewModel(_settings[0]);
-
+            var viewModel = (RadarSettingsViewModel)DataContext;
+            viewModel.CurrentEditRadarSetting = viewModel.RadarSettings[0];
         }
 
         private void BtnLoadPreset2_Click(object sender, RoutedEventArgs e)
         {
-            DataContext = new RadarSettingsViewModel(_settings[1]);
-
+            var viewModel = (RadarSettingsViewModel)DataContext;
+            viewModel.CurrentEditRadarSetting = viewModel.RadarSettings[1];
         }
 
         private void BtnLoadPreset3_Click(object sender, RoutedEventArgs e)
         {
-            DataContext = new RadarSettingsViewModel(_settings[2]);
-
+            var viewModel = (RadarSettingsViewModel)DataContext;
+            viewModel.CurrentEditRadarSetting = viewModel.RadarSettings[2];
         }
 
         private void BtnLoadPreset4_Click(object sender, RoutedEventArgs e)
         {
-            DataContext = new RadarSettingsViewModel(_settings[3]);
+            var viewModel = (RadarSettingsViewModel)DataContext;
+            viewModel.CurrentEditRadarSetting = viewModel.RadarSettings[3];
         }
 
         private void BtnLoadPreset5_Click(object sender, RoutedEventArgs e)
         {
-            DataContext = new RadarSettingsViewModel(_settings[4]);
-
+            var viewModel = (RadarSettingsViewModel)DataContext;
+            viewModel.CurrentEditRadarSetting = viewModel.RadarSettings[4];
         }
 
         private void BtnOK_Click(object sender, RoutedEventArgs e)
         {
             var viewModel = (RadarSettingsViewModel)DataContext;
 
-            if (viewModel.IsValidated())
+            if (viewModel.ValidateRadarSetting())
             {
                 DialogResult = true;
                 Close();

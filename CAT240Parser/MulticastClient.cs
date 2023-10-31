@@ -1,27 +1,40 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using UdpClient = NetCoreServer.UdpClient;
 
 namespace CAT240Parser
 {
-    public delegate void Cat240ReceivedEventHandler(object sender, Cat240DataBlock data, int radarId);
+    public delegate void UdpConnectedEventHandler(object sender, int clientId, string ip, int port);
+    public delegate void Cat240ReceivedEventHandler(object sender, int clientId, Cat240DataBlock data);
+    public delegate void UdpDisconnectedEventHandler(object sender, int clientId, string ip, int port);
+    public delegate void UdpErrorEventHandler(object sender, int clientId, string ip, int port);
 
     public class MulticastClient : UdpClient
     {
         public string Multicast;
 
-        // 定义事件
-        public event Cat240ReceivedEventHandler OnCat240Received;
-        private int _radarId;
+        private int _clientId;
+        private bool _stop;
+        private ConcurrentDictionary<uint, int> _dataBlockIds = new();
 
-        public MulticastClient(string address, int port, int radarId) : base(address, port)
+        private int _dataBlockCount;
+
+        // 定义事件
+        public event UdpConnectedEventHandler OnUdpConnected;
+        public event Cat240ReceivedEventHandler OnCat240Received;
+        public event UdpDisconnectedEventHandler OnUdpDisconnected;
+        public event UdpErrorEventHandler OnUdpError;
+
+        public MulticastClient(int clientId, string address, int port) 
+            : base(address, port) 
         {
             int coreCount = Environment.ProcessorCount;
             ThreadPool.SetMinThreads(1, 1);
             ThreadPool.SetMaxThreads(coreCount, coreCount);
-            _radarId = radarId;
-            
+
+            _clientId = clientId;
         }
 
         public void DisconnectAndStop()
@@ -37,6 +50,8 @@ namespace CAT240Parser
         {
             Trace.WriteLine($"Multicast UDP client connected a new session with Id {Id}");
 
+            OnUdpConnected?.Invoke(this, _clientId, Address, Port);
+
             // Join UDP multicast group
             JoinMulticastGroup(Multicast);
 
@@ -47,9 +62,11 @@ namespace CAT240Parser
         protected override void OnDisconnected()
         {
             Trace.WriteLine($"Multicast UDP client disconnected a session with Id {Id}");
-            
+
+            OnUdpDisconnected?.Invoke(this, _clientId, Address, Port);
+
             // Wait for a while...
-            Thread.Sleep(1000);
+            Thread.Sleep(200);
 
             // Try to connect again
             if (!_stop)
@@ -84,9 +101,8 @@ namespace CAT240Parser
 
         protected override void OnError(SocketError error)
         {
+            OnUdpError?.Invoke(this, _clientId, Address, Port);
             Trace.WriteLine($"Multicast UDP client caught an error with code {error}");
         }
-
-        private bool _stop;
     }
 }

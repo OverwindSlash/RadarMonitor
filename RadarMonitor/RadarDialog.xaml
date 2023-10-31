@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RadarMonitor"
+        xmlns:viewModel="clr-namespace:RadarMonitor.ViewModel"
         mc:Ignorable="d"
-        Title="Radar Dialog" Height="380" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Icon="Assets/RadarSettings.png" Topmost="True">
+        Title="Radar Dialog" Height="450" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Icon="Assets/RadarSettings.png" Topmost="True">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -28,45 +29,121 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Row="0" Grid.Column="0" Content="Longitude:" Margin="10,10,5,5" HorizontalAlignment="Right"></Label>
-                <TextBox Name="TbLongitude" Grid.Row="0" Grid.Column="1" Margin="5, 10, 5, 5" Height="20" HorizontalAlignment="Stretch" 
-                 Text="{Binding Longitude, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
-                <Label Grid.Row="0" Grid.Column="2" Content="(-180~180)" Margin="5,10,5,5" HorizontalAlignment="Left"></Label>
-                
-                <Label Grid.Row="1" Grid.Column="0" Content="Latitude:" Margin="10,5,5,5" HorizontalAlignment="Right"></Label>
-                <TextBox Name="TbLatitude" Grid.Row="1" Grid.Column="1" Margin="5, 5, 5, 5" Height="20" HorizontalAlignment="Stretch"
-                 Text="{Binding Latitude, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
-                <Label Grid.Row="1" Grid.Column="2" Content="(-90~90)" Margin="5,5,5,5" HorizontalAlignment="Left"></Label>
-                
-                <Label Grid.Row="2" Grid.Column="0" Content="Orientation:" Margin="10,5,5,10" HorizontalAlignment="Right"></Label>
-                <TextBox Name="TbOrientation" Grid.Row="2" Grid.Column="1" Margin="5, 5, 5, 10" Height="20" HorizontalAlignment="Stretch"
-                         Text="{Binding Orientation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
-                <Label Grid.Row="2" Grid.Column="2" Content="(-180~180)" Margin="5,5,5,10" HorizontalAlignment="Left"></Label>
+                <Label Grid.Row="0" Grid.Column="0" Content="Name:" Margin="10,10,5,5" HorizontalAlignment="Right"></Label>
+                <TextBox Name="TbName" Grid.Row="0" Grid.Column="1" Margin="5, 10, 5, 5" Height="20" HorizontalAlignment="Stretch" 
+                         Text="{Binding Name}"></TextBox>
+                <CheckBox Name="CbRadarEnabled" Grid.Row="0" Grid.Column="2" Content="Enabled" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10, 5, 0, 0"
+                          IsChecked="{Binding Enabled}"></CheckBox>
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Longitude:" Margin="10,5,5,5" HorizontalAlignment="Right"></Label>
+                <TextBox Name="TbLongitude" Grid.Row="1" Grid.Column="1" Margin="5, 5, 5, 5" Height="20" HorizontalAlignment="Stretch">
+                    <TextBox.Text>
+                        <Binding Path="Longitude" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <viewModel:LongitudeValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <Label Grid.Row="1" Grid.Column="2" Content="(-180~180)" Margin="5,5,5,5" HorizontalAlignment="Left"></Label>
+
+                <Label Grid.Row="2" Grid.Column="0" Content="Latitude:" Margin="10,5,5,5" HorizontalAlignment="Right"></Label>
+                <TextBox Name="TbLatitude" Grid.Row="2" Grid.Column="1" Margin="5, 5, 5, 5" Height="20" HorizontalAlignment="Stretch">
+                    <TextBox.Text>
+                        <Binding Path="Latitude" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <viewModel:LatitudeValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <Label Grid.Row="2" Grid.Column="2" Content="(-90~90)" Margin="5,5,5,5" HorizontalAlignment="Left"></Label>
+
+                <Label Grid.Row="3" Grid.Column="0" Content="Orientation:" Margin="10,5,5,5" HorizontalAlignment="Right"></Label>
+                <TextBox Name="TbOrientation" Grid.Row="3" Grid.Column="1" Margin="5, 5, 5, 5" Height="20" HorizontalAlignment="Stretch">
+                    <TextBox.Text>
+                        <Binding Path="Orientation" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <viewModel:OrientationValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <Label Grid.Row="3" Grid.Column="2" Content="(-180~180)" Margin="5,5,5,5" HorizontalAlignment="Left"></Label>
+
+                <Label Grid.Row="4" Grid.Column="0" Content="Max Distance:" Margin="10,5,5,10" HorizontalAlignment="Right"></Label>
+                <TextBox Name="TbMaxDistance" Grid.Row="4" Grid.Column="1" Margin="5, 5, 5, 10" Height="20" HorizontalAlignment="Stretch">
+                    <TextBox.Text>
+                        <Binding Path="MaxDistance" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <viewModel:MaxDistanceValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <Label Grid.Row="4" Grid.Column="2" Content="(KM)" Margin="5,5,5,10" HorizontalAlignment="Left"></Label>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="2" Header="CAT-240 IP Address" Margin="5">
             <StackPanel Orientation="Horizontal">
                 <Label Content="IP:" VerticalAlignment="Center" Margin="10, 5, 0, 5"></Label>
-                <TextBox Name="TbIp1" Width="40" Height="20" VerticalAlignment="Center" 
-                 Text="{Binding IpPart1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <TextBox Name="TbIp1" Width="40" Height="20" VerticalAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="IpPart1" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <viewModel:IpPart1ValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
                 <Label Content="." VerticalAlignment="Center"></Label>
-                <TextBox Name="TbIp2" Width="40" Height="20" VerticalAlignment="Center" 
-                 Text="{Binding IpPart2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <TextBox Name="TbIp2" Width="40" Height="20" VerticalAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="IpPart2" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <viewModel:IpPart2ValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
                 <Label Content="." VerticalAlignment="Center"></Label>
-                <TextBox Name="TbIp3" Width="40" Height="20" VerticalAlignment="Center" 
-                 Text="{Binding IpPart3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <TextBox Name="TbIp3" Width="40" Height="20" VerticalAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="IpPart3" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <viewModel:IpPart3ValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
                 <Label Content="." VerticalAlignment="Center"></Label>
-                <TextBox Name="TbIp4" Width="40" Height="20" VerticalAlignment="Center" 
-                 Text="{Binding IpPart4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <TextBox Name="TbIp4" Width="40" Height="20" VerticalAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="IpPart4" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <viewModel:IpPart4ValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
                 <Label Content="Port:" VerticalAlignment="Center" Margin="20, 5, 0, 5"></Label>
-                <TextBox Name="TbPort" Width="60" Height="20" VerticalAlignment="Center" 
-                 Text="{Binding Port, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"></TextBox>
+                <TextBox Name="TbPort" Width="60" Height="20" VerticalAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="Port" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <viewModel:IpPortValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </StackPanel>
         </GroupBox>
         <Grid Grid.Row="3">

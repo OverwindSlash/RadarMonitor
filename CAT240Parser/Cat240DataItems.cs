@@ -25,6 +25,8 @@ namespace CAT240Parser
         public uint TimeOfDay { get; set; }
         public uint TimeOfDayInSec { get; set; }
 
+        private byte[] _videoBlocksBuffer;
+
         private const double AzimuthUnit = 360.0 / 65536;
 
         public Cat240DataItems(Cat240DataHeader header, byte[] buffer, long size)
@@ -82,7 +84,7 @@ namespace CAT240Parser
             // End azimuth, 2 bytes, 单位：360/2^16
             EndAzimuth = BitOperation.Get2BytesBigEndian(buffer, offset);
             offset += 2;
-            EndAzimuthInDegree = EndAzimuth * AzimuthUnit;
+            //EndAzimuthInDegree = EndAzimuth * AzimuthUnit;
 
             // Start range, 4 bytes
             StartRange = BitOperation.Get4BytesBigEndian(buffer, offset);
@@ -99,7 +101,28 @@ namespace CAT240Parser
                 IsDataCompressed = (compress_flag == 0b10000000);
 
                 byte resolution_flag = buffer[offset++];
-                VideoResolution = (byte)Math.Pow(2.0, resolution_flag - 1);
+                //VideoResolution = (byte)Math.Pow(2.0, resolution_flag - 1);
+                switch (resolution_flag)
+                {
+                    case 1:
+                        VideoResolution = 1;
+                        break;
+                    case 2:
+                        VideoResolution = 2;
+                        break;
+                    case 3:
+                        VideoResolution = 4;
+                        break;
+                    case 4:
+                        VideoResolution = 8;
+                        break;
+                    case 5:
+                        VideoResolution = 16;
+                        break;
+                    case 6:
+                        VideoResolution = 32;
+                        break;
+                }
             }
 
             // Valid video bytes and cells
@@ -138,8 +161,14 @@ namespace CAT240Parser
                 ArraySegment<byte> segment = new ArraySegment<byte>(buffer, offset, VideoBlockLength);
                 offset += VideoBlockLength;
 
-                VideoBlocks.AddRange(segment.ToList());
+                //VideoBlocks.AddRange(segment.ToList());
+                for (int j = 0; j < VideoBlockLength; j++)
+                {
+                    VideoBlocks.Add(segment.Array[segment.Offset + j]);
+                }
             }
+
+            _videoBlocksBuffer = VideoBlocks.ToArray();
 
             //int count = videoBlockCount * VideoBlockLength;
             //VideoBlocks = new List<byte>(count);
@@ -159,29 +188,28 @@ namespace CAT240Parser
 
         public uint GetCellData(int cellIndex)
         {
-            byte[] buffer = VideoBlocks.ToArray();
             switch (VideoResolution)
             {
                 case 1:
-                    bool cell1Bit = BitOperation.Get1BitBigEndian(buffer, cellIndex / 8, cellIndex);
+                    bool cell1Bit = BitOperation.Get1BitBigEndian(_videoBlocksBuffer, cellIndex / 8, cellIndex);
                     return cell1Bit ? (uint)1 : 0;
                 case 2:
-                    byte cell2Bits = BitOperation.Get2BitsBigEndian(buffer, cellIndex / 4, cellIndex * 2);
+                    byte cell2Bits = BitOperation.Get2BitsBigEndian(_videoBlocksBuffer, cellIndex / 4, cellIndex * 2);
                     return (uint)cell2Bits;
                 case 4:
-                    byte cell4Bits = BitOperation.Get4BitsBigEndian(buffer, cellIndex / 2, cellIndex * 4);
+                    byte cell4Bits = BitOperation.Get4BitsBigEndian(_videoBlocksBuffer, cellIndex / 2, cellIndex * 4);
                     return (uint)cell4Bits;
                 case 8:
-                    byte cell1Byte = buffer[cellIndex];
+                    byte cell1Byte = _videoBlocksBuffer[cellIndex];
                     return (uint)cell1Byte;
                 case 16:
-                    ushort cell2Bytes = BitOperation.Get2BytesBigEndian(buffer, cellIndex * 2);
+                    ushort cell2Bytes = BitOperation.Get2BytesBigEndian(_videoBlocksBuffer, cellIndex * 2);
                     return (uint)cell2Bytes;
                 case 32:
-                    uint cell4Bytes = BitOperation.Get4BytesBigEndian(buffer, cellIndex * 4);
+                    uint cell4Bytes = BitOperation.Get4BytesBigEndian(_videoBlocksBuffer, cellIndex * 4);
                     return cell4Bytes;
                 default:
-                    byte cellDefault = buffer[cellIndex];
+                    byte cellDefault = _videoBlocksBuffer[cellIndex];
                     return (uint)cellDefault;
             }
         }

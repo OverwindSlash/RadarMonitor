@@ -1,0 +1,73 @@
+﻿encSetting:
+   encType: Catalog
+   encUri: Encs\CATALOG.031
+   encLongitude: 121.723234
+   encLatitude: 31.350226
+   encScale: 320000
+   encEnabled: true
+radarSettings:
+-
+   radarName: 崇明岛
+   radarLongitude: 121.912592
+   radarLatitude: 31.576394
+   radarOrientation: 55.0
+   radarScale: 275000
+   radarMaxDistance: 60
+   radarIpAddress: 127.0.0.1
+   radarPort: 20101
+   isRadarEnabled: true
+   isRingsDisplayed: true
+   isEchoDisplayed: true
+   isOpenGlEchoDisplayed: false
+-
+   radarName: 世博公园
+   radarLongitude: 121.489728
+   radarLatitude: 31.192678
+   radarOrientation: -85.0
+   radarScale: 20000
+   radarMaxDistance: 9
+   radarIpAddress: 127.0.0.1
+   radarPort: 20102
+   isRadarEnabled: true
+   isRingsDisplayed: false
+   isEchoDisplayed: true
+   isOpenGlEchoDisplayed: false
+-
+   radarName: 杨浦
+   radarLongitude: 121.539628
+   radarLatitude: 31.258811
+   radarOrientation: -85.0
+   radarScale: 68750
+   radarMaxDistance: 9
+   radarIpAddress: 127.0.0.1
+   radarPort: 20103
+   isRadarEnabled: true
+   isRingsDisplayed: false
+   isEchoDisplayed: true
+   isOpenGlEchoDisplayed: false
+-
+   radarName: 吴淞
+   radarLongitude: 121.496233
+   radarLatitude: 31.376250
+   radarOrientation: -87
+   radarScale: 160000
+   radarMaxDistance: 9
+   radarIpAddress: 127.0.0.1
+   radarPort: 20104
+   isRadarEnabled: true
+   isRingsDisplayed: false
+   isEchoDisplayed: true
+   isOpenGlEchoDisplayed: false
+-
+   radarName: 闵行
+   radarLongitude: 121.463678
+   radarLatitude: 31.087561
+   radarOrientation: -91.0
+   radarScale: 30000
+   radarMaxDistance: 9
+   radarIpAddress: 127.0.0.1
+   radarPort: 20106
+   isRadarEnabled: true
+   isRingsDisplayed: false
+   isEchoDisplayed: true
+   isOpenGlEchoDisplayed: false
