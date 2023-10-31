@@ -146,7 +146,7 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<VersionPrefix>1.0.0</VersionPrefix>
+		<VersionPrefix>2.0.0</VersionPrefix>
 		<Authors>Sinology International</Authors>
 		<Copyright>© 2023 Sinology. All Rights Reserved</Copyright>
 		<Description>Radar CAT240 &amp; S57 Enc viewer</Description>
