@@ -13,7 +13,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
@@ -42,6 +41,101 @@
             <sampleGL:RadarScene Name="OpenGlEchoOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False" Visibility="Hidden"/>
             <Canvas Name="RadarRingsOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3" IsHitTestVisible="False"></Canvas>
             <Canvas Name="ScaleOverlay" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="300" Height="50" Margin="20, 0, 0, 70" IsHitTestVisible="False"></Canvas>
+            <StackPanel Name="TopBlocker" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="62" Background="White">
+                <GroupBox Header="Layer Control" Width="Auto" Margin="5, 3, 5, 0">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="DisplayEnc" Content="Enc" IsEnabled="{Binding Path=IsEncLoaded}" IsChecked="{Binding Path=IsEncDisplayed}" 
+                                  Click="DisplayEnc_OnClick" Margin="0, 0, 20, 0" VerticalAlignment="Center"></CheckBox>
+                        <CheckBox Name="DisplayOpenGlEcho" Content="All Echoes" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsOpenGlEchoDisplayed}" 
+                                  Click="DisplayOpenGlEcho_OnClick" Margin="0, 0, 20, 0" VerticalAlignment="Center"></CheckBox>
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0">
+                            <TextBlock Name="TbRadar1" Text="Radar1" HorizontalAlignment="Center"></TextBlock>
+                            <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
+                                <CheckBox Name="CbRadar1Echo" Content="Echo" IsChecked="{Binding Path=IsRadar1EchoDisplayed}" 
+                                          Click="CbRadar1Echo_OnClick" Margin="0, 0, 5, 0"></CheckBox>
+                                <CheckBox Name="CbRadar1Rings" Content="Rings" IsChecked="{Binding Path=IsRadar1RingsDisplayed}" 
+                                          Click="CbRadar1Rings_OnClick"></CheckBox>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0">
+                            <TextBlock Name="TbRadar2" Text="Radar2" HorizontalAlignment="Center"></TextBlock>
+                            <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
+                                <CheckBox Name="CbRadar2Echo" Content="Echo" IsChecked="{Binding Path=IsRadar2EchoDisplayed}"
+                                          Click="CbRadar2Echo_OnClick" Margin="0, 0, 5, 0"></CheckBox>
+                                <CheckBox Name="CbRadar2Rings" Content="Rings" IsChecked="{Binding Path=IsRadar2RingsDisplayed}"
+                                          Click="CbRadar2Rings_OnClick"></CheckBox>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0">
+                            <TextBlock Name="TbRadar3" Text="Radar3" HorizontalAlignment="Center"></TextBlock>
+                            <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
+                                <CheckBox Name="CbRadar3Echo" Content="Echo" IsChecked="{Binding Path=IsRadar3EchoDisplayed}"
+                                          Click="CbRadar3Echo_OnClick" Margin="0, 0, 5, 0"></CheckBox>
+                                <CheckBox Name="CbRadar3Rings" Content="Rings" IsChecked="{Binding Path=IsRadar3RingsDisplayed}"
+                                          Click="CbRadar3Rings_OnClick" Margin="0, 0, 10, 0"></CheckBox>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0">
+                            <TextBlock Name="TbRadar4" Text="Radar4" HorizontalAlignment="Center"></TextBlock>
+                            <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
+                                <CheckBox Name="CbRadar4Echo" Content="Echo" IsChecked="{Binding Path=IsRadar4EchoDisplayed}"
+                                          Click="CbRadar4Echo_OnClick" Margin="0, 0, 5, 0"></CheckBox>
+                                <CheckBox Name="CbRadar4Rings" Content="Rings" IsChecked="{Binding Path=IsRadar4RingsDisplayed}"
+                                          Click="CbRadar4Rings_OnClick" Margin="0, 0, 10, 0"></CheckBox>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0">
+                            <TextBlock Name="TbRadar5" Text="Radar5" HorizontalAlignment="Center"></TextBlock>
+                            <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
+                                <CheckBox Name="CbRadar5Echo" Content="Echo" IsChecked="{Binding Path=IsRadar5EchoDisplayed}"
+                                          Click="CbRadar5Echo_OnClick" Margin="0, 0, 5, 0"></CheckBox>
+                                <CheckBox Name="CbRadar5Rings" Content="Rings" IsChecked="{Binding Path=IsRadar5RingsDisplayed}"
+                                          Click="CbRadar5Rings_OnClick" Margin="0, 0, 10, 0"></CheckBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+            <StackPanel Name="BottomBlocker" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="56" Background="White">
+                <GroupBox Header="Status" Width="Auto">
+                    <DockPanel LastChildFill="True">
+                        <!--Radar1-->
+                        <Image Name="ImgRadar1Status" ToolTip="Radar1 Status" Height="{Binding ElementName=LblRadar1SA, Path=ActualHeight}" Width="10"
+                               HorizontalAlignment="Center" Source="Assets/Disconnected.png" Margin="5, 0, 0, 0" VerticalAlignment="Center"></Image>
+                        <Label Name="LblRadar1SA" ToolTip="Radar1 Start Azimuth" Content="Radar1:"  VerticalAlignment="Center"></Label>
+                        <TextBlock Name="TbRadar1SA" Text="{Binding Radar1StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
+
+                        <!--Radar2-->
+                        <Image Name="ImgRadar2Status" ToolTip="Radar2 Status" Height="{Binding ElementName=LblRadar2SA, Path=ActualHeight}" Width="10"
+                               HorizontalAlignment="Center" Source="Assets/Disconnected.png" Margin="20, 0, 0, 0"  VerticalAlignment="Center"></Image>
+                        <Label Name="LblRadar2SA" ToolTip="Radar2 Start Azimuth" Content="Radar2:"  VerticalAlignment="Center"></Label>
+                        <TextBlock Name="TbRadar2SA" Text="{Binding Radar2StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
+
+                        <!--Radar3-->
+                        <Image Name="ImgRadar3Status" ToolTip="Radar3 Status" Height="{Binding ElementName=LblRadar3SA, Path=ActualHeight}" Width="10"
+                               HorizontalAlignment="Center" Source="Assets/Disconnected.png" Margin="20, 0, 0, 0"  VerticalAlignment="Center"></Image>
+                        <Label Name="LblRadar3SA" ToolTip="Radar3 Start Azimuth" Content="Radar3:"  VerticalAlignment="Center"></Label>
+                        <TextBlock Name="TbRadar3SA" Text="{Binding Radar3StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
+
+                        <!--Radar4-->
+                        <Image Name="ImgRadar4Status" ToolTip="Radar4 Status" Height="{Binding ElementName=LblRadar4SA, Path=ActualHeight}" Width="10"
+                               HorizontalAlignment="Center" Source="Assets/Disconnected.png" Margin="20, 0, 0, 0"  VerticalAlignment="Center"></Image>
+                        <Label Name="LblRadar4SA" ToolTip="Radar4 Start Azimuth" Content="Radar4:"  VerticalAlignment="Center"></Label>
+                        <TextBlock Name="TbRadar4SA" Text="{Binding Radar4StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
+
+                        <!--Radar5-->
+                        <Image Name="ImgRadar5Status" ToolTip="Radar5 Status" Height="{Binding ElementName=LblRadar5SA, Path=ActualHeight}" Width="10"
+                               HorizontalAlignment="Center" Source="Assets/Disconnected.png" Margin="20, 0, 0, 0"  VerticalAlignment="Center"></Image>
+                        <Label Name="LblRadar5SA" ToolTip="Radar5 Start Azimuth" Content="Radar5:"  VerticalAlignment="Center"></Label>
+                        <TextBlock Name="TbRadar5SA" Text="{Binding Radar5StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
+                        
+                        <!--状态栏-->
+                        <StackPanel>
+                            <TextBlock Name="TbStatusInfo" Text="Initialization done." HorizontalAlignment="Right"></TextBlock>
+                        </StackPanel>
+                    </DockPanel>
+                </GroupBox>
+            </StackPanel>
         </Grid>
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Width="120" DockPanel.Dock="Right" Margin="3, 3, 6, 3" ZIndex="1" Background="White">
             <GroupBox Header="View">
@@ -114,107 +208,15 @@
                     <Button Name="BtnPresetLocation5" Content="Radar 5" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation5_OnClick"></Button>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Header="Layer" Width="Auto">
-                <StackPanel Orientation="Vertical">
-                    <CheckBox Name="DisplayOpenGlEcho" Content="OpenGL Echo" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsOpenGlEchoDisplayed}" 
-                              Click="DisplayOpenGlEcho_OnClick"></CheckBox>
-
-                    <CheckBox Name="DisplayEnc" Content="Enc" IsEnabled="{Binding Path=IsEncLoaded}" IsChecked="{Binding Path=IsEncDisplayed}" 
-                              Click="DisplayEnc_OnClick"></CheckBox>
-                    <TextBlock Name="TbRadar1" Text="Radar1" Margin="0, 4, 0, 2"></TextBlock>
-                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar1Connected}">
-                        <CheckBox Name="CbRadar1Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar1EchoDisplayed}"
-                                  Click="CbRadar1Echo_OnClick"></CheckBox>
-                        <CheckBox Name="CbRadar1Rings" Content="Rings" IsChecked="{Binding Path=IsRadar1RingsDisplayed}"
-                                  Click="CbRadar1Rings_OnClick"></CheckBox>
-                    </StackPanel>
-                    <TextBlock Name="TbRadar2" Text="Radar2" Margin="0, 4, 0, 2"></TextBlock>
-                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar2Connected}">
-                        <CheckBox Name="CbRadar2Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar2EchoDisplayed}"
-                                  Click="CbRadar2Echo_OnClick"></CheckBox>
-                        <CheckBox Name="CbRadar2Rings" Content="Rings" IsChecked="{Binding Path=IsRadar2RingsDisplayed}"
-                                  Click="CbRadar2Rings_OnClick"></CheckBox>
-                    </StackPanel>
-                    <TextBlock Name="TbRadar3" Text="Radar3" Margin="0, 4, 0, 2"></TextBlock>
-                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar3Connected}">
-                        <CheckBox Name="CbRadar3Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar3EchoDisplayed}"
-                                  Click="CbRadar3Echo_OnClick"></CheckBox>
-                        <CheckBox Name="CbRadar3Rings" Content="Rings" IsChecked="{Binding Path=IsRadar3RingsDisplayed}"
-                                  Click="CbRadar3Rings_OnClick"></CheckBox>
-                    </StackPanel>
-                    <TextBlock Name="TbRadar4" Text="Radar4" Margin="0, 4, 0, 2"></TextBlock>
-                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar4Connected}">
-                        <CheckBox Name="CbRadar4Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar4EchoDisplayed}"
-                                  Click="CbRadar4Echo_OnClick"></CheckBox>
-                        <CheckBox Name="CbRadar4Rings" Content="Rings" IsChecked="{Binding Path=IsRadar4RingsDisplayed}"
-                                  Click="CbRadar4Rings_OnClick"></CheckBox>
-                    </StackPanel>
-                    <TextBlock Name="TbRadar5" Text="Radar5" Margin="0, 4, 0, 2"></TextBlock>
-                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar5Connected}">
-                        <CheckBox Name="CbRadar5Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar5EchoDisplayed}"
-                                  Click="CbRadar5Echo_OnClick"></CheckBox>
-                        <CheckBox Name="CbRadar5Rings" Content="Rings" IsChecked="{Binding Path=IsRadar5RingsDisplayed}"
-                                  Click="CbRadar5Rings_OnClick"></CheckBox>
-                    </StackPanel>
-                </StackPanel>
-            </GroupBox>
             <GroupBox Header="Cursor" Width="Auto">
                 <StackPanel Orientation="Vertical">
                     <Label Name="CursorLongitude" ToolTip="Longitude"  Content="Lon:"/>
                     <Label Name="CursorLatitude" ToolTip="Latitude" Content="Lat:"/>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Header="Radar Status" Width="Auto">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Orientation="Vertical">
-                        <Image Name="ImgRadar1Status" ToolTip="Radar1 Status" Height="{Binding ElementName=LblRadar1SA, Path=ActualHeight}" Width="10"
-                               HorizontalAlignment="Center" Source="Assets/Disconnected.png"></Image>
-                        <Image Name="ImgRadar2Status" ToolTip="Radar2 Status" Height="{Binding ElementName=LblRadar2SA, Path=ActualHeight}" Width="10"
-                               HorizontalAlignment="Center" Source="Assets/Disconnected.png"></Image>
-                        <Image Name="ImgRadar3Status" ToolTip="Radar3 Status" Height="{Binding ElementName=LblRadar3SA, Path=ActualHeight}" Width="10"
-                               HorizontalAlignment="Center" Source="Assets/Disconnected.png"></Image>
-                        <Image Name="ImgRadar4Status" ToolTip="Radar4 Status" Height="{Binding ElementName=LblRadar4SA, Path=ActualHeight}" Width="10"
-                               HorizontalAlignment="Center" Source="Assets/Disconnected.png"></Image>
-                        <Image Name="ImgRadar5Status" ToolTip="Radar5 Status" Height="{Binding ElementName=LblRadar5SA, Path=ActualHeight}" Width="10"
-                               HorizontalAlignment="Center" Source="Assets/Disconnected.png"></Image>
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Orientation="Vertical">
-                        <Label Name="LblRadar1SA" ToolTip="Radar1 Start Azimuth" Content="Radar1:"></Label>
-                        <Label Name="LblRadar2SA" ToolTip="Radar2 Start Azimuth" Content="Radar2:"></Label>
-                        <Label Name="LblRadar3SA" ToolTip="Radar3 Start Azimuth" Content="Radar3:"></Label>
-                        <Label Name="LblRadar4SA" ToolTip="Radar4 Start Azimuth" Content="Radar4:"></Label>
-                        <Label Name="LblRadar5SA" ToolTip="Radar5 Start Azimuth" Content="Radar5:"></Label>
-                    </StackPanel>
-                    <StackPanel Grid.Column="2" Orientation="Vertical">
-                        <TextBlock Name="TbRadar1SA" Height="{Binding ElementName=LblRadar1SA, Path=ActualHeight}" Margin="0, 5, 0, 0"
-                                   Text="{Binding Radar1StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
-                        <TextBlock Name="TbRadar2SA" Height="{Binding ElementName=LblRadar2SA, Path=ActualHeight}" 
-                                   Text="{Binding Radar2StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
-                        <TextBlock Name="TbRadar3SA" Height="{Binding ElementName=LblRadar3SA, Path=ActualHeight}" 
-                                   Text="{Binding Radar3StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
-                        <TextBlock Name="TbRadar4SA" Height="{Binding ElementName=LblRadar4SA, Path=ActualHeight}" 
-                                   Text="{Binding Radar4StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
-                        <TextBlock Name="TbRadar5SA" Height="{Binding ElementName=LblRadar5SA, Path=ActualHeight}" 
-                                   Text="{Binding Radar5StartAzimuth, StringFormat={}{0:F2}}"></TextBlock>
-                        
-                    </StackPanel>
-                </Grid>
-            </GroupBox>
             <Image Source="assets/Sinology.png" Width="100" Stretch="Fill" Margin="0, 10, 0, 0"></Image>
+            <Label Content="All rights reserved" HorizontalAlignment="Center" Margin="0, 10, 0, 0"></Label>
+            <Label Content="Sinology 2023" HorizontalAlignment="Center"></Label>
         </StackPanel>
-        <!--状态栏-->
-        <StatusBar Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0">
-            <StatusBarItem>
-                <TextBlock Name="TbStatusInfo" Text="Initialization done."></TextBlock>
-            </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right">
-                <Label Content="All rights reserved. Sinology 2023"></Label>
-            </StatusBarItem>
-        </StatusBar>
     </Grid>
 </Window>
