@@ -205,25 +205,25 @@ public partial class ExampleScene : UserControl
         isInitialized = true;
         //durationMS = 0;
 
-        //_bitmap.Lock();
-        //byte* p = (byte*)_bitmap.BackBuffer.ToPointer();
-        //gl.ReadPixels(0, 0, (uint)GLControl.ActualWidth, (uint)GLControl.ActualHeight, GLEnum.Bgra, GLEnum.UnsignedByte, p);
-        //for (int i = 0; i < (uint)GLControl.ActualWidth * (uint)GLControl.ActualHeight; i++)
-        //{
-        //    byte* alpha = p + i * 4 + 3;
-        //    if (*(p + i * 4 + 2) == (byte)0 && *(p + i * 4 + 1) == (byte)0 && *(p + i * 4) == (byte)0)
-        //    {
-        //        *(p + i * 4 + 3) = (byte)0;
-        //    }
-        //    else
-        //    {
-        //        *alpha = *(alpha - 2) * 2 > 255 ? (byte)255 : (byte)(*(alpha - 2) * 2);
-        //        *(alpha - 2) = (byte)255;
-        //    }
+        _bitmap.Lock();
+        byte* p = (byte*)_bitmap.BackBuffer.ToPointer();
+        gl.ReadPixels(0, 0, (uint)GLControl.ActualWidth, (uint)GLControl.ActualHeight, GLEnum.Bgra, GLEnum.UnsignedByte, p);
+        for (int i = 0; i < (uint)GLControl.ActualWidth * (uint)GLControl.ActualHeight; i++)
+        {
+            byte* alpha = p + i * 4 + 3;
+            if (*(p + i * 4 + 2) == (byte)0 && *(p + i * 4 + 1) == (byte)0 && *(p + i * 4) == (byte)0)
+            {
+                *(p + i * 4 + 3) = (byte)0;
+            }
+            else
+            {
+                *alpha = *(alpha - 2) * 2 > 255 ? (byte)255 : (byte)(*(alpha - 2) * 2);
+                *(alpha - 2) = (byte)255;
+            }
 
-        //}
-        //_bitmap.AddDirtyRect(new Int32Rect(0, 0, (int)GLControl.ActualWidth, (int)GLControl.ActualHeight));
-        //_bitmap.Unlock();
+        }
+        _bitmap.AddDirtyRect(new Int32Rect(0, 0, (int)GLControl.ActualWidth, (int)GLControl.ActualHeight));
+        _bitmap.Unlock();
     }
 
     public void OnReceivedRadarData(object sender, RadarDataReceivedEventArgs e)
