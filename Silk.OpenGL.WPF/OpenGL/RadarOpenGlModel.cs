@@ -24,9 +24,6 @@ namespace Silk.WPF.OpenGL
         public int UIWidth { get; set; } = 1600;
         public float RadarMaxDistance { get; set; } = 60.0f;
 
-
-        private uint lastId = 0;
-
         private int _realCells = RadarConfig.CELLS;
 
         public int RealCells
@@ -42,7 +39,6 @@ namespace Silk.WPF.OpenGL
                 {
                     DataArray = new float[RadarConfig.SECTIONS * (value + RadarConfig.HEAD)];
                     TextureData = new OpenGLSharp.Texture(gl, DataArray, (uint)(value + RadarConfig.HEAD), RadarConfig.SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit);
-                    lastId = 0;
 
                 }
                 _realCells = value;

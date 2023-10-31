@@ -20,9 +20,6 @@ namespace RadarMonitor.ViewModel
     //public delegate void Cat240PackageReceivedEventHandler(object sender, int radarId, Cat240DataBlock data);
     public delegate void Cat240PackageReceivedOpenGLEventHandler(object sender, RadarDataReceivedEventArgs e);
 
-
-    public delegate void ViewPointChangedHandler(object sender, Viewpoint viewpoint);
-
     public class RadarMonitorViewModel : INotifyPropertyChanged
     {
         #region Notify Property
@@ -49,15 +46,11 @@ namespace RadarMonitor.ViewModel
         public event Cat240SpecChangedEventHandler OnCat240SpecChanged;
         //public event Cat240PackageReceivedEventHandler OnCat240PackageReceived;
         public event Cat240PackageReceivedOpenGLEventHandler OnCat240PackageReceivedOpenGLEvent;
-        public event ViewPointChangedHandler OnViewPointChanged;
 
         // 用户配置信息
         private UserConfiguration _userConfiguration;
         private bool _isPresetLocationLoaded;
 
-        //private Dictionary<int, Cat240DataItems> _lastCat240DataItems = new Dictionary<int, Cat240DataItems>();
-        private Dictionary<int, MulticastClient> _clients = new Dictionary<int, MulticastClient>();
-        //private Dictionary<int, RadarSetting> radarSettings= new Dictionary<int, RadarSetting>();
 
         #region UserConfiguration Properties
         public UserConfiguration Configuration
@@ -588,43 +581,6 @@ namespace RadarMonitor.ViewModel
 
             var dataItems = data.Items;
             
-            //ThreadPool.QueueUserWorkItem((obj) =>
-            //{
-            //    if (!RadarSettings[radarId].IsRadarEnabled)
-            //    {
-            //        // 雷达若没启用，则略过数据包
-            //        return;
-            //    }
-
-            //    SetRadarConnectionStatus(radarId, true);
-
-            //    if (_lastCat240DataItems[radarId] != null && 
-            //        _lastCat240DataItems[radarId].StartAzimuthInDegree == dataItems.StartAzimuthInDegree)
-            //    {
-            //        // 避免切换雷达数据源时，因为没能及时处理数据而重发导致的问题
-            //        return;
-            //    }
-
-            //    // 首个数据包 或 数据包发生了变化
-            //    if (dataItems.IsSpecChanged(_lastCat240DataItems[radarId]))
-            //    {
-            //        _radarRadiusIncrements[radarId] = HalfCartesianSize / dataItems.VideoBlocks.Count;
-            //        _radarScaledSteps[radarId] = dataItems.VideoBlocks.Count / CartesianSize;
-            //        RadarSettings[radarId].RadarMaxDistance = 
-            //            (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * HalfC * dataItems.ValidCellsInDataBlock);
-
-            //        OnCat240SpecChanged?.Invoke(this, radarId, new Cat240Spec(dataItems));
-            //        OnRadarConnectionStatusChanged?.Invoke(this, radarId, string.Empty, 0, RadarConnectionStatus.Normal);
-            //    }
-
-            //    _lastCat240DataItems[radarId] = dataItems;
-
-            //    SetRadarAzimuth(radarId, dataItems.StartAzimuthInDegree);
-
-            //    PolarToCartesian(radarId, RadarSettings[radarId].RadarOrientation, dataItems);
-            //    //OnCat240PackageReceived?.Invoke(this, data);   // 调整成只变更数据，不触发显示
-            //});
-
             if (!RadarSettings[radarId].IsRadarEnabled)
             {
                 // 雷达若没启用，则略过数据包

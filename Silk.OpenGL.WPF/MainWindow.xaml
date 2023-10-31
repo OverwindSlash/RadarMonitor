@@ -14,10 +14,10 @@
         <TabItem Header="OpenGL Silk">
             <UniformGrid Rows="2"
                          Columns="2">
-                <sampleGL:ExampleScene />
-                <sampleGL:ExampleScene />
-                <sampleGL:ExampleScene />
-                <sampleGL:ExampleScene />
+                <sampleGL:RadarScene />
+                <sampleGL:RadarScene />
+                <sampleGL:RadarScene />
+                <sampleGL:RadarScene />
             </UniformGrid>
         </TabItem>
     </TabControl>

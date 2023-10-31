@@ -17,9 +17,6 @@ namespace CAT240Parser
 
         private int _clientId;
         private bool _stop;
-        private ConcurrentDictionary<uint, int> _dataBlockIds = new();
-
-        private int _dataBlockCount;
 
         // 定义事件
         public event UdpConnectedEventHandler OnUdpConnected;

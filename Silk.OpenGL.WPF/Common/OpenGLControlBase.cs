@@ -9,9 +9,9 @@ using System.Windows.Media;
 
 namespace Silk.WPF.Common;
 
-public abstract class GameBase<TFrame> : Control where TFrame : FramebufferBase
+public abstract class OpenGLControlBase<TFrame> : Control where TFrame : FramebufferBase
 {
-    public static readonly DependencyProperty FpsProperty = DependencyProperty.Register(nameof(Fps), typeof(int), typeof(GameBase<TFrame>), new PropertyMetadata(0));
+    public static readonly DependencyProperty FpsProperty = DependencyProperty.Register(nameof(Fps), typeof(int), typeof(OpenGLControlBase<TFrame>), new PropertyMetadata(0));
 
     protected readonly Stopwatch _stopwatch = Stopwatch.StartNew();
     private readonly List<int> _fpsSample = new();
