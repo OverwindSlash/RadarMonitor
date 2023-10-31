@@ -165,6 +165,10 @@ public partial class ExampleScene : UserControl
         foreach (var model in _radarModels)
         {
             var radar = model.Value;
+            if (!radar.IsDisplay)
+            {
+                continue;
+            }
             radar.BindTexture();
             radar.UpdateTexture();
 
@@ -256,7 +260,7 @@ public partial class ExampleScene : UserControl
             radar.RadarOrientation = radarInfo.RadarOrientation;
             radar.RadarMaxDistance = radarInfo.RadarMaxDistance;
             radar.RealCells = radarInfo.RealCells;
-
+            radar.IsDisplay = radarInfo.IsDisplay;
         }
         else
         {
@@ -270,8 +274,15 @@ public partial class ExampleScene : UserControl
             radar.MapHeightOffCenter = radarInfo.MapHeightOffCenter;
             radar.RadarOrientation = radarInfo.RadarOrientation;
             radar.RadarMaxDistance = radarInfo.RadarMaxDistance;
+            radar.IsDisplay = radarInfo.IsDisplay;
 
             _radarModels.Add(radar.RadarID, radar);
         }
+    }
+
+    public void OnDisplayed(int radarId, bool isDisplay)
+    {
+        var radar = _radarModels[radarId];
+        radar.IsDisplay = isDisplay;
     }
 }

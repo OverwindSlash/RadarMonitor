@@ -26,5 +26,7 @@ namespace Silk.WPF.OpenGL
         public double Longitude { get; set; } = 0;
         public double Latitude { get; set; } = 0;
         public double RadarOrientation { get; set; } = 0.0f;
+
+        public bool IsDisplay { get; set; }
     }
 }

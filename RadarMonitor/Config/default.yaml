@@ -18,7 +18,7 @@ radarSettings:
    isRadarEnabled: true
    isRingsDisplayed: true
    isEchoDisplayed: true
-   isOpenGlEchoDisplayed: false
+   isOpenGlEchoDisplayed: true
 -
    radarName: 世博公园
    radarLongitude: 121.489728
@@ -31,7 +31,7 @@ radarSettings:
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
-   isOpenGlEchoDisplayed: false
+   isOpenGlEchoDisplayed: true
 -
    radarName: 杨浦
    radarLongitude: 121.539628
@@ -44,7 +44,7 @@ radarSettings:
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
-   isOpenGlEchoDisplayed: false
+   isOpenGlEchoDisplayed: true
 -
    radarName: 吴淞
    radarLongitude: 121.496233
@@ -57,7 +57,7 @@ radarSettings:
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
-   isOpenGlEchoDisplayed: false
+   isOpenGlEchoDisplayed: true
 -
    radarName: 闵行
    radarLongitude: 121.463678
@@ -70,4 +70,4 @@ radarSettings:
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
-   isOpenGlEchoDisplayed: false
+   isOpenGlEchoDisplayed: true

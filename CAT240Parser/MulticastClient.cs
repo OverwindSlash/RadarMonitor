@@ -91,7 +91,7 @@ namespace CAT240Parser
                 //{
                 //Trace.TraceInformation($"{_radarId}");
 
-                OnCat240Received?.Invoke(this, dataBlock, _radarId);
+                OnCat240Received?.Invoke(this, _clientId, dataBlock);
                 //    lastAzimuth = dataBlock.Items.StartAzimuth;
                 //}
                 ReceiveAsync();

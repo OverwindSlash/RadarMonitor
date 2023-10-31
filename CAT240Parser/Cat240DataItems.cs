@@ -214,33 +214,6 @@ namespace CAT240Parser
             }
         }
 
-        public uint GetCellData(byte[] buffer, int cellIndex)
-        {
-            switch (VideoResolution)
-            {
-                case 1:
-                    bool cell1Bit = BitOperation.Get1BitBigEndian(buffer, cellIndex / 8, cellIndex);
-                    return cell1Bit ? (uint)1 : 0;
-                case 2:
-                    byte cell2Bits = BitOperation.Get2BitsBigEndian(buffer, cellIndex / 4, cellIndex * 2);
-                    return (uint)cell2Bits;
-                case 4:
-                    byte cell4Bits = BitOperation.Get4BitsBigEndian(buffer, cellIndex / 2, cellIndex * 4);
-                    return (uint)cell4Bits;
-                case 8:
-                    byte cell1Byte = buffer[cellIndex];
-                    return (uint)cell1Byte;
-                case 16:
-                    ushort cell2Bytes = BitOperation.Get2BytesBigEndian(buffer, cellIndex * 2);
-                    return (uint)cell2Bytes;
-                case 32:
-                    uint cell4Bytes = BitOperation.Get4BytesBigEndian(buffer, cellIndex * 4);
-                    return cell4Bytes;
-                default:
-                    byte cellDefault = buffer[cellIndex];
-                    return (uint)cellDefault;
-            }
-        }
 
         public bool IsSpecChanged(Cat240DataItems other)
         {

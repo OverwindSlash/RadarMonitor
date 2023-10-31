@@ -66,6 +66,7 @@ namespace Silk.WPF.OpenGL
             }
         }
 
+        public bool IsDisplay { get; set; }
         public int RadarID { get; set; } 
         public RadarOpenGlModel(int radarID)
         {

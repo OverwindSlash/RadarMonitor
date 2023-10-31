@@ -2,10 +2,12 @@
 using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Mapping;
 using RadarMonitor.Model;
+using Silk.WPF.OpenGL.Scene;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -15,7 +17,10 @@ namespace RadarMonitor.ViewModel
     public delegate void RadarChangedEventHandler(object sender, int radarId, RadarSetting radarSetting);
     public delegate void RadarConnectionStatusChangedHandler(object sender, int radarId, string ip, int port, RadarConnectionStatus status);
     public delegate void Cat240SpecChangedEventHandler(object sender, int radarId, Cat240Spec cat240Spec);
-    public delegate void Cat240PackageReceivedEventHandler(object sender, int radarId, Cat240DataBlock data);
+    //public delegate void Cat240PackageReceivedEventHandler(object sender, int radarId, Cat240DataBlock data);
+    public delegate void Cat240PackageReceivedOpenGLEventHandler(object sender, RadarDataReceivedEventArgs e);
+
+
     public delegate void ViewPointChangedHandler(object sender, Viewpoint viewpoint);
 
     public class RadarMonitorViewModel : INotifyPropertyChanged
@@ -50,12 +55,10 @@ namespace RadarMonitor.ViewModel
         private UserConfiguration _userConfiguration;
         private bool _isPresetLocationLoaded;
 
-        private Dictionary<int, Cat240DataItems> _lastCat240DataItems = new Dictionary<int, Cat240DataItems>();
+        //private Dictionary<int, Cat240DataItems> _lastCat240DataItems = new Dictionary<int, Cat240DataItems>();
         private Dictionary<int, MulticastClient> _clients = new Dictionary<int, MulticastClient>();
         //private Dictionary<int, RadarSetting> radarSettings= new Dictionary<int, RadarSetting>();
 
-        #region Properties
-        public bool IsEncLoaded
         #region UserConfiguration Properties
         public UserConfiguration Configuration
         {
@@ -76,6 +79,15 @@ namespace RadarMonitor.ViewModel
         }
         #endregion
 
+        private bool _isOpenGlEchoDisplayed;
+        public bool IsOpenGlEchoDisplayed
+        {
+            get => _isOpenGlEchoDisplayed;
+            set
+            {
+                SetField(ref _isOpenGlEchoDisplayed, value, "IsOpenGlEchoDisplayed");
+            }
+        }
 
         // 海图相关属性
         private bool _isEncLoaded;
@@ -507,7 +519,6 @@ namespace RadarMonitor.ViewModel
             {
                 return;
             }
-            var dataItems = data.Items;
 
             StopCaptureCat240NetworkPackage(radarId);
 
@@ -577,42 +588,77 @@ namespace RadarMonitor.ViewModel
 
             var dataItems = data.Items;
             
-            ThreadPool.QueueUserWorkItem((obj) =>
+            //ThreadPool.QueueUserWorkItem((obj) =>
+            //{
+            //    if (!RadarSettings[radarId].IsRadarEnabled)
+            //    {
+            //        // 雷达若没启用，则略过数据包
+            //        return;
+            //    }
+
+            //    SetRadarConnectionStatus(radarId, true);
+
+            //    if (_lastCat240DataItems[radarId] != null && 
+            //        _lastCat240DataItems[radarId].StartAzimuthInDegree == dataItems.StartAzimuthInDegree)
+            //    {
+            //        // 避免切换雷达数据源时，因为没能及时处理数据而重发导致的问题
+            //        return;
+            //    }
+
+            //    // 首个数据包 或 数据包发生了变化
+            //    if (dataItems.IsSpecChanged(_lastCat240DataItems[radarId]))
+            //    {
+            //        _radarRadiusIncrements[radarId] = HalfCartesianSize / dataItems.VideoBlocks.Count;
+            //        _radarScaledSteps[radarId] = dataItems.VideoBlocks.Count / CartesianSize;
+            //        RadarSettings[radarId].RadarMaxDistance = 
+            //            (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * HalfC * dataItems.ValidCellsInDataBlock);
+
+            //        OnCat240SpecChanged?.Invoke(this, radarId, new Cat240Spec(dataItems));
+            //        OnRadarConnectionStatusChanged?.Invoke(this, radarId, string.Empty, 0, RadarConnectionStatus.Normal);
+            //    }
+
+            //    _lastCat240DataItems[radarId] = dataItems;
+
+            //    SetRadarAzimuth(radarId, dataItems.StartAzimuthInDegree);
+
+            //    PolarToCartesian(radarId, RadarSettings[radarId].RadarOrientation, dataItems);
+            //    //OnCat240PackageReceived?.Invoke(this, data);   // 调整成只变更数据，不触发显示
+            //});
+
+            if (!RadarSettings[radarId].IsRadarEnabled)
             {
-                if (!RadarSettings[radarId].IsRadarEnabled)
-                {
-                    // 雷达若没启用，则略过数据包
-                    return;
-                }
+                // 雷达若没启用，则略过数据包
+                return;
+            }
+            SetRadarConnectionStatus(radarId, true);
 
-                SetRadarConnectionStatus(radarId, true);
+            // 同一雷达每个数据包基本不变的信息
+            if (dataItems.IsSpecChanged(_lastCat240DataItems[radarId]))
+            {
+                _radarRadiusIncrements[radarId] = HalfCartesianSize / dataItems.VideoBlocks.Count;
+                _radarScaledSteps[radarId] = dataItems.VideoBlocks.Count / CartesianSize;
+                RadarSettings[radarId].RadarMaxDistance =
+                    (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * HalfC * dataItems.ValidCellsInDataBlock);
 
-                if (_lastCat240DataItems[radarId] != null && 
-                    _lastCat240DataItems[radarId].StartAzimuthInDegree == dataItems.StartAzimuthInDegree)
-                {
-                    // 避免切换雷达数据源时，因为没能及时处理数据而重发导致的问题
-                    return;
-                }
-
-                // 首个数据包 或 数据包发生了变化
-                if (dataItems.IsSpecChanged(_lastCat240DataItems[radarId]))
-                {
-                    _radarRadiusIncrements[radarId] = HalfCartesianSize / dataItems.VideoBlocks.Count;
-                    _radarScaledSteps[radarId] = dataItems.VideoBlocks.Count / CartesianSize;
-                    RadarSettings[radarId].RadarMaxDistance = 
-                        (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * HalfC * dataItems.ValidCellsInDataBlock);
-
-                    OnCat240SpecChanged?.Invoke(this, radarId, new Cat240Spec(dataItems));
-                    OnRadarConnectionStatusChanged?.Invoke(this, radarId, string.Empty, 0, RadarConnectionStatus.Normal);
-                }
-
+                OnCat240SpecChanged?.Invoke(this, radarId, new Cat240Spec(dataItems));
+                OnRadarConnectionStatusChanged?.Invoke(this, radarId, string.Empty, 0, RadarConnectionStatus.Normal);
                 _lastCat240DataItems[radarId] = dataItems;
+            }
 
-                SetRadarAzimuth(radarId, dataItems.StartAzimuthInDegree);
+            SetRadarAzimuth(radarId, dataItems.StartAzimuthInDegree);
 
-                PolarToCartesian(radarId, RadarSettings[radarId].RadarOrientation, dataItems);
-                //OnCat240PackageReceived?.Invoke(this, data);   // 调整成只变更数据，不触发显示
-            });
+            List<float> DataArr = new List<float>((int)dataItems.VideoBlocks.Count + 1);
+            var t = DateTime.Now;
+            var ts = t.Hour * 60 * 60 * 1000 + t.Minute * 60 * 1000 + t.Second * 1000 + t.Millisecond;
+            DataArr.Add(ts);
+
+            for (int i = 0; i < data.Items.ValidCellsInDataBlock; i++)
+            {
+                var color = (float)data.Items.GetCellData(i) / 255;
+                DataArr.Add(color);
+            }
+
+            OnCat240PackageReceivedOpenGLEvent?.Invoke(this, new RadarDataReceivedEventArgs(radarId, data.Items.StartAzimuth, DataArr));
         }
 
         private void SetRadarConnectionStatus(int radarId, bool status)
