@@ -168,8 +168,17 @@ namespace RadarMonitor.ViewModel
             new RadarSetting(),
             new RadarSetting()
         };
-        
+
         #region Radar Properties
+        public bool IsRadarConnected
+        {
+            get => IsRadar1Connected || 
+                   IsRadar2Connected || 
+                   IsRadar3Connected || 
+                   IsRadar4Connected ||
+                   IsRadar5Connected;
+        }
+
         public List<RadarSetting> RadarSettings
         {
             get => _radarSettings;
@@ -192,6 +201,7 @@ namespace RadarMonitor.ViewModel
             {
                 _radarSettings[0].IsConnected = value;
                 OnPropertyChanged("IsRadar1Connected");
+                OnPropertyChanged("IsRadarConnected");
             }
         }
 
@@ -233,6 +243,7 @@ namespace RadarMonitor.ViewModel
             {
                 _radarSettings[1].IsConnected = value;
                 OnPropertyChanged("IsRadar2Connected");
+                OnPropertyChanged("IsRadarConnected");
             }
         }
 
@@ -274,6 +285,7 @@ namespace RadarMonitor.ViewModel
             {
                 _radarSettings[2].IsConnected = value;
                 OnPropertyChanged("IsRadar3Connected");
+                OnPropertyChanged("IsRadarConnected");
             }
         }
 
@@ -315,6 +327,7 @@ namespace RadarMonitor.ViewModel
             {
                 _radarSettings[3].IsConnected = value;
                 OnPropertyChanged("IsRadar4Connected");
+                OnPropertyChanged("IsRadarConnected");
             }
         }
 
@@ -356,6 +369,7 @@ namespace RadarMonitor.ViewModel
             {
                 _radarSettings[4].IsConnected = value;
                 OnPropertyChanged("IsRadar5Connected");
+                OnPropertyChanged("IsRadarConnected");
             }
         }
 

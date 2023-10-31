@@ -48,7 +48,7 @@
                                   Click="DisplayEnc_OnClick" Margin="0, 0, 20, 0" VerticalAlignment="Center"></CheckBox>
                         <CheckBox Name="DisplayOpenGlEcho" Content="All Echoes" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsOpenGlEchoDisplayed}" 
                                   Click="DisplayOpenGlEcho_OnClick" Margin="0, 0, 20, 0" VerticalAlignment="Center"></CheckBox>
-                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0">
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar1Connected}">
                             <TextBlock Name="TbRadar1" Text="Radar1" HorizontalAlignment="Center"></TextBlock>
                             <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
                                 <CheckBox Name="CbRadar1Echo" Content="Echo" IsChecked="{Binding Path=IsRadar1EchoDisplayed}" 
@@ -57,7 +57,7 @@
                                           Click="CbRadar1Rings_OnClick"></CheckBox>
                             </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0">
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar2Connected}">
                             <TextBlock Name="TbRadar2" Text="Radar2" HorizontalAlignment="Center"></TextBlock>
                             <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
                                 <CheckBox Name="CbRadar2Echo" Content="Echo" IsChecked="{Binding Path=IsRadar2EchoDisplayed}"
@@ -66,7 +66,7 @@
                                           Click="CbRadar2Rings_OnClick"></CheckBox>
                             </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0">
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar3Connected}">
                             <TextBlock Name="TbRadar3" Text="Radar3" HorizontalAlignment="Center"></TextBlock>
                             <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
                                 <CheckBox Name="CbRadar3Echo" Content="Echo" IsChecked="{Binding Path=IsRadar3EchoDisplayed}"
@@ -75,7 +75,7 @@
                                           Click="CbRadar3Rings_OnClick" Margin="0, 0, 10, 0"></CheckBox>
                             </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0">
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar4Connected}">
                             <TextBlock Name="TbRadar4" Text="Radar4" HorizontalAlignment="Center"></TextBlock>
                             <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
                                 <CheckBox Name="CbRadar4Echo" Content="Echo" IsChecked="{Binding Path=IsRadar4EchoDisplayed}"
@@ -84,7 +84,7 @@
                                           Click="CbRadar4Rings_OnClick" Margin="0, 0, 10, 0"></CheckBox>
                             </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0">
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar5Connected}">
                             <TextBlock Name="TbRadar5" Text="Radar5" HorizontalAlignment="Center"></TextBlock>
                             <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
                                 <CheckBox Name="CbRadar5Echo" Content="Echo" IsChecked="{Binding Path=IsRadar5EchoDisplayed}"
@@ -97,126 +97,132 @@
                 </GroupBox>
             </StackPanel>
             <StackPanel Name="BottomBlocker" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="56" Background="White">
-                <GroupBox Header="Status" Width="Auto">
+                <GroupBox Header="Status" Width="Auto" Margin="5, 0 ,5, 0">
                     <DockPanel LastChildFill="True">
                         <!--Radar1-->
                         <Image Name="ImgRadar1Status" ToolTip="Radar1 Status" Height="{Binding ElementName=LblRadar1SA, Path=ActualHeight}" Width="10"
                                HorizontalAlignment="Center" Source="Assets/Disconnected.png" Margin="5, 0, 0, 0" VerticalAlignment="Center"></Image>
                         <Label Name="LblRadar1SA" ToolTip="Radar1 Start Azimuth" Content="Radar1:"  VerticalAlignment="Center"></Label>
-                        <TextBlock Name="TbRadar1SA" Text="{Binding Radar1StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
+                        <TextBlock Name="TbRadar1SA" Width="30" Text="{Binding Radar1StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
 
                         <!--Radar2-->
                         <Image Name="ImgRadar2Status" ToolTip="Radar2 Status" Height="{Binding ElementName=LblRadar2SA, Path=ActualHeight}" Width="10"
                                HorizontalAlignment="Center" Source="Assets/Disconnected.png" Margin="20, 0, 0, 0"  VerticalAlignment="Center"></Image>
                         <Label Name="LblRadar2SA" ToolTip="Radar2 Start Azimuth" Content="Radar2:"  VerticalAlignment="Center"></Label>
-                        <TextBlock Name="TbRadar2SA" Text="{Binding Radar2StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
+                        <TextBlock Name="TbRadar2SA" Width="30" Text="{Binding Radar2StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
 
                         <!--Radar3-->
                         <Image Name="ImgRadar3Status" ToolTip="Radar3 Status" Height="{Binding ElementName=LblRadar3SA, Path=ActualHeight}" Width="10"
                                HorizontalAlignment="Center" Source="Assets/Disconnected.png" Margin="20, 0, 0, 0"  VerticalAlignment="Center"></Image>
                         <Label Name="LblRadar3SA" ToolTip="Radar3 Start Azimuth" Content="Radar3:"  VerticalAlignment="Center"></Label>
-                        <TextBlock Name="TbRadar3SA" Text="{Binding Radar3StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
+                        <TextBlock Name="TbRadar3SA" Width="30" Text="{Binding Radar3StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
 
                         <!--Radar4-->
                         <Image Name="ImgRadar4Status" ToolTip="Radar4 Status" Height="{Binding ElementName=LblRadar4SA, Path=ActualHeight}" Width="10"
                                HorizontalAlignment="Center" Source="Assets/Disconnected.png" Margin="20, 0, 0, 0"  VerticalAlignment="Center"></Image>
                         <Label Name="LblRadar4SA" ToolTip="Radar4 Start Azimuth" Content="Radar4:"  VerticalAlignment="Center"></Label>
-                        <TextBlock Name="TbRadar4SA" Text="{Binding Radar4StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
+                        <TextBlock Name="TbRadar4SA" Width="30" Text="{Binding Radar4StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
 
                         <!--Radar5-->
                         <Image Name="ImgRadar5Status" ToolTip="Radar5 Status" Height="{Binding ElementName=LblRadar5SA, Path=ActualHeight}" Width="10"
                                HorizontalAlignment="Center" Source="Assets/Disconnected.png" Margin="20, 0, 0, 0"  VerticalAlignment="Center"></Image>
                         <Label Name="LblRadar5SA" ToolTip="Radar5 Start Azimuth" Content="Radar5:"  VerticalAlignment="Center"></Label>
-                        <TextBlock Name="TbRadar5SA" Text="{Binding Radar5StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
+                        <TextBlock Name="TbRadar5SA" Width="30" Text="{Binding Radar5StartAzimuth, StringFormat={}{0:F2}}"  VerticalAlignment="Center"></TextBlock>
                         
                         <!--状态栏-->
-                        <StackPanel>
+                        <StackPanel VerticalAlignment="Center">
                             <TextBlock Name="TbStatusInfo" Text="Initialization done." HorizontalAlignment="Right"></TextBlock>
                         </StackPanel>
                     </DockPanel>
                 </GroupBox>
             </StackPanel>
         </Grid>
-        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Width="120" DockPanel.Dock="Right" Margin="3, 3, 6, 3" ZIndex="1" Background="White">
-            <GroupBox Header="View">
-                <Grid HorizontalAlignment="Center" Width="Auto">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Button Name="BtnUpperLeft" Width="30" Height="30" Grid.Row="0" Grid.Column="0" ToolTip="Upper-Left" IsEnabled="{Binding Path=IsEncLoaded}"
-                            Click="BtnUpperLeft_OnClick">
-                        <Image Source="assets/UpLeft.png"></Image>
-                    </Button>
-                    <Button Name="BtnUp" Width="30" Height="30" Grid.Row="0" Grid.Column="1" ToolTip="Up" IsEnabled="{Binding Path=IsEncLoaded}"
-                            Click="BtnUp_OnClick">
-                        <Image Source="assets/Up.png"></Image>
-                    </Button>
-                    <Button Name="BtnUpperRight" Width="30" Height="30" Grid.Row="0" Grid.Column="2" ToolTip="Upper-Right" IsEnabled="{Binding Path=IsEncLoaded}"
-                            Click="BtnUpperRight_OnClick">
-                        <Image Source="assets/UpRight.png"></Image>
-                    </Button>
-                    <Button Name="BtnLeft" Width="30" Height="30" Grid.Row="1" Grid.Column="0" ToolTip="Left" IsEnabled="{Binding Path=IsEncLoaded}"
-                            Click="BtnLeft_OnClick">
-                        <Image Source="assets/Left.png"></Image>
-                    </Button>
-                    <Button Name="BtnCenter" Width="30" Height="30" Grid.Row="1" Grid.Column="1" ToolTip="ToRadar" IsEnabled="{Binding Path=IsEncLoaded}"
-                            Click="BtnCenter_OnClick">
-                        <Image Source="assets/Center.png"></Image>
-                    </Button>
-                    <Button Name="BtnRight" Width="30" Height="30" Grid.Row="1" Grid.Column="2" ToolTip="Right" IsEnabled="{Binding Path=IsEncLoaded}"
-                            Click="BtnRight_OnClick">
-                        <Image Source="assets/Right.png"></Image>
-                    </Button>
-                    <Button Name="BtnLowerLeft" Width="30" Height="30" Grid.Row="2" Grid.Column="0" ToolTip="Lower-Left" IsEnabled="{Binding Path=IsEncLoaded}"
-                            Click="BtnLowerLeft_OnClick">
-                        <Image Source="assets/DownLeft.png"></Image>
-                    </Button>
-                    <Button Name="BtnDown" Width="30" Height="30" Grid.Row="2" Grid.Column="1" ToolTip="Down" IsEnabled="{Binding Path=IsEncLoaded}"
-                            Click="BtnDown_OnClick">
-                        <Image Source="assets/Down.png"></Image>
-                    </Button>
-                    <Button Name="BtnLowerRight" Width="30" Height="30" Grid.Row="2" Grid.Column="2" ToolTip="Lower-Right" IsEnabled="{Binding Path=IsEncLoaded}"
-                            Click="BtnLowerRight_OnClick">
-                        <Image Source="assets/DownRight.png"></Image>
-                    </Button>
-                    <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 5, 0, 0">
-                        <Button Name="BtnZoomIn" Width="30" Height="30" ToolTip="Zoom-In" Margin="0, 0, 5, 0" IsEnabled="{Binding Path=IsEncLoaded}"
-                                Click="BtnZoomIn_OnClick">
-                            <Image Source="assets/ZoomIn.png"></Image>
+        <DockPanel Grid.Row="1" Grid.Column="1" LastChildFill="True">
+            <StackPanel Orientation="Vertical" Width="120" DockPanel.Dock="
+                        Top" Margin="3, 3, 6, 3" ZIndex="1" Background="White">
+                <Image Source="assets/Radar.png" Stretch="Fill" Margin="10"></Image>
+                <GroupBox Header="View">
+                    <Grid HorizontalAlignment="Center" Width="Auto">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Button Name="BtnUpperLeft" Width="30" Height="30" Grid.Row="0" Grid.Column="0" ToolTip="Upper-Left" IsEnabled="{Binding Path=IsEncLoaded}"
+                    Click="BtnUpperLeft_OnClick">
+                            <Image Source="assets/UpLeft.png"></Image>
                         </Button>
-                        <Button Name="BtnZoomOut" Width="30" Height="30" ToolTip="Zoom-Out" Margin="5, 0, 0, 0" IsEnabled="{Binding Path=IsEncLoaded}"
-                                Click="BtnZoomOut_OnClick">
-                            <Image Source="assets/ZoomOut.png"></Image>
+                        <Button Name="BtnUp" Width="30" Height="30" Grid.Row="0" Grid.Column="1" ToolTip="Up" IsEnabled="{Binding Path=IsEncLoaded}"
+                    Click="BtnUp_OnClick">
+                            <Image Source="assets/Up.png"></Image>
                         </Button>
+                        <Button Name="BtnUpperRight" Width="30" Height="30" Grid.Row="0" Grid.Column="2" ToolTip="Upper-Right" IsEnabled="{Binding Path=IsEncLoaded}"
+                    Click="BtnUpperRight_OnClick">
+                            <Image Source="assets/UpRight.png"></Image>
+                        </Button>
+                        <Button Name="BtnLeft" Width="30" Height="30" Grid.Row="1" Grid.Column="0" ToolTip="Left" IsEnabled="{Binding Path=IsEncLoaded}"
+                    Click="BtnLeft_OnClick">
+                            <Image Source="assets/Left.png"></Image>
+                        </Button>
+                        <Button Name="BtnCenter" Width="30" Height="30" Grid.Row="1" Grid.Column="1" ToolTip="ToRadar" IsEnabled="{Binding Path=IsEncLoaded}"
+                    Click="BtnCenter_OnClick">
+                            <Image Source="assets/Center.png"></Image>
+                        </Button>
+                        <Button Name="BtnRight" Width="30" Height="30" Grid.Row="1" Grid.Column="2" ToolTip="Right" IsEnabled="{Binding Path=IsEncLoaded}"
+                    Click="BtnRight_OnClick">
+                            <Image Source="assets/Right.png"></Image>
+                        </Button>
+                        <Button Name="BtnLowerLeft" Width="30" Height="30" Grid.Row="2" Grid.Column="0" ToolTip="Lower-Left" IsEnabled="{Binding Path=IsEncLoaded}"
+                    Click="BtnLowerLeft_OnClick">
+                            <Image Source="assets/DownLeft.png"></Image>
+                        </Button>
+                        <Button Name="BtnDown" Width="30" Height="30" Grid.Row="2" Grid.Column="1" ToolTip="Down" IsEnabled="{Binding Path=IsEncLoaded}"
+                    Click="BtnDown_OnClick">
+                            <Image Source="assets/Down.png"></Image>
+                        </Button>
+                        <Button Name="BtnLowerRight" Width="30" Height="30" Grid.Row="2" Grid.Column="2" ToolTip="Lower-Right" IsEnabled="{Binding Path=IsEncLoaded}"
+                    Click="BtnLowerRight_OnClick">
+                            <Image Source="assets/DownRight.png"></Image>
+                        </Button>
+                        <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 5, 0, 0">
+                            <Button Name="BtnZoomIn" Width="30" Height="30" ToolTip="Zoom-In" Margin="0, 0, 5, 0" IsEnabled="{Binding Path=IsEncLoaded}"
+                        Click="BtnZoomIn_OnClick">
+                                <Image Source="assets/ZoomIn.png"></Image>
+                            </Button>
+                            <Button Name="BtnZoomOut" Width="30" Height="30" ToolTip="Zoom-Out" Margin="5, 0, 0, 0" IsEnabled="{Binding Path=IsEncLoaded}"
+                        Click="BtnZoomOut_OnClick">
+                                <Image Source="assets/ZoomOut.png"></Image>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Radar Locations" Width="Auto">
+                    <StackPanel Orientation="Vertical">
+                        <Button Name="BtnPresetLocation1" Content="Radar 1" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation1_OnClick"></Button>
+                        <Button Name="BtnPresetLocation2" Content="Radar 2" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation2_OnClick"></Button>
+                        <Button Name="BtnPresetLocation3" Content="Radar 3" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation3_OnClick"></Button>
+                        <Button Name="BtnPresetLocation4" Content="Radar 4" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation4_OnClick"></Button>
+                        <Button Name="BtnPresetLocation5" Content="Radar 5" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation5_OnClick"></Button>
                     </StackPanel>
-                </Grid>
-            </GroupBox>
-            <GroupBox Header="Radar Locations" Width="Auto">
-                <StackPanel Orientation="Vertical">
-                    <Button Name="BtnPresetLocation1" Content="Radar 1" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation1_OnClick"></Button>
-                    <Button Name="BtnPresetLocation2" Content="Radar 2" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation2_OnClick"></Button>
-                    <Button Name="BtnPresetLocation3" Content="Radar 3" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation3_OnClick"></Button>
-                    <Button Name="BtnPresetLocation4" Content="Radar 4" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation4_OnClick"></Button>
-                    <Button Name="BtnPresetLocation5" Content="Radar 5" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation5_OnClick"></Button>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Header="Cursor" Width="Auto">
-                <StackPanel Orientation="Vertical">
-                    <Label Name="CursorLongitude" ToolTip="Longitude"  Content="Lon:"/>
-                    <Label Name="CursorLatitude" ToolTip="Latitude" Content="Lat:"/>
-                </StackPanel>
-            </GroupBox>
-            <Image Source="assets/Sinology.png" Width="100" Stretch="Fill" Margin="0, 10, 0, 0"></Image>
-            <Label Content="All rights reserved" HorizontalAlignment="Center" Margin="0, 10, 0, 0"></Label>
-            <Label Content="Sinology 2023" HorizontalAlignment="Center"></Label>
-        </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Cursor" Width="Auto">
+                    <StackPanel Orientation="Vertical">
+                        <Label Name="CursorLongitude" ToolTip="Longitude"  Content="Lon:"/>
+                        <Label Name="CursorLatitude" ToolTip="Latitude" Content="Lat:"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+            <StackPanel VerticalAlignment="Bottom" Margin="0, 0, 0, 50">
+                <Image Source="assets/Sinology.png" Width="100" Stretch="Fill" Margin="0, 10, 0, 0"></Image>
+                <Label Content="All rights reserved" HorizontalAlignment="Center" Margin="0, 10, 0, 0"></Label>
+                <Label Content="Sinology 2023" HorizontalAlignment="Center"></Label>
+            </StackPanel>
+        </DockPanel>
     </Grid>
 </Window>

@@ -20,6 +20,7 @@
 		<None Remove="Assets\Left.png" />
 		<None Remove="Assets\Logo.png" />
 		<None Remove="Assets\Normal.png" />
+		<None Remove="Assets\Radar.png" />
 		<None Remove="Assets\RadarSettings.png" />
 		<None Remove="Assets\RadarSite.png" />
 		<None Remove="Assets\Right.png" />
@@ -68,6 +69,9 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Normal.png">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Radar.png">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\RadarSettings.png">
