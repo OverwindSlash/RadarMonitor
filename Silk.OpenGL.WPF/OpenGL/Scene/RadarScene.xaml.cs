@@ -30,7 +30,7 @@ public class RadarDataReceivedEventArgs
 public partial class RadarScene : UserControl
 {
 
-    private System.Windows.Media.Color _echoColor = System.Windows.Media.Colors.Green;
+    private System.Windows.Media.Color _echoColor = System.Windows.Media.Colors.Lime;
 
     //private bool isInitialized = false;
 
