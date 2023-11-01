@@ -6,11 +6,13 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:RadarMonitor"
         mc:Ignorable="d"
-        Title="DisplayConfigDialog" Height="280" Width="280" ResizeMode="NoResize" Topmost="True" WindowStartupLocation="CenterScreen">
+        Title="Radar Display Config" Height="350" Width="280" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
         <GroupBox Header="Processed Radar">
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
@@ -30,10 +32,15 @@
                              IsChecked="{Binding IsFadingEnabled}" Checked="RadioBoxFading_OnChecked"></RadioButton>
                 <TextBox Grid.Row="3" Grid.Column="1" Width="80" Margin="10, 0, 0, 0" HorizontalAlignment="Left"
                          Text="{Binding FadingInterval}" IsEnabled="{Binding IsFadingEnabled}"></TextBox>
-                <RadioButton GroupName="Fading" Grid.Row="4" Grid.Column="0" Content="Replace" Margin="30, 5, 10, 30" IsChecked="True"></RadioButton>
-
-                <Button Name="BtnOk" Grid.Row="5" Grid.Column="0" Width="60" Content="OK" HorizontalAlignment="Center" Click="BtnOk_OnClick"></Button>
-                <Button Name="BtnCancel" Grid.Row="5" Grid.Column="1" Width="60" Content="Cancel" HorizontalAlignment="Center" Click="BtnCancel_OnClick"></Button>
+                <RadioButton GroupName="Fading" Grid.Row="4" Grid.Column="0" Content="Replace" Margin="30, 5, 10, 10" IsChecked="True"></RadioButton>
+                <Label Grid.Row="5" Grid.Column="0" Content="Echo Threshold" Margin="10, 5, 10, 5"></Label>
+                <Slider Grid.Row="5" Grid.Column="1" Margin="10, 5, 10, 5" VerticalAlignment="Center"
+                        TickPlacement="BottomRight" Minimum ="0" Maximum="1" Value="{Binding EchoThreshold}"></Slider>
+                <Label Grid.Row="6" Grid.Column="0" Content="Echo Radius" Margin="10, 5, 10, 5"></Label>
+                <Slider Grid.Row="6" Grid.Column="1" Margin="10, 5, 10, 30" VerticalAlignment="Center"
+                        TickPlacement="BottomRight" Minimum ="0" Maximum="{Binding EchoMaxDistance}" Value="{Binding EchoRadius}"></Slider>
+                <Button Name="BtnOk" Grid.Row="7" Grid.Column="0" Width="60" Content="OK" HorizontalAlignment="Center" Click="BtnOk_OnClick"></Button>
+                <Button Name="BtnCancel" Grid.Row="7" Grid.Column="1" Width="60" Content="Cancel" HorizontalAlignment="Center" Click="BtnCancel_OnClick"></Button>
             </Grid>
         </GroupBox>
     </Grid>

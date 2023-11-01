@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RadarMonitor.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using RadarMonitor.ViewModel;
 
 namespace RadarMonitor
 {
@@ -22,11 +12,12 @@ namespace RadarMonitor
     {
         public static readonly Color DefaultImageEchoColor = Colors.Lime;
 
-        public DisplayConfigDialog(Color scanlineColor, bool isFadingEnabled, int fadingInterval)
+        public DisplayConfigDialog(Color scanlineColor, bool isFadingEnabled, int fadingInterval,
+            double echoThreshold, double echoRadius, double echoMaxDistance)
         {
             InitializeComponent();
 
-            DataContext = new DisplayConfigViewModel(scanlineColor, isFadingEnabled, fadingInterval);
+            DataContext = new DisplayConfigViewModel(scanlineColor, isFadingEnabled, fadingInterval, echoThreshold, echoRadius, echoMaxDistance);
         }
 
         private void BtnPickColor_Click(object sender, RoutedEventArgs e)

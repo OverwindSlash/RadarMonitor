@@ -49,7 +49,12 @@
                         <CheckBox Name="DisplayOpenGlEcho" Content="All Echoes" IsEnabled="{Binding Path=IsRadarConnected}" IsChecked="{Binding Path=IsOpenGlEchoDisplayed}" 
                                   Click="DisplayOpenGlEcho_OnClick" Margin="0, 0, 20, 0" VerticalAlignment="Center"></CheckBox>
                         <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar1Connected}">
-                            <TextBlock Name="TbRadar1" Text="Radar1" HorizontalAlignment="Center"></TextBlock>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Name="TbRadar1" Text="Radar1"></TextBlock>
+                                <Button Name="BtnRadar1Config" Margin="5, 0, 0, 0" Click="BtnRadar1Config_OnClick">
+                                    <Image Source="Assets/Settings.png" Width="10" Height="10"></Image>
+                                </Button>
+                            </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
                                 <CheckBox Name="CbRadar1Echo" Content="Echo" IsChecked="{Binding Path=IsRadar1EchoDisplayed}" 
                                           Click="CbRadar1Echo_OnClick" Margin="0, 0, 5, 0"></CheckBox>
@@ -58,7 +63,12 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar2Connected}">
-                            <TextBlock Name="TbRadar2" Text="Radar2" HorizontalAlignment="Center"></TextBlock>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Name="TbRadar2" Text="Radar2" HorizontalAlignment="Center"></TextBlock>
+                                <Button Name="BtnRadar2Config" Margin="5, 0, 0, 0" Click="BtnRadar2Config_OnClick">
+                                    <Image Source="Assets/Settings.png" Width="10" Height="10"></Image>
+                                </Button>
+                            </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
                                 <CheckBox Name="CbRadar2Echo" Content="Echo" IsChecked="{Binding Path=IsRadar2EchoDisplayed}"
                                           Click="CbRadar2Echo_OnClick" Margin="0, 0, 5, 0"></CheckBox>
@@ -67,7 +77,12 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar3Connected}">
-                            <TextBlock Name="TbRadar3" Text="Radar3" HorizontalAlignment="Center"></TextBlock>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Name="TbRadar3" Text="Radar3" HorizontalAlignment="Center"></TextBlock>
+                                <Button Name="BtnRadar3Config" Margin="5, 0, 0, 0" Click="BtnRadar3Config_OnClick">
+                                    <Image Source="Assets/Settings.png" Width="10" Height="10"></Image>
+                                </Button>
+                            </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
                                 <CheckBox Name="CbRadar3Echo" Content="Echo" IsChecked="{Binding Path=IsRadar3EchoDisplayed}"
                                           Click="CbRadar3Echo_OnClick" Margin="0, 0, 5, 0"></CheckBox>
@@ -76,7 +91,12 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar4Connected}">
-                            <TextBlock Name="TbRadar4" Text="Radar4" HorizontalAlignment="Center"></TextBlock>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Name="TbRadar4" Text="Radar4" HorizontalAlignment="Center"></TextBlock>
+                                <Button Name="BtnRadar4Config" Margin="5, 0, 0, 0" Click="BtnRadar4Config_OnClick">
+                                    <Image Source="Assets/Settings.png" Width="10" Height="10"></Image>
+                                </Button>
+                            </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
                                 <CheckBox Name="CbRadar4Echo" Content="Echo" IsChecked="{Binding Path=IsRadar4EchoDisplayed}"
                                           Click="CbRadar4Echo_OnClick" Margin="0, 0, 5, 0"></CheckBox>
@@ -85,7 +105,12 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar5Connected}">
-                            <TextBlock Name="TbRadar5" Text="Radar5" HorizontalAlignment="Center"></TextBlock>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Name="TbRadar5" Text="Radar5" HorizontalAlignment="Center"></TextBlock>
+                                <Button Name="BtnRadar5Config" Margin="5, 0, 0, 0" Click="BtnRadar5Config_OnClick">
+                                    <Image Source="Assets/Settings.png" Width="10" Height="10"></Image>
+                                </Button>
+                            </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0, 2, 10, 0">
                                 <CheckBox Name="CbRadar5Echo" Content="Echo" IsChecked="{Binding Path=IsRadar5EchoDisplayed}"
                                           Click="CbRadar5Echo_OnClick" Margin="0, 0, 5, 0"></CheckBox>

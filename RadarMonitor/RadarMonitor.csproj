@@ -24,6 +24,7 @@
 		<None Remove="Assets\RadarSettings.png" />
 		<None Remove="Assets\RadarSite.png" />
 		<None Remove="Assets\Right.png" />
+		<None Remove="Assets\Settings.png" />
 		<None Remove="Assets\Sinology.png" />
 		<None Remove="Assets\Up.png" />
 		<None Remove="Assets\UpLeft.png" />
@@ -82,6 +83,9 @@
 		</Content>
 		<Content Include="Assets\Right.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Settings.png">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Sinology.png">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

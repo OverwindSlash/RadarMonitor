@@ -27,6 +27,9 @@ namespace RadarMonitor.ViewModel
         private Color _scanlineColor;
         private bool _isFadingEnabled;
         private int _fadingInterval;
+        private double _echoThreshold;
+        private double _echoRadius;
+        private double _echoMaxDistance;
 
         public Color ScanlineColor
         {
@@ -62,11 +65,51 @@ namespace RadarMonitor.ViewModel
             }
         }
 
-        public DisplayConfigViewModel(Color scanlineColor, bool isFadingEnabled, int fadingInterval)
+        public double EchoThreshold
         {
-            _scanlineColor = scanlineColor;
-            _isFadingEnabled = isFadingEnabled;
-            _fadingInterval = fadingInterval;
+            get => _echoThreshold;
+            set
+            {
+                if (value >= 0 && value <= 1)
+                {
+                    SetField(ref _echoThreshold, value, "EchoThreshold");
+                }
+            }
+        }
+
+        public double EchoRadius
+        {
+            get => _echoRadius;
+            set
+            {
+                if (_echoRadius >= 0)
+                {
+                    SetField(ref _echoRadius, value, "EchoRadius");
+                }
+            }
+        }
+
+        public double EchoMaxDistance
+        {
+            get => _echoMaxDistance;
+            set
+            {
+                if (_echoMaxDistance >= 0)
+                {
+                    SetField(ref _echoMaxDistance, value, "EchoMaxDistance");
+                }
+            }
+        }
+
+        public DisplayConfigViewModel(Color scanlineColor, bool isFadingEnabled, int fadingInterval, 
+            double echoThreshold, double echoRadius, double echoMaxDistance)
+        {
+            ScanlineColor = scanlineColor;
+            IsFadingEnabled = isFadingEnabled;
+            FadingInterval = fadingInterval;
+            EchoThreshold = echoThreshold;
+            EchoRadius = echoRadius;
+            EchoMaxDistance = echoMaxDistance;
         }
     }
 }

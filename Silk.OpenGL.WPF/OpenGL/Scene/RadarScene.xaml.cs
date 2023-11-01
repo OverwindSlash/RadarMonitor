@@ -79,6 +79,12 @@ public partial class RadarScene : UserControl
         set { fade_duration = value; }
     }
 
+    public double ControlOpacity
+    {
+        get => GLControl.Opacity;
+        set => GLControl.Opacity = value;
+    }
+
     private System.Windows.Media.Imaging.WriteableBitmap _bitmap;
 
     private Dictionary<int, RadarOpenGlModel> _radarModels = new Dictionary<int, RadarOpenGlModel>();
