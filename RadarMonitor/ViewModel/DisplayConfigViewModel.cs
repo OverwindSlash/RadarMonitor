@@ -11,7 +11,6 @@ namespace RadarMonitor.ViewModel
     public delegate void EchoThresholdChangedEventHandler(object sender, int radarId, double echoThreshold);
     public delegate void EchoRadiusChangedEventHandler(object sender, int radarId, double echoRadius);
 
-
     public class DisplayConfigViewModel : INotifyPropertyChanged
     {
         #region Notify Property
