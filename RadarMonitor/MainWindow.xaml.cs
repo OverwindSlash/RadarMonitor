@@ -31,6 +31,7 @@ using System.Linq;
 using System.Threading;
 using Silk.WPF.OpenGL;
 using YamlDotNet.Serialization;
+using Silk.NET.SDL;
 
 namespace RadarMonitor
 {
@@ -1241,6 +1242,19 @@ namespace RadarMonitor
             {
                 GetAllFiles(d.FullName, fileList);
             }
+        }
+        #endregion
+
+        #region EchoOption
+        private void OnDisplayRadiusChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            OpenGlEchoOverlay.DisplayRadius = (float)e.NewValue;
+        }
+
+
+        private void OnDisplayIntensityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            OpenGlEchoOverlay.DisplayIntensity = (float)e.NewValue;
         }
         #endregion
     }

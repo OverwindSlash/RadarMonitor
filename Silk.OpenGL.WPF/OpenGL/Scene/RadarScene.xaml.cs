@@ -83,6 +83,21 @@ public partial class RadarScene : UserControl
 
     private Dictionary<int, RadarOpenGlModel> _radarModels = new Dictionary<int, RadarOpenGlModel>();
 
+    private float _displayRadius;
+    public float DisplayRadius
+    {
+        get { return _displayRadius; }
+        set { _displayRadius = value; }
+    }
+
+    private float _displayIntensity;
+
+    public float DisplayIntensity
+    {
+        get { return _displayIntensity; }
+        set { _displayIntensity = value; }
+    }
+
     public RadarScene()
     {
         InitializeComponent();
@@ -185,7 +200,8 @@ public partial class RadarScene : UserControl
             float nowSecond = t.Hour * 60 * 60 * 1000 + t.Minute * 60 * 1000 + t.Second * 1000 + t.Millisecond;
             Shader.SetUniform("uNow", nowSecond);
             Shader.SetUniform("uColor", new Vector3(EchoColor.R / 255.0f, EchoColor.G / 255.0f, EchoColor.B / 255.0f));
-
+            Shader.SetUniform("uDisplayRadius", DisplayRadius);
+            Shader.SetUniform("uDisplayIntensity", DisplayIntensity);
             //var model = Matrix4x4.Identity;
             CameraPosition.Z = (float)(radar.MapHeight / 2.0f / radar.RadarMaxDistance * heightScale);
             //Trace.WriteLine($"W:{MapWidth}, H:{MapHeight}, MD:{RadarMaxDistance}, UIW:{UIWidth}, UIH:{UIHeight}, MCW:{MapWidthOffCenter}, MCH:{MapHeightOffCenter} , Scale:{heightScale}");
