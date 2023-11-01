@@ -63,7 +63,13 @@ namespace Silk.WPF.OpenGL
         }
 
         public bool IsDisplay { get; set; }
-        public int RadarID { get; set; } 
+        public int RadarID { get; set; }
+
+        public System.Windows.Media.Color ScanlineColor { get; set; }
+        public bool IsFadingEnabled { get; set; }
+        public int FadingInterval { get; set; }
+        public float EchoThreshold { get; set; }
+        public float EchoRadius { get; set; }
         public RadarOpenGlModel(int radarID)
         {
             RadarID = radarID;

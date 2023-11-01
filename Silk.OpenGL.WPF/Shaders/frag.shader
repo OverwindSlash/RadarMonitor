@@ -8,6 +8,8 @@ uniform int uCell;
 uniform vec3 uColor;
 uniform int uFadeDuration;
 uniform float uNow;
+uniform float uEchoRadius;
+uniform float uEchoThreshold;
 
 out vec4 FragColor;
 
@@ -37,13 +39,15 @@ void main()
     
     // attention: col,row
     float g = 0.0;
-
-    g = texelFetch(uTexture0, ivec2(col, row), 0).r;
-    float prev = texelFetch(uTexture0, ivec2(0, row), 0).r;
-    float delta = uNow - prev;
-    g = (1.0 - delta / float(uFadeDuration * 1000)) * g;
+    if(r< uEchoRadius)
+    {
+        g = texelFetch(uTexture0, ivec2(col, row), 0).r;
+        g = g > uEchoThreshold ? g : 0.0;
+        float prev = texelFetch(uTexture0, ivec2(0, row), 0).r;
+        float delta = uNow - prev;
+        g = (1.0 - delta / float(uFadeDuration * 1000)) * g;
+    }
     
-    //g = abs(g);
     FragColor = vec4(uColor, min(g * 2, 1.0));
     //FragColor = vec4(vec3(0.0, g, 0.0), 1.0);
 

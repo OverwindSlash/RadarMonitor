@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Silk.WPF.OpenGL
 {
@@ -28,5 +29,18 @@ namespace Silk.WPF.OpenGL
         public double RadarOrientation { get; set; } = 0.0f;
 
         public bool IsDisplay { get; set; }
+
+        // draw
+        public Color ScanlineColor { get; set; }
+        public bool IsFadingEnabled { get; set; }
+
+        private int _fadingInterval;
+        public int FadingInterval
+        {
+            get => IsFadingEnabled ? _fadingInterval : 64;
+            set => _fadingInterval = value;
+        }
+        public float EchoThreshold { get; set; }
+        public float EchoRadius { get; set; }
     }
 }

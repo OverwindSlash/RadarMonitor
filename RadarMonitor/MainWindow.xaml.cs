@@ -50,7 +50,7 @@ namespace RadarMonitor
         private bool _isRadar1FadingEnabled = true;
         private int _radar1FadingInterval = 7;
         private double _radar1EchoThreshold = 0;
-        private double _radar1EchoRadius = 0;
+        private double _radar1EchoRadius = 1;
         private double _radar1MaxDistance = 0;
 
         // Radar2 Display Setting
@@ -58,7 +58,7 @@ namespace RadarMonitor
         private bool _isRadar2FadingEnabled = true;
         private int _radar2FadingInterval = 7;
         private double _radar2EchoThreshold = 0;
-        private double _radar2EchoRadius = 0;
+        private double _radar2EchoRadius = 1;
         private double _radar2MaxDistance = 0;
 
         // Radar3 Display Setting
@@ -66,7 +66,7 @@ namespace RadarMonitor
         private bool _isRadar3FadingEnabled = true;
         private int _radar3FadingInterval = 7;
         private double _radar3EchoThreshold = 0;
-        private double _radar3EchoRadius = 0;
+        private double _radar3EchoRadius = 1;
         private double _radar3MaxDistance = 0;
 
         // Radar4 Display Setting
@@ -74,7 +74,7 @@ namespace RadarMonitor
         private bool _isRadar4FadingEnabled = true;
         private int _radar4FadingInterval = 7;
         private double _radar4EchoThreshold = 0;
-        private double _radar4EchoRadius = 0;
+        private double _radar4EchoRadius = 1;
         private double _radar4MaxDistance = 0;
 
         // Radar5 Display Setting
@@ -82,7 +82,7 @@ namespace RadarMonitor
         private bool _isRadar5FadingEnabled = true;
         private int _radar5FadingInterval = 7;
         private double _radar5EchoThreshold = 0;
-        private double _radar5EchoRadius = 0;
+        private double _radar5EchoRadius = 1;
         private double _radar5MaxDistance = 0;
 
         // Radar Display Settings
@@ -1170,6 +1170,12 @@ namespace RadarMonitor
             radarInfo.Longitude = setting.RadarLongitude;
             radarInfo.RadarOrientation = setting.RadarOrientation;
             radarInfo.IsDisplay = setting.IsOpenGlEchoDisplayed;
+
+            radarInfo.ScanlineColor = _radarEchoColors[radarId];
+            radarInfo.IsFadingEnabled = _isRadarFadingEnabledFlags[radarId];
+            radarInfo.FadingInterval = _radarFadingIntervals[radarId];
+            radarInfo.EchoThreshold = (float)_radarEchoThresholds[radarId];
+            radarInfo.EchoRadius = (float)_radarEchoRadiuses[radarId];
         }
         #endregion
 
@@ -1382,13 +1388,18 @@ namespace RadarMonitor
                 _isRadarFadingEnabledFlags[radarId] = config.IsFadingEnabled;
                 _radarFadingIntervals[radarId] = config.FadingInterval;
                 _radarEchoThresholds[radarId] = config.EchoThreshold;
-                _radarMaxDistances[radarId] = config.EchoRadius;
+                _radarEchoRadiuses[radarId] = config.EchoRadius;
 
-                // Change Color
-                OpenGlEchoOverlay.EchoColor = _radar1EchoColor;
-                OpenGlEchoOverlay.FadeDuration = config.FadingInterval;
-                //_isFadingEnabled = config.IsFadingEnabled;
-                //_fadingInterval = config.FadingInterval;
+                var radar = _radarInfos[radarId];
+                if (radar != null)
+                {
+                    radar.ScanlineColor = config.ScanlineColor;
+                    radar.IsFadingEnabled= config.IsFadingEnabled;
+                    radar.FadingInterval = config.FadingInterval;
+                    radar.EchoThreshold = (float) config.EchoThreshold;
+                    radar.EchoRadius = (float) config.EchoRadius;
+                    OpenGlEchoOverlay.OnConfigChanged(radar);
+                }
             }
         }
     }
