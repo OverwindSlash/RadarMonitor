@@ -557,7 +557,7 @@ namespace RadarMonitor
                 // Change Color
                 OpenGlEchoOverlay.EchoColor = _echoColor;
                 OpenGlEchoOverlay.FadeDuration = config.FadingInterval;
-                //_isFadingEnabled = config.IsFadingEnabled;
+                _isFadingEnabled = config.IsFadingEnabled;
                 _fadingInterval = config.FadingInterval;
             }
         }
