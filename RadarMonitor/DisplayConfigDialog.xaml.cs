@@ -5,6 +5,7 @@ using System.Windows.Media;
 
 namespace RadarMonitor
 {
+
     /// <summary>
     /// Interaction logic for DisplayConfigDialog.xaml
     /// </summary>
@@ -12,12 +13,13 @@ namespace RadarMonitor
     {
         public static readonly Color DefaultImageEchoColor = Colors.Lime;
 
-        public DisplayConfigDialog(Color scanlineColor, bool isFadingEnabled, int fadingInterval,
+        public DisplayConfigDialog(int radarId, Color scanlineColor, bool isFadingEnabled, int fadingInterval,
             double echoThreshold, double echoRadius, double echoMaxDistance)
         {
             InitializeComponent();
 
-            DataContext = new DisplayConfigViewModel(scanlineColor, isFadingEnabled, fadingInterval, echoThreshold, echoRadius, echoMaxDistance);
+            DataContext = new DisplayConfigViewModel(radarId, scanlineColor, isFadingEnabled, fadingInterval,
+                echoThreshold, echoRadius, echoMaxDistance);
         }
 
         private void BtnPickColor_Click(object sender, RoutedEventArgs e)

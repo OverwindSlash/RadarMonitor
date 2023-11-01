@@ -5,6 +5,13 @@ using System.Windows.Media;
 
 namespace RadarMonitor.ViewModel
 {
+    public delegate void EchoColorChangedEventHandler(object sender, int radarId, Color scanlineColor);
+    public delegate void FadingEnabledChangedEventHandler(object sender, int radarId, bool isFadingEnabled);
+    public delegate void FadingIntervalChangedEventHandler(object sender, int radarId, int fadingInterval);
+    public delegate void EchoThresholdChangedEventHandler(object sender, int radarId, double echoThreshold);
+    public delegate void EchoRadiusChangedEventHandler(object sender, int radarId, double echoRadius);
+
+
     public class DisplayConfigViewModel : INotifyPropertyChanged
     {
         #region Notify Property
@@ -24,6 +31,7 @@ namespace RadarMonitor.ViewModel
         }
         #endregion
 
+        private int _radarId;
         private Color _scanlineColor;
         private bool _isFadingEnabled;
         private int _fadingInterval;
@@ -31,12 +39,19 @@ namespace RadarMonitor.ViewModel
         private double _echoRadius;
         private double _echoMaxDistance;
 
+        public event EchoColorChangedEventHandler OnEchoColorChanged;
+        public event FadingEnabledChangedEventHandler OnFadingEnabledChanged;
+        public event FadingIntervalChangedEventHandler OnFadingIntervalChanged;
+        public event EchoThresholdChangedEventHandler OnEchoThresholdChanged;
+        public event EchoRadiusChangedEventHandler OnEchoRadiusChanged;
+
         public Color ScanlineColor
         {
             get => _scanlineColor;
             set
             {
                 SetField(ref _scanlineColor, value, "ScanlineColor");
+                OnEchoColorChanged?.Invoke(this, _radarId, _scanlineColor);
             }
         }
 
@@ -46,6 +61,7 @@ namespace RadarMonitor.ViewModel
             set
             {
                 SetField(ref _isFadingEnabled, value, "IsFadingEnabled");
+                OnFadingEnabledChanged?.Invoke(this, _radarId, _isFadingEnabled);
             }
         }
 
@@ -62,6 +78,8 @@ namespace RadarMonitor.ViewModel
                 {
                     SetField(ref _fadingInterval, 1, "FadingInterval");
                 }
+
+                OnFadingIntervalChanged?.Invoke(this, _radarId, _fadingInterval);
             }
         }
 
@@ -73,6 +91,7 @@ namespace RadarMonitor.ViewModel
                 if (value >= 0 && value <= 1)
                 {
                     SetField(ref _echoThreshold, value, "EchoThreshold");
+                    OnEchoThresholdChanged?.Invoke(this, _radarId, _echoThreshold);
                 }
             }
         }
@@ -85,6 +104,7 @@ namespace RadarMonitor.ViewModel
                 if (_echoRadius >= 0)
                 {
                     SetField(ref _echoRadius, value, "EchoRadius");
+                    OnEchoRadiusChanged?.Invoke(this, _radarId, _echoRadius);
                 }
             }
         }
@@ -101,9 +121,10 @@ namespace RadarMonitor.ViewModel
             }
         }
 
-        public DisplayConfigViewModel(Color scanlineColor, bool isFadingEnabled, int fadingInterval, 
+        public DisplayConfigViewModel(int radarId, Color scanlineColor, bool isFadingEnabled, int fadingInterval, 
             double echoThreshold, double echoRadius, double echoMaxDistance)
         {
+            _radarId = radarId;
             ScanlineColor = scanlineColor;
             IsFadingEnabled = isFadingEnabled;
             FadingInterval = fadingInterval;
