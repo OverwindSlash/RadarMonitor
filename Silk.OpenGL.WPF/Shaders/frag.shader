@@ -44,10 +44,10 @@ void main()
     {
         
         g = texelFetch(uTexture0, ivec2(col, row), 0).r;
+        g = g < uDisplayIntensity ? 0.0 : g;
         float prev = texelFetch(uTexture0, ivec2(0, row), 0).r;
         float delta = uNow - prev;
         g = (1.0 - delta / float(uFadeDuration * 1000)) * g;
-        g = g < uDisplayIntensity ? 0.0 : g;
     }
     
     //g = abs(g);
