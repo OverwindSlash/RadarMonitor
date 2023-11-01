@@ -98,6 +98,13 @@ public partial class RadarScene : UserControl
         set { _displayIntensity = value; }
     }
 
+    public double GLControlOpacity
+    {
+        get { return this.GLControl.Opacity; }
+        set { this.GLControl.Opacity = value; }
+    }
+
+
     public RadarScene()
     {
         InitializeComponent();
