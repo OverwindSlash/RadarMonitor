@@ -37,8 +37,10 @@ namespace Silk.WPF.OpenGL
                 }
                 if (value != _realCells)
                 {
+                    IsChanging = true;
                     DataArray = new float[RadarConfig.SECTIONS * (value + RadarConfig.HEAD)];
                     TextureData = new OpenGLSharp.Texture(gl, DataArray, (uint)(value + RadarConfig.HEAD), RadarConfig.SECTIONS, InternalFormat.R32f, PixelFormat.Red, PixelType.Float, TextureUnit);
+                    IsChanging=false;
 
                 }
                 _realCells = value;
@@ -70,6 +72,8 @@ namespace Silk.WPF.OpenGL
         public int FadingInterval { get; set; }
         public float EchoThreshold { get; set; }
         public float EchoRadius { get; set; }
+        public bool IsChanging { get; internal set; }
+
         public RadarOpenGlModel(int radarID)
         {
             RadarID = radarID;

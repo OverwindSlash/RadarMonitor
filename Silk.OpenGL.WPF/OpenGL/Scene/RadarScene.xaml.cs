@@ -29,11 +29,6 @@ public class RadarDataReceivedEventArgs
 
 public partial class RadarScene : UserControl
 {
-
-    private System.Windows.Media.Color _echoColor = System.Windows.Media.Colors.Lime;
-
-    //private bool isInitialized = false;
-
     private BufferObject<float> Vbo;
     private BufferObject<uint> Ebo;
     private VertexArrayObject<float, uint> Vao;
@@ -58,8 +53,6 @@ public partial class RadarScene : UserControl
             _isDisplay = value;
         }
     }
-
-    private bool radarChanging = false;
 
     public double ControlOpacity
     {
@@ -112,7 +105,80 @@ public partial class RadarScene : UserControl
         Vao.VertexAttributePointer(0, 3, VertexAttribPointerType.Float, 5, 0);
         Vao.VertexAttributePointer(1, 2, VertexAttribPointerType.Float, 5, 3);
 
-        Shader = new OpenGLSharp.Shader(gl, "shaders/vert.shader", "shaders/frag.shader");
+        string vertexShader = @"#version 330 core
+                    layout (location = 0) in
+                    vec3 vPos;
+                    layout (location = 1) in
+                    vec2 vUv;
+
+                    uniform mat4 uView;
+                    uniform mat4 uProjection;
+
+                    out vec2 fUv;
+
+                    void main()
+                    {
+                        //Multiplying our uniform with the vertex position, the multiplication order here does matter.
+                        gl_Position = uProjection * uView  * vec4(vPos, 1.0);
+                        fUv = vUv;
+                    }";
+        string fragmentShader = @"#version 330 core
+                    in vec2 fUv;
+
+                    uniform sampler2D uTexture0;
+
+                    uniform int uSection;
+                    uniform int uCell;
+                    uniform vec3 uColor;
+                    uniform int uFadeDuration;
+                    uniform float uNow;
+                    uniform float uEchoRadius;
+                    uniform float uEchoThreshold;
+
+                    out vec4 FragColor;
+
+                    const float PI = 3.1415926535897932384626433832795;
+                    float GetAngle(float x, float y)
+                    {
+                        float angle = atan(y, x);
+                        if (angle < 0.0f)
+                            angle = PI * 2 + angle;
+
+                        return angle;
+                    }
+
+
+
+                    void main()
+                    {
+                        float x = fUv.x - 0.5;
+                        float y = fUv.y - 0.5;
+    
+                        float r = sqrt(x * x + y * y);
+                        float theta = GetAngle(x, y);
+    
+                        float range = 2 * PI / uSection;
+                        int row = int(theta / range);
+                        int col = int(r / (0.5f / uCell));
+    
+                        // attention: col,row
+                        float g = 0.0;
+                        if(r< uEchoRadius)
+                        {
+                            g = texelFetch(uTexture0, ivec2(col, row), 0).r;
+                            g = g > uEchoThreshold ? g : 0.0;
+                            float prev = texelFetch(uTexture0, ivec2(0, row), 0).r;
+                            float delta = uNow - prev;
+                            g = (1.0 - delta / float(uFadeDuration * 1000)) * g;
+                        }
+    
+                        FragColor = vec4(uColor, min(g * 2, 1.0));
+
+                    }";
+
+        //Shader = new OpenGLSharp.Shader(gl, "shaders/vert.shader", "shaders/frag.shader");
+        Shader = new OpenGLSharp.Shader(gl, vertexShader, fragmentShader,ShaderSrcType.FromString);
+
 
     }
 
@@ -133,12 +199,9 @@ public partial class RadarScene : UserControl
         }
         GL gl = RenderContext.Gl;
 
-        //gl.ClearColor(12.0f/255, 6.0f/255, 66.0f/255, 0.0f);
         gl.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         gl.Clear((uint)(ClearBufferMask.ColorBufferBit));
-
-
 
         foreach (var model in _radarModels)
         {
@@ -179,26 +242,22 @@ public partial class RadarScene : UserControl
             gl.DrawElements(GLEnum.Triangles, (uint)6, GLEnum.UnsignedInt, null);
 
         }
-        //isInitialized = true;
         //durationMS = 0;
 
     }
 
     public void OnReceivedRadarData(object sender, RadarDataReceivedEventArgs e)
     {
-        //if (!isInitialized)
-        //{
-        //    return;
-        //}
-        if (radarChanging)
-        {
-            return;
-        }
-
+        
         var radar = _radarModels[e.RadarID];
 
         if (radar != null)
         {
+            if (radar.IsChanging)
+            {
+                return;
+            }
+
             radar.UpdateData(e);
         }
 
