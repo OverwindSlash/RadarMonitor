@@ -1,10 +1,10 @@
-﻿using CAT240Parser;
-using Esri.ArcGISRuntime.Geometry;
+﻿using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Hydrography;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.UI.Controls;
 using RadarMonitor.Model;
 using RadarMonitor.ViewModel;
+using Silk.WPF.OpenGL;
 using Silk.WPF.OpenGL.Scene;
 using System;
 using System.Collections.Generic;
@@ -27,10 +27,6 @@ using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Point = System.Windows.Point;
 using Window = System.Windows.Window;
-using System.Linq;
-using System.Threading;
-using Silk.WPF.OpenGL;
-using YamlDotNet.Serialization;
 
 namespace RadarMonitor
 {

@@ -29,12 +29,14 @@ namespace RadarMonitor
         private void BtnOk_OnClick(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
+            DataContext = null;
             Close();
         }
 
         private void BtnCancel_OnClick(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+            DataContext = null;
             Close();
         }
 
