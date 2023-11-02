@@ -5,17 +5,36 @@ using Silk.NET.OpenGL;
 
 namespace OpenGLSharp
 {
+    public enum ShaderSrcType
+    {
+        FromPath = 0,
+        FromString = 1
+    }
     public class Shader : IDisposable
     {
         private uint _handle;
         private GL _gl;
 
-        public Shader(GL gl, string vertexPath, string fragmentPath)
+        public Shader(GL gl, string vertexPath, string fragmentPath, ShaderSrcType shaderSrcType=ShaderSrcType.FromPath)
         {
             _gl = gl;
-
-            uint vertex = LoadShader(ShaderType.VertexShader, vertexPath);
-            uint fragment = LoadShader(ShaderType.FragmentShader, fragmentPath);
+            uint vertex, fragment;
+            switch (shaderSrcType)
+            {   
+                case ShaderSrcType.FromPath:
+                    vertex = LoadShader(ShaderType.VertexShader, vertexPath);
+                    fragment = LoadShader(ShaderType.FragmentShader, fragmentPath);
+                    break;
+                case ShaderSrcType.FromString:
+                    vertex = LoadShaderFromString(ShaderType.VertexShader, vertexPath);
+                    fragment = LoadShaderFromString(ShaderType.FragmentShader, fragmentPath);
+                    break;
+                default:
+                    vertex = LoadShader(ShaderType.VertexShader, vertexPath);
+                    fragment = LoadShader(ShaderType.FragmentShader, fragmentPath);
+                    break;
+            }
+            
             _handle = _gl.CreateProgram();
             _gl.AttachShader(_handle, vertex);
             _gl.AttachShader(_handle, fragment);
@@ -94,6 +113,20 @@ namespace OpenGLSharp
         private uint LoadShader(ShaderType type, string path)
         {
             string src = File.ReadAllText(path);
+            uint handle = _gl.CreateShader(type);
+            _gl.ShaderSource(handle, src);
+            _gl.CompileShader(handle);
+            string infoLog = _gl.GetShaderInfoLog(handle);
+            if (!string.IsNullOrWhiteSpace(infoLog))
+            {
+                throw new Exception($"Error compiling shader of type {type}, failed with error {infoLog}");
+            }
+
+            return handle;
+        }
+
+        private uint LoadShaderFromString(ShaderType type, string src)
+        {
             uint handle = _gl.CreateShader(type);
             _gl.ShaderSource(handle, src);
             _gl.CompileShader(handle);

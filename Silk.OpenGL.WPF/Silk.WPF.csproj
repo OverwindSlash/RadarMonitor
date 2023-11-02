@@ -25,17 +25,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Shaders\frag.shader">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Shaders\vert.shader">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+	  <ProjectReference Include="..\CAT240Parser\CAT240Parser.csproj" />
+	  <ProjectReference Include="..\OpenGL\OpenGLSharp.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\CAT240Parser\CAT240Parser.csproj" />
-	  <ProjectReference Include="..\OpenGL\OpenGLSharp.csproj" />
+	  <Folder Include="Shaders\" />
 	</ItemGroup>
 	
 </Project>
