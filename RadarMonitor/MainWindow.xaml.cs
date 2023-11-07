@@ -41,6 +41,7 @@ namespace RadarMonitor
         private double _dpcY;
         private const int RadarCount = 5;
 
+        #region Radar Display Settings
         // Radar1 Display Setting
         private Color _radar1EchoColor = DisplayConfigDialog.DefaultImageEchoColor;
         private bool _isRadar1FadingEnabled = true;
@@ -88,7 +89,8 @@ namespace RadarMonitor
         private List<double> _radarEchoThresholds;
         private List<double> _radarEchoRadiuses;
         private List<double> _radarMaxDistances;
-
+        #endregion
+        
         private readonly bool _encDetailDisplayFlag = false;
 
         public RadarSettingsViewModel DialogViewModel { get; set; }
@@ -107,53 +109,14 @@ namespace RadarMonitor
 
             // 初始化 ArcGIS 地图控件
             InitializeMapView();
-            //InitializeMapOverlays();
 
+            // 初始化雷达显示设置
             InitializeRadarDisplaySettings();
 
             // 如果有用户配置文件，则加载并预载入指定海图和雷达
             LoadUserConfiguration();
         }
-
-        private void InitializeRadarDisplaySettings()
-        {
-            _radarEchoColors = new()
-            {
-                _radar1EchoColor, _radar2EchoColor, _radar3EchoColor, 
-                _radar4EchoColor, _radar5EchoColor
-            };
-
-            _isRadarFadingEnabledFlags = new()
-            {
-                _isRadar1FadingEnabled, _isRadar2FadingEnabled, _isRadar3FadingEnabled, 
-                _isRadar4FadingEnabled, _isRadar5FadingEnabled
-            };
-
-            _radarFadingIntervals = new()
-            {
-                _radar1FadingInterval, _radar2FadingInterval, _radar3FadingInterval,
-                _radar4FadingInterval, _radar5FadingInterval
-            };
-
-            _radarEchoThresholds = new()
-            {
-                _radar1EchoThreshold, _radar2EchoThreshold, _radar3EchoThreshold,
-                _radar4EchoThreshold, _radar5EchoThreshold
-            };
-
-            _radarEchoRadiuses = new()
-            {
-                _radar1EchoRadius, _radar2EchoRadius, _radar3EchoRadius,
-                _radar4EchoRadius, _radar5EchoRadius
-            };
-
-            _radarMaxDistances = new()
-            {
-                _radar1MaxDistance, _radar2MaxDistance, _radar3MaxDistance,
-                _radar4MaxDistance, _radar5MaxDistance
-            };
-        }
-
+        
         private void InitializeDisplayMetric()
         {
             _dpiX = 96;
@@ -226,7 +189,45 @@ namespace RadarMonitor
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.NoteOnChartData = _encDetailDisplayFlag;
             #endregion
         }
+        
+        private void InitializeRadarDisplaySettings()
+        {
+            _radarEchoColors = new()
+            {
+                _radar1EchoColor, _radar2EchoColor, _radar3EchoColor,
+                _radar4EchoColor, _radar5EchoColor
+            };
 
+            _isRadarFadingEnabledFlags = new()
+            {
+                _isRadar1FadingEnabled, _isRadar2FadingEnabled, _isRadar3FadingEnabled,
+                _isRadar4FadingEnabled, _isRadar5FadingEnabled
+            };
+
+            _radarFadingIntervals = new()
+            {
+                _radar1FadingInterval, _radar2FadingInterval, _radar3FadingInterval,
+                _radar4FadingInterval, _radar5FadingInterval
+            };
+
+            _radarEchoThresholds = new()
+            {
+                _radar1EchoThreshold, _radar2EchoThreshold, _radar3EchoThreshold,
+                _radar4EchoThreshold, _radar5EchoThreshold
+            };
+
+            _radarEchoRadiuses = new()
+            {
+                _radar1EchoRadius, _radar2EchoRadius, _radar3EchoRadius,
+                _radar4EchoRadius, _radar5EchoRadius
+            };
+
+            _radarMaxDistances = new()
+            {
+                _radar1MaxDistance, _radar2MaxDistance, _radar3MaxDistance,
+                _radar4MaxDistance, _radar5MaxDistance
+            };
+        }
 
         private async Task LoadUserConfiguration()
         {
@@ -352,7 +353,8 @@ namespace RadarMonitor
                 BaseMapView.Map.OperationalLayers.Add(encLayer);
             }
 
-            Envelope fullExtent = GeometryEngine.CombineExtents(dataSetExtents); 
+            // 以下代码可能会导致海图加载异常，所以注释掉
+            //Envelope fullExtent = GeometryEngine.CombineExtents(dataSetExtents); 
             //await BaseMapView.SetViewpointAsync(new Viewpoint(fullExtent));
 
             // 记录海图类型及Uri
@@ -542,6 +544,7 @@ namespace RadarMonitor
         }
         #endregion
 
+        #region Map EventHandler
         private void BaseMapView_OnViewpointChanged(object? sender, EventArgs e)
         {
             var viewpoint = BaseMapView.GetCurrentViewpoint(ViewpointType.CenterAndScale);
@@ -623,27 +626,9 @@ namespace RadarMonitor
             RefreshRadarEcho(viewModel);
             RedrawRadarRings(viewModel);
         }
+        #endregion
 
-        private void ConfigDisplay_OnClick(object sender, RoutedEventArgs e)
-        {
-            // var configDialog = new DisplayConfigDialog(_radar1EchoColor, _isRadar1FadingEnabled, _radar1FadingInterval);
-            // bool? dialogResult = configDialog.ShowDialog();
-            //
-            // if (dialogResult == true)
-            // {
-            //     var config = (DisplayConfigViewModel)configDialog.DataContext;
-            //
-            //     _radar1EchoColor = config.ScanlineColor;
-            //
-            //     // Change Color
-            //     OpenGlEchoOverlay.EchoColor = _radar1EchoColor;
-            //     OpenGlEchoOverlay.FadeDuration = config.FadingInterval;
-            //     //_isFadingEnabled = config.IsFadingEnabled;
-            //     //_fadingInterval = config.FadingInterval;
-            // }
-        }
-
-        #region Display Control
+        #region Layer Display Control
         private void DisplayEnc_OnClick(object sender, RoutedEventArgs e)
         {
             CheckBox displayEncCheckBox = (CheckBox)sender;
@@ -850,6 +835,142 @@ namespace RadarMonitor
             {
                 OpenGlEchoOverlay.Visibility = Visibility.Hidden;
                 OpenGlEchoOverlay.IsDisplay = false;
+            }
+        }
+        #endregion
+
+        #region Radar Display Control
+        private void BtnRadar1Config_OnClick(object sender, RoutedEventArgs e)
+        {
+            int radarId = 0;
+            ConfigRadarDisplay(radarId);
+        }
+
+        private void BtnRadar2Config_OnClick(object sender, RoutedEventArgs e)
+        {
+            int radarId = 1;
+            ConfigRadarDisplay(radarId);
+        }
+
+        private void BtnRadar3Config_OnClick(object sender, RoutedEventArgs e)
+        {
+            int radarId = 2;
+            ConfigRadarDisplay(radarId);
+        }
+
+        private void BtnRadar4Config_OnClick(object sender, RoutedEventArgs e)
+        {
+            int radarId = 3;
+            ConfigRadarDisplay(radarId);
+        }
+
+        private void BtnRadar5Config_OnClick(object sender, RoutedEventArgs e)
+        {
+            int radarId = 4;
+            ConfigRadarDisplay(radarId);
+        }
+
+        private void ConfigRadarDisplay(int radarId)
+        {
+            Color prevEchoColor = _radarEchoColors[radarId];
+            bool prevFadingEnabled = _isRadarFadingEnabledFlags[radarId];
+            int prevFadingInterval = _radarFadingIntervals[radarId];
+            double prevEchoThreshold = _radarEchoThresholds[radarId];
+            double prevEchoRadius = _radarEchoRadiuses[radarId];
+            double prevEchoMaxDistance = _radarMaxDistances[radarId];
+
+            var configDialog = new DisplayConfigDialog(radarId, prevEchoColor, prevFadingEnabled, prevFadingInterval,
+                prevEchoThreshold, prevEchoRadius, prevEchoMaxDistance);
+
+            var config = (DisplayConfigViewModel)configDialog.DataContext;
+            config.OnEchoColorChanged += ConfigOnOnEchoColorChanged;
+            config.OnFadingEnabledChanged += ConfigOnOnFadingEnabledChanged;
+            config.OnFadingIntervalChanged += ConfigOnOnFadingIntervalChanged;
+            config.OnEchoThresholdChanged += ConfigOnOnEchoThresholdChanged;
+            config.OnEchoRadiusChanged += ConfigOnOnEchoRadiusChanged;
+
+            bool? dialogResult = configDialog.ShowDialog();
+
+            var radar = _radarInfos[radarId];
+            if (dialogResult == true)
+            {
+                _radarEchoColors[radarId] = config.ScanlineColor;
+                _isRadarFadingEnabledFlags[radarId] = config.IsFadingEnabled;
+                _radarFadingIntervals[radarId] = config.FadingInterval;
+                _radarEchoThresholds[radarId] = config.EchoThreshold;
+                _radarEchoRadiuses[radarId] = config.EchoRadius;
+
+                if (radar != null)
+                {
+                    radar.ScanlineColor = config.ScanlineColor;
+                    radar.IsFadingEnabled = config.IsFadingEnabled;
+                    radar.FadingInterval = config.FadingInterval;
+                    radar.EchoThreshold = (float)config.EchoThreshold;
+                    radar.EchoRadius = (float)(config.EchoRadius / _radarMaxDistances[radarId]);
+                    OpenGlEchoOverlay.OnConfigChanged(radar);
+                }
+            }
+            else
+            {
+                if (radar != null)
+                {
+                    radar.ScanlineColor = prevEchoColor;
+                    radar.IsFadingEnabled = prevFadingEnabled;
+                    radar.FadingInterval = prevFadingInterval;
+                    radar.EchoThreshold = (float)prevEchoThreshold;
+                    radar.EchoRadius = (float)(prevEchoRadius / _radarMaxDistances[radarId]);
+                    OpenGlEchoOverlay.OnConfigChanged(radar);
+                }
+            }
+        }
+
+        private void ConfigOnOnEchoColorChanged(object sender, int radarId, Color scanlineColor)
+        {
+            var radar = _radarInfos[radarId];
+            if (radar != null)
+            {
+                radar.ScanlineColor = scanlineColor;
+                OpenGlEchoOverlay.OnConfigChanged(radar);
+            }
+        }
+
+        private void ConfigOnOnFadingEnabledChanged(object sender, int radarId, bool isFadingEnabled)
+        {
+            var radar = _radarInfos[radarId];
+            if (radar != null)
+            {
+                radar.IsFadingEnabled = isFadingEnabled;
+                OpenGlEchoOverlay.OnConfigChanged(radar);
+            }
+        }
+
+        private void ConfigOnOnFadingIntervalChanged(object sender, int radarId, int fadingInterval)
+        {
+            var radar = _radarInfos[radarId];
+            if (radar != null)
+            {
+                radar.FadingInterval = fadingInterval;
+                OpenGlEchoOverlay.OnConfigChanged(radar);
+            }
+        }
+
+        private void ConfigOnOnEchoThresholdChanged(object sender, int radarId, double echoThreshold)
+        {
+            var radar = _radarInfos[radarId];
+            if (radar != null)
+            {
+                radar.EchoThreshold = (float)echoThreshold;
+                OpenGlEchoOverlay.OnConfigChanged(radar);
+            }
+        }
+
+        private void ConfigOnOnEchoRadiusChanged(object sender, int radarId, double echoRadius)
+        {
+            var radar = _radarInfos[radarId];
+            if (radar != null)
+            {
+                radar.EchoRadius = (float)(echoRadius / _radarMaxDistances[radarId]);
+                OpenGlEchoOverlay.OnConfigChanged(radar);
             }
         }
         #endregion
@@ -1331,139 +1452,5 @@ namespace RadarMonitor
             }
         }
         #endregion
-
-        private void BtnRadar1Config_OnClick(object sender, RoutedEventArgs e)
-        {
-            int radarId = 0;
-            ConfigRadarDisplay(radarId);
-        }
-
-        private void BtnRadar2Config_OnClick(object sender, RoutedEventArgs e)
-        {
-            int radarId = 1;
-            ConfigRadarDisplay(radarId);
-        }
-
-        private void BtnRadar3Config_OnClick(object sender, RoutedEventArgs e)
-        {
-            int radarId = 2;
-            ConfigRadarDisplay(radarId);
-        }
-
-        private void BtnRadar4Config_OnClick(object sender, RoutedEventArgs e)
-        {
-            int radarId = 3;
-            ConfigRadarDisplay(radarId);
-        }
-
-        private void BtnRadar5Config_OnClick(object sender, RoutedEventArgs e)
-        {
-            int radarId = 4;
-            ConfigRadarDisplay(radarId);
-        }
-
-        private void ConfigRadarDisplay(int radarId)
-        {
-            Color prevEchoColor = _radarEchoColors[radarId];
-            bool prevFadingEnabled = _isRadarFadingEnabledFlags[radarId];
-            int prevFadingInterval = _radarFadingIntervals[radarId];
-            double prevEchoThreshold = _radarEchoThresholds[radarId];
-            double prevEchoRadius = _radarEchoRadiuses[radarId];
-            double prevEchoMaxDistance = _radarMaxDistances[radarId];
-
-            var configDialog = new DisplayConfigDialog(radarId, prevEchoColor, prevFadingEnabled, prevFadingInterval, 
-                prevEchoThreshold, prevEchoRadius, prevEchoMaxDistance);
-
-            var config = (DisplayConfigViewModel)configDialog.DataContext;
-            config.OnEchoColorChanged += ConfigOnOnEchoColorChanged;
-            config.OnFadingEnabledChanged += ConfigOnOnFadingEnabledChanged;
-            config.OnFadingIntervalChanged += ConfigOnOnFadingIntervalChanged;
-            config.OnEchoThresholdChanged += ConfigOnOnEchoThresholdChanged;
-            config.OnEchoRadiusChanged += ConfigOnOnEchoRadiusChanged;
-
-            bool? dialogResult = configDialog.ShowDialog();
-            
-            var radar = _radarInfos[radarId];
-            if (dialogResult == true)
-            {
-                _radarEchoColors[radarId] = config.ScanlineColor;
-                _isRadarFadingEnabledFlags[radarId] = config.IsFadingEnabled;
-                _radarFadingIntervals[radarId] = config.FadingInterval;
-                _radarEchoThresholds[radarId] = config.EchoThreshold;
-                _radarEchoRadiuses[radarId] = config.EchoRadius;
-                
-                if (radar != null)
-                {
-                    radar.ScanlineColor = config.ScanlineColor;
-                    radar.IsFadingEnabled= config.IsFadingEnabled;
-                    radar.FadingInterval = config.FadingInterval;
-                    radar.EchoThreshold = (float) config.EchoThreshold;
-                    radar.EchoRadius = (float) (config.EchoRadius / _radarMaxDistances[radarId]);
-                    OpenGlEchoOverlay.OnConfigChanged(radar);
-                }
-            }
-            else
-            {
-                if (radar != null)
-                {
-                    radar.ScanlineColor = prevEchoColor;
-                    radar.IsFadingEnabled = prevFadingEnabled;
-                    radar.FadingInterval = prevFadingInterval;
-                    radar.EchoThreshold = (float)prevEchoThreshold;
-                    radar.EchoRadius = (float)(prevEchoRadius / _radarMaxDistances[radarId]);
-                    OpenGlEchoOverlay.OnConfigChanged(radar);
-                }
-            }
-        }
-
-        private void ConfigOnOnEchoColorChanged(object sender, int radarId, Color scanlineColor)
-        {
-            var radar = _radarInfos[radarId];
-            if (radar != null)
-            {
-                radar.ScanlineColor = scanlineColor;
-                OpenGlEchoOverlay.OnConfigChanged(radar);
-            }
-        }
-
-        private void ConfigOnOnFadingEnabledChanged(object sender, int radarId, bool isFadingEnabled)
-        {
-            var radar = _radarInfos[radarId];
-            if (radar != null)
-            {
-                radar.IsFadingEnabled = isFadingEnabled;
-                OpenGlEchoOverlay.OnConfigChanged(radar);
-            }
-        }
-
-        private void ConfigOnOnFadingIntervalChanged(object sender, int radarId, int fadingInterval)
-        {
-            var radar = _radarInfos[radarId];
-            if (radar != null)
-            {
-                radar.FadingInterval = fadingInterval;
-                OpenGlEchoOverlay.OnConfigChanged(radar);
-            }
-        }
-
-        private void ConfigOnOnEchoThresholdChanged(object sender, int radarId, double echoThreshold)
-        {
-            var radar = _radarInfos[radarId];
-            if (radar != null)
-            {
-                radar.EchoThreshold = (float)echoThreshold;
-                OpenGlEchoOverlay.OnConfigChanged(radar);
-            }
-        }
-
-        private void ConfigOnOnEchoRadiusChanged(object sender, int radarId, double echoRadius)
-        {
-            var radar = _radarInfos[radarId];
-            if (radar != null)
-            {
-                radar.EchoRadius = (float) (echoRadius / _radarMaxDistances[radarId]);
-                OpenGlEchoOverlay.OnConfigChanged(radar);
-            }
-        }
     }
 }

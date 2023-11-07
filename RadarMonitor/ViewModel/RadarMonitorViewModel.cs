@@ -47,8 +47,7 @@ namespace RadarMonitor.ViewModel
         // 用户配置信息
         private UserConfiguration _userConfiguration;
         private bool _isPresetLocationLoaded;
-
-
+        
         #region UserConfiguration Properties
         public UserConfiguration Configuration
         {
@@ -69,6 +68,8 @@ namespace RadarMonitor.ViewModel
         }
         #endregion
 
+
+        // OpenGL 回波显示
         private bool _isOpenGlEchoDisplayed;
         public bool IsOpenGlEchoDisplayed
         {
@@ -459,30 +460,6 @@ namespace RadarMonitor.ViewModel
         }
         #endregion
 
-
-        // 雷达回波直角坐标系
-        public const int CartesianSize = 2000;
-        public const double HalfCartesianSize = CartesianSize / 2.0;
-
-        private List<int[,]> _radarCartesianDatas = new()
-        {
-            new int[CartesianSize, CartesianSize], 
-            new int[CartesianSize, CartesianSize], 
-            new int[CartesianSize, CartesianSize], 
-            new int[CartesianSize, CartesianSize], 
-            new int[CartesianSize, CartesianSize]
-        };
-
-        private List<double> _radarRadiusIncrements = new()
-            { 0, 0, 0, 0, 0 };
-
-        private List<int> _radarScaledSteps = new ()
-            { 1, 1, 1, 1, 1 };
-
-        // 雷达数据及参数
-        public List<int[,]> RadarCartesianDatas => _radarCartesianDatas;
-
-
         // UDP Clients
         private List<MulticastClient> _udpClients = new()
         {
@@ -550,8 +527,6 @@ namespace RadarMonitor.ViewModel
             {
                 client.Disconnect();
                 client.Dispose();
-
-                _radarCartesianDatas[radarId] = new int[CartesianSize, CartesianSize];
             }
         }
 
@@ -568,6 +543,7 @@ namespace RadarMonitor.ViewModel
 
         private void OnUdpConnected(object sender, int clientId, string ip, int port)
         {
+            // 这里只是 UDP 端口连接，不是雷达连接，所以不用改变雷达状态
             OnRadarConnectionStatusChanged?.Invoke(this, clientId, ip, port, RadarConnectionStatus.Connected);
         }
 
@@ -597,15 +573,15 @@ namespace RadarMonitor.ViewModel
                 // 雷达若没启用，则略过数据包
                 return;
             }
+
+            // 雷达连接后改变连接状态
             SetRadarConnectionStatus(radarId, true);
 
             // 同一雷达每个数据包基本不变的信息
             if (dataItems.IsSpecChanged(_lastCat240DataItems[radarId]))
             {
-                _radarRadiusIncrements[radarId] = HalfCartesianSize / dataItems.VideoBlocks.Count;
-                _radarScaledSteps[radarId] = dataItems.VideoBlocks.Count / CartesianSize;
                 RadarSettings[radarId].RadarMaxDistance =
-                    (int)(dataItems.CellDuration * dataItems.VideoCellDurationUnit * HalfC * dataItems.ValidCellsInDataBlock);
+                    (int)Math.Ceiling(dataItems.CellDuration * dataItems.VideoCellDurationUnit * HalfC * dataItems.ValidCellsInDataBlock);
 
                 OnCat240SpecChanged?.Invoke(this, radarId, new Cat240Spec(dataItems));
                 OnRadarConnectionStatusChanged?.Invoke(this, radarId, string.Empty, 0, RadarConnectionStatus.Normal);
@@ -669,30 +645,6 @@ namespace RadarMonitor.ViewModel
                 case 4:
                     Radar5StartAzimuth = azimuthInDegree;
                     break;
-            }
-        }
-
-        private void PolarToCartesian(int radarId, double radarOrientation, Cat240DataItems items)
-        {
-            double angleInRadians = (items.StartAzimuthInDegree + radarOrientation) * Math.PI / 180.0;
-
-            var cosAzi = Math.Cos(angleInRadians);
-            var sinAzi = Math.Sin(angleInRadians);
-
-            double cosAziStep = _radarRadiusIncrements[radarId] * cosAzi;
-            double sinAziStep = _radarRadiusIncrements[radarId] * sinAzi;
-
-            // TODO: 后续看是否需要这样的性能优化
-            for (int i = 0; i < items.VideoBlocks.Count; i += _radarScaledSteps[radarId])
-            {
-                int x = (int)(HalfCartesianSize + i * cosAziStep);
-                int y = (int)(HalfCartesianSize + i * sinAziStep);
-
-                if (x >= 0 && x < CartesianSize && y >= 0 && y < CartesianSize)
-                {
-                    int grayValue = (int)items.GetCellData(i);
-                    _radarCartesianDatas[radarId][x, y] = grayValue;
-                }
             }
         }
 

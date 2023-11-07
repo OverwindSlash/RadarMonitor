@@ -29,8 +29,8 @@
                 <MenuItem Header="_Radar">
                     <MenuItem Name="ConnectRadar" Header="_Source..." Click="ConnectRadar_OnClick"></MenuItem>
                 </MenuItem>
-                <MenuItem Header="_Config" Visibility="Hidden">
-                    <MenuItem Name="ConfigDisplay" Header="_Display Control" Click="ConfigDisplay_OnClick"></MenuItem>
+                <MenuItem Header="_Profile" Visibility="Hidden">
+                    <MenuItem Name="SaveProfile" Header="_Save Profile"></MenuItem>
                 </MenuItem>
             </Menu>
         </DockPanel>

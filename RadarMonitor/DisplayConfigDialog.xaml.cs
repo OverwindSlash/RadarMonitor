@@ -22,10 +22,6 @@ namespace RadarMonitor
                 echoThreshold, echoRadius, echoMaxDistance);
         }
 
-        private void BtnPickColor_Click(object sender, RoutedEventArgs e)
-        {
-            
-        }
         private void BtnOk_OnClick(object sender, RoutedEventArgs e)
         {
             DialogResult = true;

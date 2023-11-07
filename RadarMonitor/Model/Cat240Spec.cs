@@ -1,4 +1,5 @@
-﻿using CAT240Parser;
+﻿using System;
+using CAT240Parser;
 
 namespace RadarMonitor.Model
 {
@@ -22,7 +23,7 @@ namespace RadarMonitor.Model
             ValidBytesInDataBlock = cat240DataItems.ValidBytesInDataBlock;
             ValidCellsInDataBlock = cat240DataItems.ValidCellsInDataBlock;
             VideoBlockLength = cat240DataItems.VideoBlockLength;
-            MaxDistance = (int)(CellDuration * VideoCellDurationUnit * 300000 / 2 * ValidCellsInDataBlock);
+            MaxDistance = (int)Math.Ceiling(CellDuration * VideoCellDurationUnit * 300000 / 2 * ValidCellsInDataBlock);
         }
     }
 }
