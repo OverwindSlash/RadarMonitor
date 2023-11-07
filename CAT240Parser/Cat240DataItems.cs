@@ -84,7 +84,7 @@ namespace CAT240Parser
             // End azimuth, 2 bytes, 单位：360/2^16
             EndAzimuth = BitOperation.Get2BytesBigEndian(buffer, offset);
             offset += 2;
-            //EndAzimuthInDegree = EndAzimuth * AzimuthUnit;
+            EndAzimuthInDegree = EndAzimuth * AzimuthUnit;
 
             // Start range, 4 bytes
             StartRange = BitOperation.Get4BytesBigEndian(buffer, offset);
@@ -213,7 +213,6 @@ namespace CAT240Parser
                     return (uint)cellDefault;
             }
         }
-
 
         public bool IsSpecChanged(Cat240DataItems other)
         {
