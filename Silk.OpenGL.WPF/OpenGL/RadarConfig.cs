@@ -8,7 +8,7 @@ namespace Silk.WPF.OpenGL
 {
     public class RadarConfig
     {
-        public const int SECTIONS = 512;
+        public const int SECTIONS = 2048;
         public const int CELLS = 6000;
         public const float AZI_SPAN = 65536 / (float)SECTIONS;
         public const int HEAD = 1;

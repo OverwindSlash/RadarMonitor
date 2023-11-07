@@ -135,7 +135,7 @@
 		<PackageReference Include="OpenCvSharp4.Extensions" Version="4.8.0.20230708" />
 		<PackageReference Include="OpenCvSharp4.Windows" Version="4.8.0.20230708" />
 		<PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.8.0.20230708" />
-		<PackageReference Include="YamlDotNet" Version="13.4.0" />
+		<PackageReference Include="YamlDotNet" Version="13.7.1" />
 	</ItemGroup>
 
 	<ItemGroup>

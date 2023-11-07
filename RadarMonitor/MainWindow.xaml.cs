@@ -352,8 +352,8 @@ namespace RadarMonitor
                 BaseMapView.Map.OperationalLayers.Add(encLayer);
             }
 
-            Envelope fullExtent = GeometryEngine.CombineExtents(dataSetExtents);
-            await BaseMapView.SetViewpointAsync(new Viewpoint(fullExtent));
+            Envelope fullExtent = GeometryEngine.CombineExtents(dataSetExtents); 
+            //await BaseMapView.SetViewpointAsync(new Viewpoint(fullExtent));
 
             // 记录海图类型及Uri
             GetViewModel().RecordEncTypeAndUri("Dir", encDir);
