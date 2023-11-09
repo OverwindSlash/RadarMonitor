@@ -28,9 +28,9 @@
                 <Label Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" Content="Fading" Margin="10, 10, 10, 5"></Label>
                 <RadioButton Name="RadioBoxFading" GroupName="Fading" Grid.Row="3" Grid.Column="0" Content="Real-time" Margin="30, 0, 10, 0"
                              IsChecked="{Binding IsFadingEnabled}" Checked="RadioBoxFading_OnChecked"></RadioButton>
-                <TextBox Grid.Row="3" Grid.Column="1" Width="80" Margin="10, 0, 0, 0" HorizontalAlignment="Left"
+                <TextBox Grid.Row="3" Grid.Column="1" Width="80" Margin="10, 0, 0, 10" HorizontalAlignment="Left"
                          Text="{Binding FadingInterval}" IsEnabled="{Binding IsFadingEnabled}"></TextBox>
-                <RadioButton GroupName="Fading" Grid.Row="4" Grid.Column="0" Content="Replace" Margin="30, 5, 10, 30" IsChecked="True"></RadioButton>
+                <!--<RadioButton GroupName="Fading" Grid.Row="4" Grid.Column="0" Content="Replace" Margin="30, 5, 10, 30" IsChecked="True"></RadioButton>-->
 
                 <Button Name="BtnOk" Grid.Row="5" Grid.Column="0" Width="60" Content="OK" HorizontalAlignment="Center" Click="BtnOk_OnClick"></Button>
                 <Button Name="BtnCancel" Grid.Row="5" Grid.Column="1" Width="60" Content="Cancel" HorizontalAlignment="Center" Click="BtnCancel_OnClick"></Button>

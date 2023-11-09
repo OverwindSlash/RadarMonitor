@@ -121,6 +121,15 @@
 
                     <CheckBox Name="DisplayEnc" Content="Enc" IsEnabled="{Binding Path=IsEncLoaded}" IsChecked="{Binding Path=IsEncDisplayed}" 
                               Click="DisplayEnc_OnClick"></CheckBox>
+                    <StackPanel >
+                        <TextBlock Text="Radius" />
+                        <Slider Name="DisplayRadius" Value="1" Maximum="1" Minimum="0" ValueChanged="OnDisplayRadiusChanged"/>
+                    </StackPanel>
+                    <StackPanel >
+                        <TextBlock Text="Intensity" />
+                        <Slider Name="DisplayIntensity" Value="0" Maximum="1" Minimum="0" ValueChanged="OnDisplayIntensityChanged"/>
+                    </StackPanel>
+                    
                     <TextBlock Name="TbRadar1" Text="Radar1" Margin="0, 4, 0, 2"></TextBlock>
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=IsRadar1Connected}">
                         <CheckBox Name="CbRadar1Echo" Content="Echo" Margin="0, 0, 3, 0" IsChecked="{Binding Path=IsRadar1EchoDisplayed}"
