@@ -468,19 +468,19 @@ namespace RadarMonitor
 
         private void OnRadarConnectionStatusChanged(object sender, int radarId, string ip, int port, RadarConnectionStatus status)
         {
-            string imgSrc = @"Assets\Disconnected.png";
-            switch (status)
-            {
-                case RadarConnectionStatus.Connected:
-                    imgSrc = @"Assets\Connected.png";
-                    break;
-                case RadarConnectionStatus.Normal:
-                    imgSrc = @"Assets\Normal.png";
-                    break;
-            }
-
             Dispatcher.Invoke(() =>
             {
+                string imgSrc = @"Assets\Disconnected.png";
+                switch (status)
+                {
+                    case RadarConnectionStatus.Connected:
+                        imgSrc = @"Assets\Connected.png";
+                        break;
+                    case RadarConnectionStatus.Normal:
+                        imgSrc = @"Assets\Normal.png";
+                        break;
+                }
+
                 switch (radarId)
                 {
                     case 0:
@@ -634,13 +634,13 @@ namespace RadarMonitor
 
             if (displayEncCheckBox.IsChecked.Value)
             {
-                // BaseMapView.Visibility = Visibility.Visible;
+                BaseMapView.Visibility = Visibility.Visible;
                 // ScaleOverlay.Visibility = Visibility.Visible;
                 OpenGlEchoOverlay.ControlOpacity = 0.8;
             }
             else
             {
-                // BaseMapView.Visibility = Visibility.Hidden;
+                BaseMapView.Visibility = Visibility.Hidden;
                 // ScaleOverlay.Visibility = Visibility.Hidden;
                 OpenGlEchoOverlay.ControlOpacity = 1.0;
             }
@@ -1059,6 +1059,7 @@ namespace RadarMonitor
         {
             double mapScale = BaseMapView.MapScale;
             double kmWith1Cm = (mapScale / 100000.0);
+            double nmWith1Cm = kmWith1Cm / 1.852;
 
             Brush scaleBrush = new SolidColorBrush(Colors.LimeGreen);
             int scaleLength = 3;
@@ -1137,9 +1138,10 @@ namespace RadarMonitor
                 ScaleOverlay.Children.Add(mark);
 
                 // 标尺尾部标签
+                string distance = (end * kmWith1Cm).ToString("F1");
                 TextBlock TailLabel = new TextBlock
                 {
-                    Text = (end * kmWith1Cm).ToString("F1"),
+                    Text = distance,
                     Foreground = scaleBrush,
                     FontSize = labelFontSize,
                     Margin = new Thickness(end * _dpcX - labelXOffset, canvasHeight / 2 + labelYOffset, 0, 0)
@@ -1148,9 +1150,10 @@ namespace RadarMonitor
             }
 
             // KM尾标
+            string unitLabel = "(KM)";
             TextBlock kmLabel = new TextBlock
             {
-                Text = "(KM)",
+                Text = unitLabel,
                 Foreground = scaleBrush,
                 FontSize = labelFontSize,
                 Margin = new Thickness(scaleLength * _dpcX + labelXOffset, canvasHeight / 2 - labelYOffset, 0, 0)
