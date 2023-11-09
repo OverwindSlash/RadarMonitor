@@ -608,7 +608,6 @@ namespace RadarMonitor
                 //TransformOpenGlRadarEcho(radarSetting.RadarLongitude, radarSetting.RadarLatitude,
                 //    radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, encScale);
                 TransformOpenGlRadarEcho(radarId, encScale);
-
             }
         }
 

@@ -50,7 +50,7 @@ namespace CAT240Parser
             OnUdpConnected?.Invoke(this, _clientId, Address, Port);
 
             // Join UDP multicast group
-            JoinMulticastGroup(Multicast);
+            //JoinMulticastGroup(Multicast);
 
             // Start receive datagrams
             ReceiveAsync();

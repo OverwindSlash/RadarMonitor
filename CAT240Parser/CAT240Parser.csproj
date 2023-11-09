@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Compile Remove="Cat240UdpClient.cs" />
-    <Compile Remove="SimpleUdpClient.cs" />
   </ItemGroup>
 
   <ItemGroup>

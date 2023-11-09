@@ -1,15 +1,15 @@
 ﻿encSetting:
-   encType: Dir
-   encUri: Encs\Hongkong
-   encLongitude: 114.059464
-   encLatitude: 22.220194
-   encScale: 150000
+   encType: Catalog
+   encUri: Encs\CATALOG.031
+   encLongitude: 121.723234
+   encLatitude: 31.350226
+   encScale: 320000
    encEnabled: true
 radarSettings:
 -
-   radarName: 香港岛1
-   radarLongitude: 114.200670
-   radarLatitude: 22.293878
+   radarName: 崇明岛
+   radarLongitude: 121.912592
+   radarLatitude: 31.576394
    radarOrientation: 55.0
    radarScale: 275000
    radarMaxDistance: 60
@@ -20,9 +20,9 @@ radarSettings:
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: true
 -
-   radarName: 大屿山1
-   radarLongitude: 113.870939
-   radarLatitude: 22.267821
+   radarName: 世博公园
+   radarLongitude: 121.489728
+   radarLatitude: 31.192678
    radarOrientation: -85.0
    radarScale: 20000
    radarMaxDistance: 9
@@ -33,9 +33,9 @@ radarSettings:
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: true
 -
-   radarName: 南丫岛
-   radarLongitude: 114.117719
-   radarLatitude: 22.181681
+   radarName: 杨浦
+   radarLongitude: 121.539628
+   radarLatitude: 31.258811
    radarOrientation: -85.0
    radarScale: 68750
    radarMaxDistance: 9
@@ -46,9 +46,9 @@ radarSettings:
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: true
 -
-   radarName: 枕箱岛
-   radarLongitude: 113.813114
-   radarLatitude: 22.134093
+   radarName: 吴淞
+   radarLongitude: 121.496233
+   radarLatitude: 31.376250
    radarOrientation: -87
    radarScale: 160000
    radarMaxDistance: 9
@@ -59,9 +59,9 @@ radarSettings:
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: true
 -
-   radarName: 外伶仃岛
-   radarLongitude: 114.035044
-   radarLatitude: 22.111725
+   radarName: 闵行
+   radarLongitude: 121.463678
+   radarLatitude: 31.087561
    radarOrientation: -91.0
    radarScale: 30000
    radarMaxDistance: 9
