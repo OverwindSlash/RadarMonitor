@@ -41,6 +41,8 @@ namespace RadarMonitor
         private double _dpcY;
         private const int RadarCount = 5;
 
+        private bool _showInKm = false;
+
         #region Radar Display Settings
         // Radar1 Display Setting
         private Color _radar1EchoColor = DisplayConfigDialog.DefaultImageEchoColor;
@@ -257,6 +259,8 @@ namespace RadarMonitor
                     await BaseMapView.SetViewpointAsync(new Viewpoint(
                         new MapPoint(encSetting.EncLongitude, encSetting.EncLatitude, SpatialReferences.Wgs84),
                         encSetting.EncScale));
+
+                    DrawScaleLine();
                 }
             }
             catch (Exception e)
@@ -1138,7 +1142,16 @@ namespace RadarMonitor
                 ScaleOverlay.Children.Add(mark);
 
                 // 标尺尾部标签
-                string distance = (end * kmWith1Cm).ToString("F1");
+                string distance = String.Empty;
+                if (_showInKm)
+                {
+                    distance = (end * kmWith1Cm).ToString("F1");
+                }
+                else
+                {
+                    distance = (end * nmWith1Cm).ToString("F1");
+                }
+
                 TextBlock TailLabel = new TextBlock
                 {
                     Text = distance,
@@ -1150,7 +1163,16 @@ namespace RadarMonitor
             }
 
             // KM尾标
-            string unitLabel = "(KM)";
+            string unitLabel = string.Empty;
+            if (_showInKm)
+            {
+                unitLabel = "(KM)";
+            }
+            else
+            {
+                unitLabel = "(NM)";
+            }
+
             TextBlock kmLabel = new TextBlock
             {
                 Text = unitLabel,
@@ -1214,6 +1236,7 @@ namespace RadarMonitor
 
                 // 添加距离文字
                 double radiusInKm = ringOffset * (BaseMapView.MapScale / 100000.0);
+                double radiusInNm = radiusInKm / 1.852;
                 ringOffset += ringStep;
 
                 if (radiusInKm == 0)
@@ -1222,7 +1245,15 @@ namespace RadarMonitor
                 }
 
                 TextBlock distanceText = new TextBlock();
-                distanceText.Text = radiusInKm.ToString("F1") + "KM";
+                if (_showInKm)
+                {
+                    distanceText.Text = radiusInKm.ToString("F1") + "KM";
+                }
+                else
+                {
+                    distanceText.Text = radiusInNm.ToString("F1") + "NM";
+                }
+                
                 distanceText.Foreground = ringBrush;
                 distanceText.FontSize = ringFontSize;
 
