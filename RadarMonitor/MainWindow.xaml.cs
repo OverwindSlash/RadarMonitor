@@ -42,6 +42,7 @@ namespace RadarMonitor
         private const int RadarCount = 5;
 
         private bool _showInKm = false;
+        private const double KmPerNm = 1.852;
 
         #region Radar Display Settings
         // Radar1 Display Setting
@@ -97,7 +98,7 @@ namespace RadarMonitor
 
         public RadarSettingsViewModel DialogViewModel { get; set; }
 
-        private Dictionary<int, RadarInfoModel> _radarInfos = new Dictionary<int, RadarInfoModel>();
+        private Dictionary<int, RadarInfoModel> _radarInfos = new();
 
         public MainWindow()
         {
@@ -461,6 +462,8 @@ namespace RadarMonitor
                 var radarSetting = viewModel.RadarSettings[radarId];
                 viewModel.CaptureCat240NetworkPackage(radarId, radarSetting.RadarIpAddress, radarSetting.RadarPort);
             }
+
+            DrawScaleLine();
         }
 
         private void OnRadarChanged(object sender, int radarId, RadarSetting radarSetting)
@@ -880,10 +883,10 @@ namespace RadarMonitor
             int prevFadingInterval = _radarFadingIntervals[radarId];
             double prevEchoThreshold = _radarEchoThresholds[radarId];
             double prevEchoRadius = _radarEchoRadiuses[radarId];
-            double prevEchoMaxDistance = _radarMaxDistances[radarId];
+            double prevEchoMaxDistance = _showInKm ? _radarMaxDistances[radarId] : _radarMaxDistances[radarId] / KmPerNm;
 
             var configDialog = new DisplayConfigDialog(radarId, prevEchoColor, prevFadingEnabled, prevFadingInterval,
-                prevEchoThreshold, prevEchoRadius, prevEchoMaxDistance);
+                prevEchoThreshold, prevEchoRadius, prevEchoMaxDistance, _showInKm);
 
             var config = (DisplayConfigViewModel)configDialog.DataContext;
             config.OnEchoColorChanged += ConfigOnOnEchoColorChanged;
@@ -1063,9 +1066,15 @@ namespace RadarMonitor
         {
             double mapScale = BaseMapView.MapScale;
             double kmWith1Cm = (mapScale / 100000.0);
-            double nmWith1Cm = kmWith1Cm / 1.852;
+            double nmWith1Cm = kmWith1Cm / KmPerNm;
+
+            var viewModel = GetViewModel();
 
             Brush scaleBrush = new SolidColorBrush(Colors.LimeGreen);
+            if (!viewModel.IsRadarConnected)
+            {
+                scaleBrush = new SolidColorBrush(Colors.Black);
+            }
             int scaleLength = 3;
             int markHeight = 4;
             int labelXOffset = 5;
@@ -1199,7 +1208,13 @@ namespace RadarMonitor
             double radarX = point.X;
             double radarY = point.Y;
 
-            double maxDistance = Math.Max(ringsOverlay.ActualWidth, ringsOverlay.ActualHeight) / 2;
+            //double maxDistance = Math.Max(ringsOverlay.ActualWidth, ringsOverlay.ActualHeight) / 2;
+
+            var viewModel = GetViewModel();
+            var radarSetting = viewModel.RadarSettings[radarId];
+            double kmWith1Cm = (viewModel.EncScale / 100000.0);
+            double kmWith1Px = kmWith1Cm / _dpcX;
+            double maxDistance = 1.2 * radarSetting.RadarMaxDistance / kmWith1Px;
 
             // 绘制雷达点
             double radarPointRadius = 1.0;
@@ -1236,7 +1251,7 @@ namespace RadarMonitor
 
                 // 添加距离文字
                 double radiusInKm = ringOffset * (BaseMapView.MapScale / 100000.0);
-                double radiusInNm = radiusInKm / 1.852;
+                double radiusInNm = radiusInKm / KmPerNm;
                 ringOffset += ringStep;
 
                 if (radiusInKm == 0)
@@ -1485,5 +1500,33 @@ namespace RadarMonitor
             }
         }
         #endregion
+
+        private void RbNm_OnChecked(object sender, RoutedEventArgs e)
+        {
+            var viewModel = GetViewModel();
+            if (viewModel == null || !viewModel.IsEncLoaded)
+            {
+                return;
+            }
+
+            _showInKm = false;
+
+            DrawScaleLine();
+            RedrawRadarRings(viewModel);
+        }
+
+        private void RbKm_OnChecked(object sender, RoutedEventArgs e)
+        {
+            var viewModel = GetViewModel();
+            if (viewModel == null || !viewModel.IsEncLoaded)
+            {
+                return;
+            }
+
+            _showInKm = true;
+
+            DrawScaleLine();
+            RedrawRadarRings(viewModel);
+        }
     }
 }

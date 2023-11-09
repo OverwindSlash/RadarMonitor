@@ -14,12 +14,16 @@ namespace RadarMonitor
         public static readonly Color DefaultImageEchoColor = Colors.Lime;
 
         public DisplayConfigDialog(int radarId, Color scanlineColor, bool isFadingEnabled, int fadingInterval,
-            double echoThreshold, double echoRadius, double echoMaxDistance)
+            double echoThreshold, double echoRadius, double echoMaxDistance, bool showInKm)
         {
             InitializeComponent();
 
             DataContext = new DisplayConfigViewModel(radarId, scanlineColor, isFadingEnabled, fadingInterval,
                 echoThreshold, echoRadius, echoMaxDistance);
+
+            GbCurrentRadar.Header = $"Radar {radarId + 1}";
+
+            LblDistanceUnit.Content = showInKm ? "KM" : "NM";
         }
 
         private void BtnOk_OnClick(object sender, RoutedEventArgs e)
