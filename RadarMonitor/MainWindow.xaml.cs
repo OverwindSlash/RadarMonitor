@@ -643,7 +643,7 @@ namespace RadarMonitor
             {
                 BaseMapView.Visibility = Visibility.Visible;
                 // ScaleOverlay.Visibility = Visibility.Visible;
-                OpenGlEchoOverlay.ControlOpacity = 0.8;
+                OpenGlEchoOverlay.ControlOpacity = 0.7;
             }
             else
             {
@@ -1171,7 +1171,7 @@ namespace RadarMonitor
                 ScaleOverlay.Children.Add(TailLabel);
             }
 
-            // KM尾标
+            // 距离单位尾标
             string unitLabel = string.Empty;
             if (_showInKm)
             {
@@ -1286,7 +1286,6 @@ namespace RadarMonitor
                 return;
             }
 
-
             double kmWith1Cm = (encScale / 100000.0);
             double kmWith1Px = kmWith1Cm / _dpcX;
             double kmWith1Lon = 111.32;
@@ -1313,7 +1312,6 @@ namespace RadarMonitor
             radarInfo.MapHeightOffCenter = mapHeightOffCenter;
 
             OpenGlEchoOverlay.CreateUpdateRadar(radarInfo);
-
         }
 
         public void CreateUpdateRadarInfoBase(int radarId, RadarSetting setting)

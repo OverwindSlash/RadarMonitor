@@ -5,7 +5,6 @@ using System.Windows.Media;
 
 namespace RadarMonitor
 {
-
     /// <summary>
     /// Interaction logic for DisplayConfigDialog.xaml
     /// </summary>
@@ -22,7 +21,6 @@ namespace RadarMonitor
                 echoThreshold, echoRadius, echoMaxDistance);
 
             GbCurrentRadar.Header = $"Radar {radarId + 1}";
-
             LblDistanceUnit.Content = showInKm ? "KM" : "NM";
         }
 
