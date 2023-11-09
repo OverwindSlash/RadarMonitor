@@ -473,11 +473,11 @@ namespace RadarMonitor.ViewModel
 
 
         // UDP Clients
-        private List<MulticastClient> _udpClients = new()
-        {
-            null, null, null, null, null
-        };
-
+        //private List<MulticastClient> _udpClients = new()
+        //{
+        //    null, null, null, null, null
+        //};
+        private Dictionary<int, MulticastClient> _udpClients = new Dictionary<int, MulticastClient>();
         public RadarMonitorViewModel()
         {
             Configuration = UserConfiguration.LoadConfiguration("Config/default.yaml");
@@ -508,14 +508,14 @@ namespace RadarMonitor.ViewModel
 
         public void CaptureCat240NetworkPackage(int radarId, string radarIp, int radarPort)
         {
-            if (radarId > _udpClients.Count - 1)
+            if (_udpClients.ContainsKey(radarId))
             {
-                return;
+                StopCaptureCat240NetworkPackage(radarId);
             }
 
-            StopCaptureCat240NetworkPackage(radarId);
 
             var client = new MulticastClient(radarId, radarIp, radarPort);
+            _udpClients[radarId]=client;
             client.SetupMulticast(true);
             client.Multicast = $"239.255.0.{radarId}";
             client.OnUdpConnected += OnUdpConnected;
@@ -524,16 +524,10 @@ namespace RadarMonitor.ViewModel
             client.OnUdpError += OnUdpError;
             client.Connect();
 
-            _udpClients.Add(client);
         }
 
         public void StopCaptureCat240NetworkPackage(int radarId)
         {
-            if (radarId > _udpClients.Count - 1)
-            {
-                return;
-            }
-
             var client = _udpClients[radarId];
             if (client != null)
             {
@@ -546,8 +540,9 @@ namespace RadarMonitor.ViewModel
 
         public void DisposeCat240Parser()
         {
-            foreach (var client in _udpClients)
+            foreach (var item in _udpClients)
             {
+                var client = item.Value;
                 if (client != null)
                 {
                     client.DisconnectAndStop();

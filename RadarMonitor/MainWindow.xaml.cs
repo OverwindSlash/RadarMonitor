@@ -349,12 +349,7 @@ namespace RadarMonitor
 
             // 默认显示图片雷达回波
             bool showImageEchoFirst = false;
-            //foreach (var radarSetting in viewModel.RadarSettings)
-            //{
-            //    radarSetting.IsEchoDisplayed = showImageEchoFirst;
-            //    radarSetting.IsOpenGlEchoDisplayed = !showImageEchoFirst;
 
-            //}
             viewModel.IsOpenGlEchoDisplayed = true;
             OpenGlEchoOverlay.IsDisplay = true;
             OpenGlEchoOverlay.Visibility = Visibility.Visible;
