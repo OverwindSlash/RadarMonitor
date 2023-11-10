@@ -3,6 +3,7 @@ using Silk.NET.OpenGL;
 using Silk.NET.WGL.Extensions.NV;
 using Silk.WPF.Common;
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 
@@ -27,6 +28,7 @@ public class OpenGLControl : OpenGLControlBase<Framebuffer>
 
             Ready?.Invoke();
         }
+
     }
 
     protected override void OnSizeChanged(SizeChangedInfo sizeInfo)
@@ -36,6 +38,16 @@ public class OpenGLControl : OpenGLControlBase<Framebuffer>
             Framebuffer?.Dispose();
             Framebuffer = new Framebuffer(_context, (int)sizeInfo.NewSize.Width, (int)sizeInfo.NewSize.Height);
         }
+    }
+
+    public override void OnSessionChanged()
+    {
+        if (_context != null)
+        {
+            Framebuffer?.Dispose();
+            Framebuffer = new Framebuffer(_context, (int)Framebuffer.D3dImage.Width, (int)Framebuffer.D3dImage.Height);
+        }
+        
     }
 
     protected override void OnDraw(DrawingContext drawingContext)

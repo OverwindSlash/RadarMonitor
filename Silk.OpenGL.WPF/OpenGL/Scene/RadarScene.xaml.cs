@@ -320,4 +320,9 @@ public partial class RadarScene : UserControl
             radar.EchoRadius = radarInfo.EchoRadius;
         }
     }
+
+    public void OnSessionChanged()
+    {
+        GLControl.OnSessionChanged();
+    }
 }

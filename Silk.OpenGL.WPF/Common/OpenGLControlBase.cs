@@ -1,10 +1,14 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace Silk.WPF.Common;
@@ -49,6 +53,8 @@ public abstract class OpenGLControlBase<TFrame> : Control where TFrame : Framebu
             Loaded += (_, _) => InvalidateVisual();
 
             OnStart();
+
+            SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
         }
     }
 
@@ -97,7 +103,30 @@ public abstract class OpenGLControlBase<TFrame> : Control where TFrame : Framebu
         }
     }
 
+    private async void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
+    {
+        if (e.Reason == SessionSwitchReason.SessionUnlock)
+        {
+            await Task.Delay(1000);
+            if (!DesignerProperties.GetIsInDesignMode(this))
+            {
+                OnSessionChanged();
+            }
+
+        }
+        else if (e.Reason == SessionSwitchReason.SessionLock)
+        {
+            //if (!DesignerProperties.GetIsInDesignMode(this))
+            //{
+            //    OnSessionChanged();
+            //}
+        }
+    }
+
     protected abstract void OnStart();
     protected abstract void OnDraw(DrawingContext drawingContext);
     protected abstract void OnSizeChanged(SizeChangedInfo sizeInfo);
+
+    public abstract void OnSessionChanged();
+
 }

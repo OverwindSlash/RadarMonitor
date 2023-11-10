@@ -457,6 +457,8 @@ namespace RadarMonitor
                 var radarSetting = viewModel.RadarSettings[radarId];
                 viewModel.CaptureCat240NetworkPackage(radarId, radarSetting.RadarIpAddress, radarSetting.RadarPort);
             }
+
+            OpenGlEchoOverlay.OnSessionChanged();
         }
 
         private void OnRadarChanged(object sender, int radarId, RadarSetting radarSetting)
@@ -637,6 +639,7 @@ namespace RadarMonitor
                 // BaseMapView.Visibility = Visibility.Visible;
                 // ScaleOverlay.Visibility = Visibility.Visible;
                 OpenGlEchoOverlay.ControlOpacity = 0.8;
+                
             }
             else
             {
