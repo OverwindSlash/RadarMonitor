@@ -41,6 +41,9 @@ namespace RadarMonitor
         private double _dpcY;
         private const int RadarCount = 5;
 
+        private bool _showInKm = false;
+        private const double KmPerNm = 1.852;
+
         #region Radar Display Settings
         // Radar1 Display Setting
         private Color _radar1EchoColor = DisplayConfigDialog.DefaultImageEchoColor;
@@ -95,7 +98,7 @@ namespace RadarMonitor
 
         public RadarSettingsViewModel DialogViewModel { get; set; }
 
-        private Dictionary<int, RadarInfoModel> _radarInfos = new Dictionary<int, RadarInfoModel>();
+        private Dictionary<int, RadarInfoModel> _radarInfos = new();
 
         public MainWindow()
         {
@@ -257,6 +260,8 @@ namespace RadarMonitor
                     await BaseMapView.SetViewpointAsync(new Viewpoint(
                         new MapPoint(encSetting.EncLongitude, encSetting.EncLatitude, SpatialReferences.Wgs84),
                         encSetting.EncScale));
+
+                    DrawScaleLine();
                 }
             }
             catch (Exception e)
@@ -459,6 +464,8 @@ namespace RadarMonitor
             }
 
             OpenGlEchoOverlay.OnSessionChanged();
+
+            DrawScaleLine();
         }
 
         private void OnRadarChanged(object sender, int radarId, RadarSetting radarSetting)
@@ -470,19 +477,19 @@ namespace RadarMonitor
 
         private void OnRadarConnectionStatusChanged(object sender, int radarId, string ip, int port, RadarConnectionStatus status)
         {
-            string imgSrc = @"Assets\Disconnected.png";
-            switch (status)
-            {
-                case RadarConnectionStatus.Connected:
-                    imgSrc = @"Assets\Connected.png";
-                    break;
-                case RadarConnectionStatus.Normal:
-                    imgSrc = @"Assets\Normal.png";
-                    break;
-            }
-
             Dispatcher.Invoke(() =>
             {
+                string imgSrc = @"Assets\Disconnected.png";
+                switch (status)
+                {
+                    case RadarConnectionStatus.Connected:
+                        imgSrc = @"Assets\Connected.png";
+                        break;
+                    case RadarConnectionStatus.Normal:
+                        imgSrc = @"Assets\Normal.png";
+                        break;
+                }
+
                 switch (radarId)
                 {
                     case 0:
@@ -636,14 +643,13 @@ namespace RadarMonitor
 
             if (displayEncCheckBox.IsChecked.Value)
             {
-                // BaseMapView.Visibility = Visibility.Visible;
+                BaseMapView.Visibility = Visibility.Visible;
                 // ScaleOverlay.Visibility = Visibility.Visible;
                 OpenGlEchoOverlay.ControlOpacity = 0.8;
-                
             }
             else
             {
-                // BaseMapView.Visibility = Visibility.Hidden;
+                BaseMapView.Visibility = Visibility.Hidden;
                 // ScaleOverlay.Visibility = Visibility.Hidden;
                 OpenGlEchoOverlay.ControlOpacity = 1.0;
             }
@@ -879,10 +885,10 @@ namespace RadarMonitor
             int prevFadingInterval = _radarFadingIntervals[radarId];
             double prevEchoThreshold = _radarEchoThresholds[radarId];
             double prevEchoRadius = _radarEchoRadiuses[radarId];
-            double prevEchoMaxDistance = _radarMaxDistances[radarId];
+            double prevEchoMaxDistance = _showInKm ? _radarMaxDistances[radarId] : _radarMaxDistances[radarId] / KmPerNm;
 
             var configDialog = new DisplayConfigDialog(radarId, prevEchoColor, prevFadingEnabled, prevFadingInterval,
-                prevEchoThreshold, prevEchoRadius, prevEchoMaxDistance);
+                prevEchoThreshold, prevEchoRadius, prevEchoMaxDistance, _showInKm);
 
             var config = (DisplayConfigViewModel)configDialog.DataContext;
             config.OnEchoColorChanged += ConfigOnOnEchoColorChanged;
@@ -1062,8 +1068,15 @@ namespace RadarMonitor
         {
             double mapScale = BaseMapView.MapScale;
             double kmWith1Cm = (mapScale / 100000.0);
+            double nmWith1Cm = kmWith1Cm / KmPerNm;
+
+            var viewModel = GetViewModel();
 
             Brush scaleBrush = new SolidColorBrush(Colors.LimeGreen);
+            if (!viewModel.IsRadarConnected)
+            {
+                scaleBrush = new SolidColorBrush(Colors.Black);
+            }
             int scaleLength = 3;
             int markHeight = 4;
             int labelXOffset = 5;
@@ -1140,9 +1153,19 @@ namespace RadarMonitor
                 ScaleOverlay.Children.Add(mark);
 
                 // 标尺尾部标签
+                string distance = String.Empty;
+                if (_showInKm)
+                {
+                    distance = (end * kmWith1Cm).ToString("F1");
+                }
+                else
+                {
+                    distance = (end * nmWith1Cm).ToString("F1");
+                }
+
                 TextBlock TailLabel = new TextBlock
                 {
-                    Text = (end * kmWith1Cm).ToString("F1"),
+                    Text = distance,
                     Foreground = scaleBrush,
                     FontSize = labelFontSize,
                     Margin = new Thickness(end * _dpcX - labelXOffset, canvasHeight / 2 + labelYOffset, 0, 0)
@@ -1150,10 +1173,20 @@ namespace RadarMonitor
                 ScaleOverlay.Children.Add(TailLabel);
             }
 
-            // KM尾标
+            // 距离单位尾标
+            string unitLabel = string.Empty;
+            if (_showInKm)
+            {
+                unitLabel = "(KM)";
+            }
+            else
+            {
+                unitLabel = "(NM)";
+            }
+
             TextBlock kmLabel = new TextBlock
             {
-                Text = "(KM)",
+                Text = unitLabel,
                 Foreground = scaleBrush,
                 FontSize = labelFontSize,
                 Margin = new Thickness(scaleLength * _dpcX + labelXOffset, canvasHeight / 2 - labelYOffset, 0, 0)
@@ -1177,7 +1210,13 @@ namespace RadarMonitor
             double radarX = point.X;
             double radarY = point.Y;
 
-            double maxDistance = Math.Max(ringsOverlay.ActualWidth, ringsOverlay.ActualHeight) / 2;
+            //double maxDistance = Math.Max(ringsOverlay.ActualWidth, ringsOverlay.ActualHeight) / 2;
+
+            var viewModel = GetViewModel();
+            var radarSetting = viewModel.RadarSettings[radarId];
+            double kmWith1Cm = (viewModel.EncScale / 100000.0);
+            double kmWith1Px = kmWith1Cm / _dpcX;
+            double maxDistance = 1.2 * radarSetting.RadarMaxDistance / kmWith1Px;
 
             // 绘制雷达点
             double radarPointRadius = 1.0;
@@ -1214,6 +1253,7 @@ namespace RadarMonitor
 
                 // 添加距离文字
                 double radiusInKm = ringOffset * (BaseMapView.MapScale / 100000.0);
+                double radiusInNm = radiusInKm / KmPerNm;
                 ringOffset += ringStep;
 
                 if (radiusInKm == 0)
@@ -1222,7 +1262,15 @@ namespace RadarMonitor
                 }
 
                 TextBlock distanceText = new TextBlock();
-                distanceText.Text = radiusInKm.ToString("F1") + "KM";
+                if (_showInKm)
+                {
+                    distanceText.Text = radiusInKm.ToString("F1") + "KM";
+                }
+                else
+                {
+                    distanceText.Text = radiusInNm.ToString("F1") + "NM";
+                }
+                
                 distanceText.Foreground = ringBrush;
                 distanceText.FontSize = ringFontSize;
 
@@ -1239,7 +1287,6 @@ namespace RadarMonitor
             {
                 return;
             }
-
 
             double kmWith1Cm = (encScale / 100000.0);
             double kmWith1Px = kmWith1Cm / _dpcX;
@@ -1267,7 +1314,6 @@ namespace RadarMonitor
             radarInfo.MapHeightOffCenter = mapHeightOffCenter;
 
             OpenGlEchoOverlay.CreateUpdateRadar(radarInfo);
-
         }
 
         public void CreateUpdateRadarInfoBase(int radarId, RadarSetting setting)
@@ -1454,5 +1500,33 @@ namespace RadarMonitor
             }
         }
         #endregion
+
+        private void RbNm_OnChecked(object sender, RoutedEventArgs e)
+        {
+            var viewModel = GetViewModel();
+            if (viewModel == null || !viewModel.IsEncLoaded)
+            {
+                return;
+            }
+
+            _showInKm = false;
+
+            DrawScaleLine();
+            RedrawRadarRings(viewModel);
+        }
+
+        private void RbKm_OnChecked(object sender, RoutedEventArgs e)
+        {
+            var viewModel = GetViewModel();
+            if (viewModel == null || !viewModel.IsEncLoaded)
+            {
+                return;
+            }
+
+            _showInKm = true;
+
+            DrawScaleLine();
+            RedrawRadarRings(viewModel);
+        }
     }
 }

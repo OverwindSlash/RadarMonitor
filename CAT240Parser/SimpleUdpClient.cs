@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace CAT240Parser
 {
@@ -40,12 +39,12 @@ namespace CAT240Parser
             ThreadPool.SetMinThreads(1, 1);
             ThreadPool.SetMaxThreads(coreCount, coreCount);
 
+            OnUdpConnected?.Invoke(this, _clientId, _udpDestIp, _port);
+
+            _isRunning = true;
+
             ThreadPool.QueueUserWorkItem(new WaitCallback(async (obj) =>
             {
-                OnUdpConnected?.Invoke(this, _clientId, _udpDestIp, _port);
-
-                _isRunning = true;
-
                 while (_isRunning)
                 {
                     try
@@ -69,6 +68,7 @@ namespace CAT240Parser
         {
             _isRunning = false;
             OnUdpDisconnected?.Invoke(this, _clientId, _udpDestIp, _port);
+            Close();
         }
 
         public void DisconnectAndStop()

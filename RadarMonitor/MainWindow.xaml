@@ -118,6 +118,11 @@
                                           Click="CbRadar5Rings_OnClick" Margin="0, 0, 10, 0"></CheckBox>
                             </StackPanel>
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="30, 2, 10, 0" VerticalAlignment="Center">
+                            <Label Content="Distance Unit:"></Label>
+                            <RadioButton Name="RbNm" Content="NM" GroupName="NmKm" IsChecked="True" Margin="5, 5, 0, 0" Checked="RbNm_OnChecked"></RadioButton>
+                            <RadioButton Name="RbKm" Content="KM" GroupName="NmKm" Margin="10, 5, 0, 0" Checked="RbKm_OnChecked"></RadioButton>
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>

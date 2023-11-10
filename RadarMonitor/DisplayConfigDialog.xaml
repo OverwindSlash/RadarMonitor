@@ -6,9 +6,9 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:RadarMonitor"
         mc:Ignorable="d"
-        Title="Radar Display Config" Height="350" Width="280" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="Radar Display Config" Height="370" Width="340" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
-        <GroupBox Header="Processed Radar">
+        <GroupBox Name="GbCurrentRadar" Header="Radar">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
@@ -22,6 +22,7 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Content="Scan Line" Margin="10, 5, 10, 5"></Label>
@@ -34,13 +35,26 @@
                          Text="{Binding FadingInterval}" IsEnabled="{Binding IsFadingEnabled}"></TextBox>
                 <RadioButton GroupName="Fading" Grid.Row="4" Grid.Column="0" Content="Replace" Margin="30, 5, 10, 10" IsChecked="True"></RadioButton>
                 <Label Grid.Row="5" Grid.Column="0" Content="Echo Threshold" Margin="10, 5, 10, 5"></Label>
-                <Slider Grid.Row="5" Grid.Column="1" Margin="10, 5, 10, 5" VerticalAlignment="Center"
+                <Slider Name="SldThreshold" Grid.Row="5" Grid.Column="1" Margin="10, 5, 10, 5" VerticalAlignment="Center"
                         TickPlacement="BottomRight" Minimum ="0" Maximum="1" Value="{Binding EchoThreshold}"></Slider>
+                <Border Grid.Row="5" Grid.Column="2">
+                    <TextBox Margin="10, 5, 10, 5" Width="40" HorizontalAlignment="Left" VerticalContentAlignment="Center" 
+                             Text="{Binding ElementName=SldThreshold, Path=Value, StringFormat={}{0:F2}}"></TextBox>
+                </Border>
                 <Label Grid.Row="6" Grid.Column="0" Content="Echo Radius" Margin="10, 5, 10, 5"></Label>
-                <Slider Grid.Row="6" Grid.Column="1" Margin="10, 5, 10, 30" VerticalAlignment="Center"
+                <Slider Name="SldRadius" Grid.Row="6" Grid.Column="1" Margin="10, 5, 10, 5" VerticalAlignment="Center"
                         TickPlacement="BottomRight" Minimum ="0" Maximum="{Binding EchoMaxDistance}" Value="{Binding EchoRadius}"></Slider>
-                <Button Name="BtnOk" Grid.Row="7" Grid.Column="0" Width="60" Content="OK" HorizontalAlignment="Center" Click="BtnOk_OnClick"></Button>
-                <Button Name="BtnCancel" Grid.Row="7" Grid.Column="1" Width="60" Content="Cancel" HorizontalAlignment="Center" Click="BtnCancel_OnClick"></Button>
+                <Border Grid.Row="6" Grid.Column="2">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox Margin="10, 5, 10, 5" Width="40" HorizontalAlignment="Left" VerticalContentAlignment="Center"
+                                 Text="{Binding ElementName=SldRadius, Path=Value, StringFormat={}{0:F2}}"></TextBox>
+                        <Label Name="LblDistanceUnit" Content="KM" VerticalContentAlignment="Center"></Label>
+                    </StackPanel>
+                </Border>
+                <StackPanel Grid.Row="7" Grid.ColumnSpan="3" Margin="0, 30, 0 , 0" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Name="BtnOk" Width="60" Content="OK" HorizontalAlignment="Center" Click="BtnOk_OnClick"></Button>
+                    <Button Name="BtnCancel" Width="60" Content="Cancel" Margin="80, 0, 0, 0" HorizontalAlignment="Center" Click="BtnCancel_OnClick"></Button>
+                </StackPanel>
             </Grid>
         </GroupBox>
     </Grid>

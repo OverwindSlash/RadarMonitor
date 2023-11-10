@@ -514,7 +514,7 @@ namespace RadarMonitor.ViewModel
             //client.Connect();
             client.Listen();
 
-            _udpClients.Add(client);
+            _udpClients[radarId] = client;
         }
 
         public void StopCaptureCat240NetworkPackage(int radarId)
@@ -523,6 +523,8 @@ namespace RadarMonitor.ViewModel
             {
                 return;
             }
+
+            _lastCat240DataItems[radarId] = null;
 
             var client = _udpClients[radarId];
             if (client != null)
@@ -545,7 +547,7 @@ namespace RadarMonitor.ViewModel
 
         private void OnUdpConnected(object sender, int clientId, string ip, int port)
         {
-            // 这里只是 UDP 端口连接，不是雷达连接，所以不用改变雷达状态
+            SetRadarConnectionStatus(clientId, true);
             OnRadarConnectionStatusChanged?.Invoke(this, clientId, ip, port, RadarConnectionStatus.Connected);
         }
 
