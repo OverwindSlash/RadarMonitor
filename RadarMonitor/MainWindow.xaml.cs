@@ -1203,7 +1203,7 @@ namespace RadarMonitor
 
             Brush ringBrush = new SolidColorBrush(Colors.Chartreuse);   // 距离环的颜色
             DoubleCollection dashArray = new DoubleCollection(new double[] { 2, 4 });
-            int ringFontSize = 12;
+            int ringFontSize = 10;
 
             // 定义雷达回波的圆心坐标
             var point = BaseMapView.LocationToScreen(new MapPoint(longitude, latitude, SpatialReferences.Wgs84));
@@ -1261,22 +1261,43 @@ namespace RadarMonitor
                     continue;   // 不显示 0KM
                 }
 
-                TextBlock distanceText = new TextBlock();
+                // 右标尺环文字
+                TextBlock distanceTextRight = new TextBlock();
                 if (_showInKm)
                 {
-                    distanceText.Text = radiusInKm.ToString("F1") + "KM";
+                    distanceTextRight.Text = radiusInKm.ToString("F1") + "KM";
                 }
                 else
                 {
-                    distanceText.Text = radiusInNm.ToString("F1") + "NM";
+                    distanceTextRight.Text = radiusInNm.ToString("F1") + "NM";
                 }
                 
-                distanceText.Foreground = ringBrush;
-                distanceText.FontSize = ringFontSize;
+                distanceTextRight.Foreground = ringBrush;
+                distanceTextRight.FontSize = ringFontSize;
 
-                Canvas.SetLeft(distanceText, radarX + radius + 2);
-                Canvas.SetTop(distanceText, radarY);
-                ringsOverlay.Children.Add(distanceText);
+                Canvas.SetLeft(distanceTextRight, radarX + radius + 2);
+                Canvas.SetTop(distanceTextRight, radarY);
+
+                ringsOverlay.Children.Add(distanceTextRight);
+
+                // 左标尺环文字
+                TextBlock distanceTextLeft = new TextBlock();
+                if (_showInKm)
+                {
+                    distanceTextLeft.Text = radiusInKm.ToString("F1") + "KM";
+                }
+                else
+                {
+                    distanceTextLeft.Text = radiusInNm.ToString("F1") + "NM";
+                }
+
+                distanceTextLeft.Foreground = ringBrush;
+                distanceTextLeft.FontSize = ringFontSize;
+
+                Canvas.SetLeft(distanceTextLeft, radarX - radius - 40);
+                Canvas.SetTop(distanceTextLeft, radarY);
+
+                ringsOverlay.Children.Add(distanceTextLeft);
             }
         }
 
