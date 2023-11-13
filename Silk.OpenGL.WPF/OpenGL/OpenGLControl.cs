@@ -4,6 +4,7 @@ using Silk.NET.WGL.Extensions.NV;
 using Silk.WPF.Common;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
@@ -40,8 +41,9 @@ public class OpenGLControl : OpenGLControlBase<Framebuffer>
         }
     }
 
-    public override void OnSessionChanged()
+    public async override void OnSessionChanged()
     {
+        await Task.Delay(1000);
         if (_context != null)
         {
             Framebuffer?.Dispose();
