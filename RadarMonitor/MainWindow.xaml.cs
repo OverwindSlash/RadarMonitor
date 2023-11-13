@@ -1551,5 +1551,12 @@ namespace RadarMonitor
             DrawScaleLine();
             RedrawRadarRings(viewModel);
         }
+
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+            Trace.TraceInformation("OnActivated");
+            OpenGlEchoOverlay.OnSessionChanged();
+        }
     }
 }

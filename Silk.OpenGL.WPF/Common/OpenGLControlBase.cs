@@ -54,7 +54,7 @@ public abstract class OpenGLControlBase<TFrame> : Control where TFrame : Framebu
 
             OnStart();
 
-            SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
+            //SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
         }
     }
 
