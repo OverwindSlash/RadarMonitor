@@ -1210,13 +1210,15 @@ namespace RadarMonitor
             double radarX = point.X;
             double radarY = point.Y;
 
-            //double maxDistance = Math.Max(ringsOverlay.ActualWidth, ringsOverlay.ActualHeight) / 2;
-
             var viewModel = GetViewModel();
             var radarSetting = viewModel.RadarSettings[radarId];
             double kmWith1Cm = (viewModel.EncScale / 100000.0);
             double kmWith1Px = kmWith1Cm / _dpcX;
             double maxDistance = 1.2 * radarSetting.RadarMaxDistance / kmWith1Px;
+
+            double screenMaxDistance = Math.Max(ringsOverlay.ActualWidth, ringsOverlay.ActualHeight) / 2;
+
+            maxDistance = Math.Min(maxDistance, screenMaxDistance);
 
             // 绘制雷达点
             double radarPointRadius = 1.0;
