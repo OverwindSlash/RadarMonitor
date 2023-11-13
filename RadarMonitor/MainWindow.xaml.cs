@@ -644,14 +644,20 @@ namespace RadarMonitor
             if (displayEncCheckBox.IsChecked.Value)
             {
                 BaseMapView.Visibility = Visibility.Visible;
-                // ScaleOverlay.Visibility = Visibility.Visible;
-                OpenGlEchoOverlay.ControlOpacity = 0.8;
+                ScaleOverlay.Visibility = Visibility.Visible;
+                OpenGlEchoOverlay.ControlOpacity = 0.7;
             }
             else
             {
-                BaseMapView.Visibility = Visibility.Hidden;
-                // ScaleOverlay.Visibility = Visibility.Hidden;
-                OpenGlEchoOverlay.ControlOpacity = 1.0;
+                if (GetViewModel().IsRadarConnected)
+                {
+                    OpenGlEchoOverlay.ControlOpacity = 1.0;
+                }
+                else
+                {
+                    BaseMapView.Visibility = Visibility.Hidden;
+                    ScaleOverlay.Visibility = Visibility.Hidden;
+                }
             }
         }
 
