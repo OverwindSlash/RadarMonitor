@@ -645,7 +645,7 @@ namespace RadarMonitor
             {
                 BaseMapView.Visibility = Visibility.Visible;
                 ScaleOverlay.Visibility = Visibility.Visible;
-                OpenGlEchoOverlay.ControlOpacity = 0.7;
+                OpenGlEchoOverlay.ControlOpacity = 0.8;
             }
             else
             {

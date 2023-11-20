@@ -250,6 +250,10 @@ public partial class RadarScene : UserControl
     {
         
         var radar = _radarModels[e.RadarID];
+        if (!radar.IsDisplay)
+        {
+            return;
+        }
 
         if (radar != null)
         {

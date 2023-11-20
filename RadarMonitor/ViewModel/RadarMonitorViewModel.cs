@@ -582,6 +582,10 @@ namespace RadarMonitor.ViewModel
             SetRadarConnectionStatus(radarId, true);
 
             // 同一雷达每个数据包基本不变的信息
+            if (dataItems.ValidCellsInDataBlock <1024)
+            {
+                return;
+            }
             if (dataItems.IsSpecChanged(_lastCat240DataItems[radarId]))
             {
                 RadarSettings[radarId].RadarMaxDistance =
