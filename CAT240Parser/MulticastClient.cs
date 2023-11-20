@@ -37,7 +37,7 @@ namespace CAT240Parser
         public void DisconnectAndStop()
         {
             _stop = true;
-            //LeaveMulticastGroup(Multicast);
+            LeaveMulticastGroup(Multicast);
             Disconnect();
             while (IsConnected)
                 Thread.Yield();
@@ -50,7 +50,7 @@ namespace CAT240Parser
             OnUdpConnected?.Invoke(this, _clientId, Address, Port);
 
             // Join UDP multicast group
-            //JoinMulticastGroup(Multicast);
+            JoinMulticastGroup(Multicast);
 
             // Start receive datagrams
             ReceiveAsync();

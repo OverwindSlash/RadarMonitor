@@ -13,8 +13,9 @@ radarSettings:
    radarOrientation: 55.0
    radarScale: 275000
    radarMaxDistance: 60
-   radarIpAddress: 127.0.0.1
+   radarIpAddress: 234.3.1.1
    radarPort: 20101
+   localIp: 127.0.0.1
    isRadarEnabled: true
    isRingsDisplayed: true
    isEchoDisplayed: true
@@ -26,8 +27,9 @@ radarSettings:
    radarOrientation: -85.0
    radarScale: 20000
    radarMaxDistance: 9
-   radarIpAddress: 127.0.0.1
+   radarIpAddress: 234.3.1.4
    radarPort: 20102
+   localIp: 127.0.0.1
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
@@ -39,8 +41,9 @@ radarSettings:
    radarOrientation: -85.0
    radarScale: 68750
    radarMaxDistance: 9
-   radarIpAddress: 127.0.0.1
+   radarIpAddress: 234.3.1.5
    radarPort: 20103
+   localIp: 127.0.0.1
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
@@ -52,8 +55,9 @@ radarSettings:
    radarOrientation: -87
    radarScale: 160000
    radarMaxDistance: 9
-   radarIpAddress: 127.0.0.1
+   radarIpAddress: 234.3.1.6
    radarPort: 20104
+   localIp: 127.0.0.1
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
@@ -65,8 +69,9 @@ radarSettings:
    radarOrientation: -91.0
    radarScale: 30000
    radarMaxDistance: 9
-   radarIpAddress: 127.0.0.1
+   radarIpAddress: 234.3.1.7
    radarPort: 20106
+   localIp: 127.0.0.1
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true

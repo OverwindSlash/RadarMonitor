@@ -460,7 +460,7 @@ namespace RadarMonitor
             for (int radarId = 0; radarId < RadarCount; radarId++)
             {
                 var radarSetting = viewModel.RadarSettings[radarId];
-                viewModel.CaptureCat240NetworkPackage(radarId, radarSetting.RadarIpAddress, radarSetting.RadarPort);
+                viewModel.CaptureCat240NetworkPackage(radarId, radarSetting.RadarIpAddress, radarSetting.RadarPort, radarSetting.LocalIp);
             }
 
             OpenGlEchoOverlay.OnSessionChanged();

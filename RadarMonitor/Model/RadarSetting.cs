@@ -16,6 +16,8 @@ namespace RadarMonitor.Model
         public string RadarIpAddress { get; set; } = "127.0.0.1";
         public int RadarPort { get; set; } = 20101;
 
+        public string LocalIp { get; set; } = "127.0.0.1";
+
         public bool IsRadarEnabled { get; set; } = false;
 
         [YamlIgnore]
