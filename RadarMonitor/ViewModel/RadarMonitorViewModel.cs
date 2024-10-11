@@ -203,6 +203,11 @@ namespace RadarMonitor.ViewModel
             }
         }
 
+        public string Radar1Name
+        {
+            get => _radarSettings[0].RadarName;
+        }
+
         public bool IsRadar1RingsDisplayed
         {
             get => _radarSettings[0].IsRingsDisplayed;
@@ -243,6 +248,11 @@ namespace RadarMonitor.ViewModel
                 OnPropertyChanged("IsRadar2Connected");
                 OnPropertyChanged("IsRadarConnected");
             }
+        }
+
+        public string Radar2Name
+        {
+            get => _radarSettings[1].RadarName;
         }
 
         public bool IsRadar2RingsDisplayed
@@ -287,6 +297,11 @@ namespace RadarMonitor.ViewModel
             }
         }
 
+        public string Radar3Name
+        {
+            get => _radarSettings[2].RadarName;
+        }
+
         public bool IsRadar3RingsDisplayed
         {
             get => _radarSettings[2].IsRingsDisplayed;
@@ -329,6 +344,11 @@ namespace RadarMonitor.ViewModel
             }
         }
 
+        public string Radar4Name
+        {
+            get => _radarSettings[3].RadarName;
+        }
+
         public bool IsRadar4RingsDisplayed
         {
             get => _radarSettings[3].IsRingsDisplayed;
@@ -369,6 +389,11 @@ namespace RadarMonitor.ViewModel
                 OnPropertyChanged("IsRadar5Connected");
                 OnPropertyChanged("IsRadarConnected");
             }
+        }
+
+        public string Radar5Name
+        {
+            get => _radarSettings[4].RadarName;
         }
 
         public bool IsRadar5RingsDisplayed
@@ -582,7 +607,7 @@ namespace RadarMonitor.ViewModel
             SetRadarConnectionStatus(radarId, true);
 
             // 同一雷达每个数据包基本不变的信息
-            if (dataItems.ValidCellsInDataBlock <1024)
+            if (dataItems.ValidCellsInDataBlock < 1000)
             {
                 return;
             }

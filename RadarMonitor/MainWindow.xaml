@@ -50,7 +50,7 @@
                                   Click="DisplayOpenGlEcho_OnClick" Margin="0, 0, 20, 0" VerticalAlignment="Center"></CheckBox>
                         <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar1Connected}">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Name="TbRadar1" Text="Radar1"></TextBlock>
+                                <TextBlock Name="TbRadar1" Text="{Binding Path=Radar1Name}"></TextBlock>
                                 <Button Name="BtnRadar1Config" Margin="5, 0, 0, 0" Click="BtnRadar1Config_OnClick">
                                     <Image Source="Assets/Settings.png" Width="10" Height="10"></Image>
                                 </Button>
@@ -64,7 +64,7 @@
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar2Connected}">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Name="TbRadar2" Text="Radar2" HorizontalAlignment="Center"></TextBlock>
+                                <TextBlock Name="TbRadar2" Text="{Binding Path=Radar2Name}" HorizontalAlignment="Center"></TextBlock>
                                 <Button Name="BtnRadar2Config" Margin="5, 0, 0, 0" Click="BtnRadar2Config_OnClick">
                                     <Image Source="Assets/Settings.png" Width="10" Height="10"></Image>
                                 </Button>
@@ -78,7 +78,7 @@
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar3Connected}">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Name="TbRadar3" Text="Radar3" HorizontalAlignment="Center"></TextBlock>
+                                <TextBlock Name="TbRadar3" Text="{Binding Path=Radar3Name}" HorizontalAlignment="Center"></TextBlock>
                                 <Button Name="BtnRadar3Config" Margin="5, 0, 0, 0" Click="BtnRadar3Config_OnClick">
                                     <Image Source="Assets/Settings.png" Width="10" Height="10"></Image>
                                 </Button>
@@ -92,7 +92,7 @@
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar4Connected}">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Name="TbRadar4" Text="Radar4" HorizontalAlignment="Center"></TextBlock>
+                                <TextBlock Name="TbRadar4" Text="{Binding Path=Radar4Name}" HorizontalAlignment="Center"></TextBlock>
                                 <Button Name="BtnRadar4Config" Margin="5, 0, 0, 0" Click="BtnRadar4Config_OnClick">
                                     <Image Source="Assets/Settings.png" Width="10" Height="10"></Image>
                                 </Button>
@@ -106,7 +106,7 @@
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="0, 0, 20, 0" IsEnabled="{Binding Path=IsRadar5Connected}">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Name="TbRadar5" Text="Radar5" HorizontalAlignment="Center"></TextBlock>
+                                <TextBlock Name="TbRadar5" Text="{Binding Path=Radar5Name}" HorizontalAlignment="Center"></TextBlock>
                                 <Button Name="BtnRadar5Config" Margin="5, 0, 0, 0" Click="BtnRadar5Config_OnClick">
                                     <Image Source="Assets/Settings.png" Width="10" Height="10"></Image>
                                 </Button>
@@ -234,11 +234,11 @@
                 </GroupBox>
                 <GroupBox Header="Radar Locations" Width="Auto">
                     <StackPanel Orientation="Vertical">
-                        <Button Name="BtnPresetLocation1" Content="Radar 1" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation1_OnClick"></Button>
-                        <Button Name="BtnPresetLocation2" Content="Radar 2" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation2_OnClick"></Button>
-                        <Button Name="BtnPresetLocation3" Content="Radar 3" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation3_OnClick"></Button>
-                        <Button Name="BtnPresetLocation4" Content="Radar 4" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation4_OnClick"></Button>
-                        <Button Name="BtnPresetLocation5" Content="Radar 5" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation5_OnClick"></Button>
+                        <Button Name="BtnPresetLocation1" Content="{Binding Path=Radar1Name}" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation1_OnClick"></Button>
+                        <Button Name="BtnPresetLocation2" Content="{Binding Path=Radar2Name}" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation2_OnClick"></Button>
+                        <Button Name="BtnPresetLocation3" Content="{Binding Path=Radar3Name}" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation3_OnClick"></Button>
+                        <Button Name="BtnPresetLocation4" Content="{Binding Path=Radar4Name}" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation4_OnClick"></Button>
+                        <Button Name="BtnPresetLocation5" Content="{Binding Path=Radar5Name}" Margin="0, 3, 0, 3" IsEnabled="{Binding Path=IsPresetLocationsLoaded}" Click="BtnPresetLocation5_OnClick"></Button>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Header="Cursor" Width="Auto">

@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using UdpClient = NetCoreServer.UdpClient;
@@ -49,8 +48,14 @@ namespace CAT240Parser
 
             OnUdpConnected?.Invoke(this, _clientId, Address, Port);
 
-            // Join UDP multicast group
-            JoinMulticastGroup(Multicast);
+            var ips = Multicast.Split('.');
+            var ipPart1 = int.Parse(ips[0]);
+
+            if (ipPart1 >= 224 & ipPart1 <= 239)
+            {
+                // Join UDP multicast group
+                JoinMulticastGroup(Multicast);
+            }
 
             // Start receive datagrams
             ReceiveAsync();

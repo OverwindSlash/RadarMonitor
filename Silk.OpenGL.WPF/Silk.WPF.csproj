@@ -11,9 +11,13 @@
 
 	<ItemGroup>
 	  <Compile Remove="OpenGL\Common\**" />
+	  <Compile Remove="Shaders\**" />
 	  <EmbeddedResource Remove="OpenGL\Common\**" />
+	  <EmbeddedResource Remove="Shaders\**" />
 	  <None Remove="OpenGL\Common\**" />
+	  <None Remove="Shaders\**" />
 	  <Page Remove="OpenGL\Common\**" />
+	  <Page Remove="Shaders\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -27,10 +31,6 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\CAT240Parser\CAT240Parser.csproj" />
 	  <ProjectReference Include="..\OpenGL\OpenGLSharp.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Shaders\" />
 	</ItemGroup>
 	
 </Project>

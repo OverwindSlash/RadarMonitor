@@ -105,6 +105,10 @@ namespace Silk.WPF.OpenGL
             //Array.Copy( e.DataArray.ToArray(), 0,  DataArray, idx* (RealCells+1),  e.DataArray.Count);
             lock (Lock)
             {
+                if (DataList.Count > RadarConfig.MAX_UPDATING)
+                {
+                    return;
+                }
                 DataList.Add(e);
             }
         }

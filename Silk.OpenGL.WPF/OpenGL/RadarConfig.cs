@@ -12,5 +12,6 @@ namespace Silk.WPF.OpenGL
         public const int CELLS = 6000;
         public const float AZI_SPAN = 65536 / (float)SECTIONS;
         public const int HEAD = 1;
+        public const int MAX_UPDATING = 256;
     }
 }

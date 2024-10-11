@@ -15,6 +15,7 @@ radarSettings:
    radarMaxDistance: 60
    radarIpAddress: 127.0.0.1
    radarPort: 20101
+   localIp: 0.0.0.0
    isRadarEnabled: true
    isRingsDisplayed: true
    isEchoDisplayed: true
@@ -28,6 +29,7 @@ radarSettings:
    radarMaxDistance: 9
    radarIpAddress: 127.0.0.1
    radarPort: 20102
+   localIp: 0.0.0.0
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
@@ -41,6 +43,7 @@ radarSettings:
    radarMaxDistance: 9
    radarIpAddress: 127.0.0.1
    radarPort: 20103
+   localIp: 0.0.0.0
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
@@ -54,6 +57,7 @@ radarSettings:
    radarMaxDistance: 9
    radarIpAddress: 127.0.0.1
    radarPort: 20104
+   localIp: 0.0.0.0
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
@@ -67,6 +71,7 @@ radarSettings:
    radarMaxDistance: 9
    radarIpAddress: 127.0.0.1
    radarPort: 20106
+   localIp: 0.0.0.0
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true

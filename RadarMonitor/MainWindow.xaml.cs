@@ -399,7 +399,7 @@ namespace RadarMonitor
             BaseMapView.Map.OperationalLayers.Add(encLayer);
 
             Envelope fullExtent = GeometryEngine.CombineExtents(dataSetExtents);
-            await BaseMapView.SetViewpointAsync(new Viewpoint(fullExtent));
+            //await BaseMapView.SetViewpointAsync(new Viewpoint(fullExtent));
 
             // 记录海图类型及Uri
             GetViewModel().RecordEncTypeAndUri("Cell", cellFile);
@@ -1321,10 +1321,12 @@ namespace RadarMonitor
             double kmWith1Px = kmWith1Cm / _dpcX;
             double kmWith1Lon = 111.32;
 
+            double adjustRatio = 1.32;   // magic number
+
             int uiWidth = (int)OpenGlEchoOverlay.ActualWidth;
             int uiHeight = (int)OpenGlEchoOverlay.ActualHeight;
-            float mapWidth = (float)(uiWidth * kmWith1Px);
-            float mapHeight = (float)(uiHeight * kmWith1Px);
+            float mapWidth = (float)(uiWidth * kmWith1Px * adjustRatio);
+            float mapHeight = (float)(uiHeight * kmWith1Px * adjustRatio);
 
             Viewpoint center = BaseMapView.GetCurrentViewpoint(ViewpointType.CenterAndScale);
             MapPoint centerPoint = center.TargetGeometry as MapPoint;
@@ -1332,8 +1334,8 @@ namespace RadarMonitor
             double xOffset = radarInfo.Longitude - centerPoint.X;
             double yOffset = radarInfo.Latitude - centerPoint.Y;
 
-            float mapWidthOffCenter = (float)(xOffset * kmWith1Lon);
-            float mapHeightOffCenter = (float)(yOffset * kmWith1Lon);
+            float mapWidthOffCenter = (float)(xOffset * kmWith1Lon * adjustRatio);
+            float mapHeightOffCenter = (float)(yOffset * kmWith1Lon * adjustRatio);
 
             radarInfo.UIWidth = uiWidth;
             radarInfo.UIHeight = uiHeight;
