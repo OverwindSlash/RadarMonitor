@@ -10,12 +10,14 @@ namespace CAT240Parser
     public delegate void UdpDisconnectedEventHandler(object sender, int clientId, string ip, int port);
     public delegate void UdpErrorEventHandler(object sender, int clientId, string ip, int port);
 
-    public class MulticastClient : UdpClient
+    public class Cat240UdpClient : UdpClient
     {
-        public string Multicast;
+        public string DestinationIp;
 
         private int _clientId;
         private bool _stop;
+
+        private bool _isMultiCast;
 
         // 定义事件
         public event UdpConnectedEventHandler OnUdpConnected;
@@ -23,7 +25,7 @@ namespace CAT240Parser
         public event UdpDisconnectedEventHandler OnUdpDisconnected;
         public event UdpErrorEventHandler OnUdpError;
 
-        public MulticastClient(int clientId, string address, int port) 
+        public Cat240UdpClient(int clientId, string address, int port) 
             : base(address, port) 
         {
             int coreCount = Environment.ProcessorCount;
@@ -36,7 +38,11 @@ namespace CAT240Parser
         public void DisconnectAndStop()
         {
             _stop = true;
-            LeaveMulticastGroup(Multicast);
+            if (_isMultiCast)
+            {
+                LeaveMulticastGroup(DestinationIp);
+            }
+            
             Disconnect();
             while (IsConnected)
                 Thread.Yield();
@@ -48,13 +54,14 @@ namespace CAT240Parser
 
             OnUdpConnected?.Invoke(this, _clientId, Address, Port);
 
-            var ips = Multicast.Split('.');
+            var ips = DestinationIp.Split('.');
             var ipPart1 = int.Parse(ips[0]);
 
             if (ipPart1 >= 224 & ipPart1 <= 239)
             {
+                _isMultiCast = true;
                 // Join UDP multicast group
-                JoinMulticastGroup(Multicast);
+                JoinMulticastGroup(DestinationIp);
             }
 
             // Start receive datagrams

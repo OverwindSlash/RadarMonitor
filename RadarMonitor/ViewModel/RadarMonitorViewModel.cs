@@ -486,7 +486,7 @@ namespace RadarMonitor.ViewModel
         #endregion
 
         // UDP Clients
-        private List<MulticastClient> _udpClients = new()
+        private List<Cat240UdpClient> _udpClients = new()
         {
             null, null, null, null, null
         };
@@ -528,10 +528,10 @@ namespace RadarMonitor.ViewModel
 
             StopCaptureCat240NetworkPackage(radarId);
 
-            var client = new MulticastClient(radarId, localIp, radarPort);
+            var client = new Cat240UdpClient(radarId, localIp, radarPort);
             //var client = new SimpleUdpClient(radarId, radarIp, radarPort);
             client.SetupMulticast(true);
-            client.Multicast = radarIp;
+            client.DestinationIp = radarIp;
             client.OnUdpConnected += OnUdpConnected;
             client.OnCat240Received += OnReceivedCat240DataBlock;
             client.OnUdpDisconnected += OnUdpDisconnected;
