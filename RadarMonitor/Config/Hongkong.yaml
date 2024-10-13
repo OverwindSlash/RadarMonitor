@@ -1,6 +1,6 @@
 ﻿encSetting:
-   encType: Cell
-   encUri: Encs\Hongkong-New\C23C302W.000
+   encType: Dir
+   encUri: Encs\Hongkong-New
    encLongitude: 113.912527
    encLatitude: 22.312984
    encScale: 50000
@@ -8,42 +8,45 @@
 radarSettings:
 -
    radarName: SMR-1
-   radarLongitude: 113.927940877
-   radarLatitude: 22.302170751
-   radarOrientation: -89.0
+   radarLongitude: 113.928940877
+   radarLatitude: 22.302870751
+   radarOrientation: -89.5
    radarScale: 40000
    radarMaxDistance: 60
    radarIpAddress: 234.3.1.1
    radarPort: 39011
    localIp: 0.0.0.0
+   displayScaleRatio: 1.43
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: true
 -
    radarName: SMR-4
-   radarLongitude: 113.906627
-   radarLatitude: 22.304826
-   radarOrientation: -89.0
+   radarLongitude: 113.907027
+   radarLatitude: 22.305626
+   radarOrientation: -89
    radarScale: 40000
    radarMaxDistance: 9
    radarIpAddress: 234.3.1.4
-   radarPort: 30000
+   radarPort: 39014
    localIp: 0.0.0.0
+   displayScaleRatio: 1.4
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: true
 -
    radarName: SMR-7
-   radarLongitude: 113.9209078
-   radarLatitude: 22.31380000
-   radarOrientation: -88.5
+   radarLongitude: 113.9205078
+   radarLatitude: 22.3141000
+   radarOrientation: -89.5
    radarScale: 40000
    radarMaxDistance: 9
    radarIpAddress: 234.3.1.7
    radarPort: 39017
    localIp: 0.0.0.0
+   displayScaleRatio: 1.38
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
@@ -52,26 +55,28 @@ radarSettings:
    radarName: SMR-6
    radarLongitude: 113.905038
    radarLatitude: 22.3246797
-   radarOrientation: -88.8
+   radarOrientation: -88.7
    radarScale: 40000
    radarMaxDistance: 9
    radarIpAddress: 234.3.1.6
    radarPort: 39016
    localIp: 0.0.0.0
+   displayScaleRatio: 1.33
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true
    isOpenGlEchoDisplayed: true
 -
    radarName: SMR-5
-   radarLongitude: 113.920300
-   radarLatitude: 22.330323
-   radarOrientation: -89.0
+   radarLongitude: 113.920000
+   radarLatitude: 22.330523
+   radarOrientation: -89.5
    radarScale: 40000
    radarMaxDistance: 9
    radarIpAddress: 234.3.1.5
    radarPort: 39015
    localIp: 0.0.0.0
+   displayScaleRatio: 1.38
    isRadarEnabled: true
    isRingsDisplayed: false
    isEchoDisplayed: true

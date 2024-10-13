@@ -145,7 +145,7 @@ namespace RadarMonitor
 
         private void InitializeMapView()
         {
-            BaseMapView.Map = new Map();
+            BaseMapView.Map = new Map(SpatialReferences.Wgs84);
             BaseMapView.IsAttributionTextVisible = false;
 
             #region Enc configuration
@@ -164,7 +164,7 @@ namespace RadarMonitor
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.DepthContours = _encDetailDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.DryingLine = _encDetailDisplayFlag;
 
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Lights = true;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Lights = false;
 
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.MagneticVariation = _encDetailDisplayFlag;
 
@@ -173,7 +173,7 @@ namespace RadarMonitor
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ProhibitedAndRestrictedAreas = _encDetailDisplayFlag;
 
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.Seabed = _encDetailDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ShipsRoutingSystemsAndFerryRoutes = true;
+            EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.ShipsRoutingSystemsAndFerryRoutes = false;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.SpotSoundings = _encDetailDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.StandardMiscellaneous = _encDetailDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.ViewingGroupSettings.SubmarineCablesAndPipelines = _encDetailDisplayFlag;
@@ -182,7 +182,7 @@ namespace RadarMonitor
 
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.BerthNumber = _encDetailDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.CurrentVelocity = _encDetailDisplayFlag;
-            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.GeographicNames = true;
+            EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.GeographicNames = false;
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.HeightOfIsletOrLandFeature = _encDetailDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.ImportantText = _encDetailDisplayFlag;
             EncEnvironmentSettings.Default.DisplaySettings.TextGroupVisibilitySettings.LightDescription = _encDetailDisplayFlag;
@@ -453,7 +453,7 @@ namespace RadarMonitor
 
                 // CreateUpdateRadar
                 CreateUpdateRadarInfoBase(i, radarSetting);
-                TransformOpenGlRadarEcho(i, viewModel.EncScale);
+                TransformOpenGlRadarEcho(i, radarSetting.DisplayScaleRatio, viewModel.EncScale);
             }
 
             // 抓取 CAT240 网络包
@@ -530,7 +530,7 @@ namespace RadarMonitor
                     radarInfo.RealCells = (int)cat240spec.ValidCellsInDataBlock;
                     radarInfo.RadarMaxDistance = cat240spec.MaxDistance;
 
-                    TransformOpenGlRadarEcho(radarId, viewModel.EncScale);
+                    TransformOpenGlRadarEcho(radarId, radarSetting.DisplayScaleRatio, viewModel.EncScale);
                     RedrawRadarRings(viewModel);
                 });
             }
@@ -616,7 +616,7 @@ namespace RadarMonitor
             {
                 //TransformOpenGlRadarEcho(radarSetting.RadarLongitude, radarSetting.RadarLatitude,
                 //    radarSetting.RadarOrientation, radarSetting.RadarMaxDistance, encScale);
-                TransformOpenGlRadarEcho(radarId, encScale);
+                TransformOpenGlRadarEcho(radarId, radarSetting.DisplayScaleRatio, encScale);
             }
         }
 
@@ -1309,7 +1309,7 @@ namespace RadarMonitor
             }
         }
 
-        private void TransformOpenGlRadarEcho(int radarId, double encScale)
+        private void TransformOpenGlRadarEcho(int radarId, double displayRatio, double encScale)
         {
             RadarInfoModel radarInfo = _radarInfos[radarId];
             if ((radarInfo.Longitude == 0) || (radarInfo.Latitude == 0) || (encScale == 0))
@@ -1321,7 +1321,8 @@ namespace RadarMonitor
             double kmWith1Px = kmWith1Cm / _dpcX;
             double kmWith1Lon = 111.32;
 
-            double adjustRatio = 1.32;   // magic number
+            //double adjustRatio = 1.4;   // magic number
+            double adjustRatio = displayRatio;
 
             int uiWidth = (int)OpenGlEchoOverlay.ActualWidth;
             int uiHeight = (int)OpenGlEchoOverlay.ActualHeight;

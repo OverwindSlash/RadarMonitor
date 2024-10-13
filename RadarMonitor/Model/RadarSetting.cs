@@ -18,6 +18,8 @@ namespace RadarMonitor.Model
 
         public string LocalIp { get; set; } = "127.0.0.1";
 
+        public double DisplayScaleRatio { get; set; }
+
         public bool IsRadarEnabled { get; set; } = false;
 
         [YamlIgnore]
